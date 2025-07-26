@@ -7,7 +7,7 @@ const GlobalMessageSchema = new mongoose.Schema(
       required: true,
     },
     senderImage: {
-      type: Image,
+      type: string,
     },
     senderName: {
       type: String,

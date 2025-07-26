@@ -15,13 +15,35 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    imageUrl: {
+    image: {
       type: String,
       default: "",
     },
     about: {
       type: String,
       default: "",
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    lastActive: {
+      type: Date,
+      default: Date.now,
+    },
+    verifyToken: {
+      type: String,
+      required: true,
+    },
+    verifyTokenExpiresAt: {
+      type: Date,
+    },
+    resetToken: {
+      type: String,
+      required: true,
+    },
+    resetTokenExpiresAt: {
+      type: Date,
     },
   },
   { timestamps: true }
