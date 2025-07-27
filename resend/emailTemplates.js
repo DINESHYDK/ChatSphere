@@ -1,4 +1,3 @@
-const verificationCode = Math.random();
 export const VERIFICATION_EMAIL_TEMPLATE = () => {
   return;
   `
