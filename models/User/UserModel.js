@@ -1,10 +1,15 @@
 import mongoose from "mongoose";
+import { StringXor } from "next/dist/compiled/webpack/webpack";
 const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       trim: true,
+    },
+    gender: {
+      type: String,
+      enum: ["male", "female"],
     },
     email: {
       type: String,
@@ -30,6 +35,13 @@ const UserSchema = new mongoose.Schema(
     lastActive: {
       type: Date,
       default: Date.now,
+    },
+    blockedUsers: {
+      type: Array,
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    },
+    totalOpinionSubmit: {
+      type: Number,
     },
     verifyToken: String,
     verifyTokenExpiresAt: Date,
