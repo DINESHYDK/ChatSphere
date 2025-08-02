@@ -18,13 +18,12 @@ export const sendVerifyUserEmail = async (mailId) => {
     console.log("Unable to send verification email", err);
   }
 };
-export const sendResetPassEmail = async (mailId) => {
-  let verifyToken = generateToken();
+export const sendResetPassEmail = async (mailId, token) => {
   const { data, error } = await resend.emails.send({
-    from: "",
+    from: "onboarding@resend.dev",
     to: mailId,
-    subject: "Rest password",
-    html: FORGOT_PASSWORD_TEMPLATE(mailId),
+    subject: "Reset your password",
+    html: FORGOT_PASSWORD_TEMPLATE(token),
   });
 
   if (err) {

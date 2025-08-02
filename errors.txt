@@ -1,0 +1,8 @@
+./pages/signup.js
+
+Module parse failed: Identifier 'showPassword' has already been declared (10:11)
+|     const [password, setPassword] = useState('');
+|     const [showPassword, setShowPassword] = useState(false);
+>     const [showPassword, setShowPassword] = useState(false);
+|     const [error, setError] = useState('');
+|     const [message, setMessage] = useState('');

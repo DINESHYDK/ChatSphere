@@ -31,9 +31,9 @@ export const VERIFICATION_EMAIL_TEMPLATE = () => {
 `;
 };
 
-export const FORGOT_PASSWORD_TEMPLATE = () => {
-  return
-  `<!DOCTYPE html>
+export const FORGOT_PASSWORD_TEMPLATE = (token) => {
+  const resetURL = `http://localhost:3000/reset-password?token=${token}`;
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -49,7 +49,7 @@ export const FORGOT_PASSWORD_TEMPLATE = () => {
     <p>We received a request to reset your password. If you didn't make this request, please ignore this email.</p>
     <p>To reset your password, click the button below:</p>
     <div style="text-align: center; margin: 30px 0;">
-      <a href="{resetURL}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+      <a href="${resetURL}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
     </div>
     <p>This link will expire in 1 hour for security reasons.</p>
     <p>Best regards,<br>Your App Team</p>
