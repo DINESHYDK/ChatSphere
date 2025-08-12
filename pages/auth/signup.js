@@ -22,9 +22,9 @@ const Signup = () => {
     console.log(userData);
   }
   return (
-    <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 bg-black">
+    <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-4xl/9  tracking-tight text-white">
+        <h2 className="mt-10 text-center text-4xl/9  tracking-tight ">
           Register your account
         </h2>
       </div>
@@ -34,7 +34,7 @@ const Signup = () => {
           <div>
             <label
               htmlFor="email"
-              className="block text-2sm/6 font-medium text-white font-bold"
+              className="block text-2sm/6 font-medium  font-bold"
             >
               Name
             </label>
@@ -55,7 +55,7 @@ const Signup = () => {
           <div>
             <label
               htmlFor="email"
-              className="block text-2sm/6 font-medium text-white font-bold"
+              className="block text-2sm/6 font-medium  font-bold"
             >
               Email address
             </label>
@@ -77,7 +77,7 @@ const Signup = () => {
             <div className="flex items-center justify-between">
               <label
                 htmlFor="password"
-                className="block text-2sm/6 font-medium text-white"
+                className="block text-2sm/6 font-medium "
               >
                 Password
               </label>

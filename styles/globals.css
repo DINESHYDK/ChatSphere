@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .inputStyle { 
-  @apply block w-full rounded-md bg-transparent px-3 py-2.5 text-white text-2xl outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm border;
+  @apply block w-full rounded-md bg-transparent px-3 py-2.5  text-2xl outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-gray-600 sm:text-sm border;
 }
 
 .authSubmitBtn {

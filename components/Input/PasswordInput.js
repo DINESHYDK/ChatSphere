@@ -22,13 +22,13 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
       />
       {!isTypePassword && (
         <IoMdEye
-          className="absolute right-4 top-2.5 text-2xl cursor-pointer text-white"
+          className="absolute right-4 top-2.5 text-2xl cursor-pointer "
           onClick={handleEyeClick}
         />
       )}
       {isTypePassword && (
         <LuEyeClosed
-          className="absolute right-4 top-2.5 text-2xl cursor-pointer text-white"
+          className="absolute right-4 top-2.5 text-2xl cursor-pointer "
           onClick={handleEyeClick}
         />
       )}

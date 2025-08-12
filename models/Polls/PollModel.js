@@ -21,6 +21,11 @@ const PollSchema = new mongoose.Schema(
         },
       },
     ],
+    pollFor: {
+      type: String,
+      enum: ["all", "female", "male"],
+      default: "all",
+    },
     totalVotes: {
       type: Number,
       default: 0,

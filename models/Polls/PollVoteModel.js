@@ -2,11 +2,15 @@ import mongoose from "mongoose";
 const PollVoteSchema = new mongoose.schema(
   {
     pollId: { type: mongoose.Schema.Types.ObjectId, ref: "poll" },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
     optionIndex: {
         type: Number,
         required: true,
     },
-    userId: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    userGender: {
+      type: String,
+      enum: ["male", "female"],
+    }
   },
   { timeStampe: true }
 );
