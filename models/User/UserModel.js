@@ -28,6 +28,9 @@ const UserSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    emailVerificationToken: {
+      type: String, // *** Later will be used as a slug during email verification ***
+    },
     isVerified: {
       type: Boolean,
       default: false,

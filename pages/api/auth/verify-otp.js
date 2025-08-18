@@ -2,7 +2,7 @@ import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import setTokenAndCookie from "../../../utils/generateTokenAndCookie";
 
-export default async function verifyEmail(req, res) {
+export default async function verifyOTP(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {

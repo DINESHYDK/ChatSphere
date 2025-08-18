@@ -1,4 +1,4 @@
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { LuEyeClosed } from "react-icons/lu";
 import { IoMdEye } from "react-icons/io";
 
@@ -10,7 +10,6 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
   return (
     <div className="mt-1 relative">
       <input
-        id="password"
         type={`${isTypePassword ? "password" : "text"}`}
         name="password"
         value={value}

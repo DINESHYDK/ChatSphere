@@ -1,39 +1,59 @@
 import React from "react";
 import { useState } from "react";
 import PasswordInput from "../../components/Input/PasswordInput";
+import GenderInput from "../../components/Input/GenderInput";
+import authStore from "../../store/authStore";
 
 const Signup = () => {
+  const { SignUp, is_auth_request_pending } = authStore(); // *** Zustand global state ***
+
   const [userData, setUserData] = useState({
     userName: "",
     email: "",
     password: "",
+    gender: "male",
   });
   function handleDataChange(e) {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
   }
+  function onGenderChange(g) {
+    setUserData({ ...userData, gender: g });
+  }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    const { email, password } = userData;
+    const { userName, email, password, gender } = userData;
     if (userName == "" || email === "" || password === "") {
       return;
     }
-    console.log(userData);
+    SignUp(userData);
   }
   return (
     <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-4xl/9  tracking-tight ">
-          Register your account
+        <h2 className="mt-10 text-center text-2xl  sm:text-3xl/9  tracking-tight font-inria ">
+          Welcome to
+          <span
+            href="/auth/signin"
+            className=" text-4xl font-semibold text-[#6A89A7]  mx-1 "
+          >
+            SiteName
+          </span>
         </h2>
       </div>
 
-      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-4" onSubmit={handleSubmit}>
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 className="mt-2 text-center text-2xl  tracking-tight font-inria">
+          Register account
+        </h2>
+      </div>
+
+      <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form className="space-y-2" onSubmit={handleSubmit}>
           <div>
             <label
-              htmlFor="email"
+              htmlFor="name"
               className="block text-2sm/6 font-medium  font-bold"
             >
               Name
@@ -93,17 +113,35 @@ const Signup = () => {
           </div>
 
           <div>
-            <button type="submit" className="authSubmitBtn">
+            <div className="flex items-center justify-between mb-1">
+              <label
+                htmlFor="password"
+                className="block text-2sm/6 font-medium "
+              >
+                Select gender
+              </label>
+            </div>
+            <div className="flex items-center justify-between">
+              <GenderInput value={userData.gender} onChange={onGenderChange} />
+            </div>
+          </div>
+
+          <div>
+            <button
+              type="submit"
+              className="authSubmitBtn"
+              disabled={is_auth_request_pending}
+            >
               Sign In
             </button>
           </div>
         </form>
 
-        <p className="mt-10 text-center text-sm/6 text-gray-500">
+        <p className="mt-3 text-center text-sm/6 text-gray-500">
           Already have an account?
           <a
             href="/auth/signin"
-            className=" text-lg font-semibold text-indigo-600 hover:text-indigo-500 mx-1 underline"
+            className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
           >
             Sign In
           </a>

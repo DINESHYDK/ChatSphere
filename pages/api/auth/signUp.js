@@ -1,8 +1,10 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
-import bcrypt from "bcrypt";
-import generateToken from "../../../utils/generateAuthToken";
 import { sendVerifyUserEmail } from "../../../resend/email";
+
+import bcrypt from "bcrypt";
+import crypto from "crypto";
+import generateToken from "../../../utils/generateAuthToken";
 
 export default async function signUp(req, res) {
   await connectToDatabase();
@@ -23,11 +25,13 @@ export default async function signUp(req, res) {
       const hashedPassword = await bcrypt.hash(password, salt);
 
       const verifyToken = generateToken();
+      const token = crypto.randomBytes(32).toString("hex");
 
       const newUser = new UserModel({
         userName,
         email,
         password: hashedPassword,
+        emailVerificationToken: token,
         verifyToken,
         verifyTokenExpiresAt: Date.now() + 24 * 100 * 60 * 60, // *** Will expire in 24 hr ***
       });

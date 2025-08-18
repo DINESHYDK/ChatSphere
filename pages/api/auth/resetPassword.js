@@ -9,7 +9,7 @@ export default async function resetPassword(req, res) {
       const { token } = req.query;
       const { password } = req.body;
       let user = await UserModel.findOne({
-        resetToken: token,
+        resetToken: token.toString(), 
       }).select("-password");
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });

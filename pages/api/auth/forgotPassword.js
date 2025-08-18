@@ -4,7 +4,6 @@ import UserModel from "../../../models/User/UserModel";
 import generateAuthToken from "../../../utils/generateAuthToken";
 
 export default async function forgotPassword(req, res) {
-  
   await connectToDatabase();
   if (req.method === "POST") {
     try {

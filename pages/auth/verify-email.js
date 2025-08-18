@@ -1,92 +1,81 @@
-import React, { useRef, useState } from "react";
-import { InputOTP } from "../../components/ui/input-otp";
+import React, { useRef, useState, useEffect } from "react";
+import authStore from "../../store/authStore";
+import VerifyOtpInput from "../../components/Input/OtpInput";
+import { useRouter } from "next/router";
+
 export default function VerifyEmail() {
-  const [otp, setOtp] = useState(Array(4).fill("")); // Array with 6 empty strings
-  const inputRefs = useRef([]); // Array of refs for each input field
+  const router = useRouter();
+  const { token } = router.query;
+  const {
+    verifyEmail,
+    is_email_verified,
+    is_auth_request_pending,
+    verify_otp,
+  } = authStore();
 
-  const handleKeyDown = (e) => {
-    if (
-      !/^[0-9]{1}$/.test(e.key) &&
-      e.key !== "Backspace" &&
-      e.key !== "Delete" &&
-      e.key !== "Tab" &&
-      !e.metaKey
-    ) {
-      e.preventDefault();
-    }
+  useEffect(() => {
+    if (!router.isReady && !token) return;
+    verifyEmail(token); // *** Global state ***
+  }, [router.isReady, token]);
 
-    if (e.key === "Delete" || e.key === "Backspace") {
-      const index = inputRefs.current.indexOf(e.target);
-      if (index > 0) {
-        setOtp((prevOtp) => [
-          ...prevOtp.slice(0, index - 1),
-          "",
-          ...prevOtp.slice(index),
-        ]);
-        inputRefs.current[index - 1].focus();
-      }
-    }
-  };
+  const [otp, setOtp] = useState("");
 
-  const handleInput = (e) => {
-    const { target } = e;
-    const index = inputRefs.current.indexOf(target);
-    if (target.value) {
-      setOtp((prevOtp) => [
-        ...prevOtp.slice(0, index),
-        target.value,
-        ...prevOtp.slice(index + 1),
-      ]);
-      if (index < otp.length - 1) {
-        inputRefs.current[index + 1].focus();
-      }
-    }
-  };
-
-  const handleFocus = (e) => {
-    e.target.select();
-  };
-
-  const handlePaste = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
-    const text = e.clipboardData.getData("text");
-    if (!new RegExp(`^[0-9]{${otp.length}}$`).test(text)) {
-      return;
-    }
-    const digits = text.split("");
-    setOtp(digits);
-  };
+    if (is_auth_request_pending || !otp) return;
+    verify_otp(otp);
+  }
+  return;
+  !is_email_verified ? (
+    <>
+      <h1>Loading</h1>
+    </>
+  ) : (
+    <>
+      <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="mt-2 text-center text-3xl  tracking-tight font-inria">
+            Verify your Email
+          </h2>
+        </div>
 
-  return (
-    <InputOTP/>
-    // <section className="bg-white py-10 dark:bg-dark">
-    //   <div className="container">
-    //   <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-    //     <h2 className="mt-10 text-center text-2xl/9  tracking-tight text-gray-900">
-    //       Verify your email
-    //     </h2>
-    //     <p>Enter a 6-digit code sent to your email address</p>
-    //   </div>
-    //     <div>
-    //       <form id="otp-form" className="flex gap-2">
-    //         {otp.map((digit, index) => (
-    //           <input
-    //             key={index}
-    //             type="text"
-    //             maxLength={1}
-    //             value={digit}
-    //             onChange={handleInput}
-    //             onKeyDown={handleKeyDown}
-    //             onFocus={handleFocus}
-    //             onPaste={handlePaste}
-    //             ref={(el) => (inputRefs.current[index] = el)}
-    //             className="shadow-xs flex w-[64px] items-center justify-center rounded-lg border border-stroke bg-white border-black p-2 text-center text-2xl font-medium  outline-none sm:text-4xl dark:border-dark-3 dark:bg-white/5"
-    //           />
-    //         ))}
-    //         {/* You can conditionally render a submit button here based on otp length */}
-    //       </form>
-    //     </div>
-    //   </div>
-    // </section>
+        <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
+          <form className="space-y-6 w-full max-w-sm mx-auto" onSubmit={handleSubmit}>
+            <div className="text-center space-y-2">
+              <p className="text-sm text-muted-foreground">
+                An OTP has been sent to your email. It will expire in{" "}
+                <span className="font-medium text-foreground">15 minutes</span>.
+              </p>
+            </div>
+
+            {/* OTP Input */}
+            <div className="flex justify-center">
+              <VerifyOtpInput otp={otp} setOtp={setOtp} />
+            </div>
+
+            {/* Submit Button */}
+            <div className="flex justify-center">
+              <button
+                type="submit"
+                disabled={is_auth_request_pending || otp.length < 6}
+                className="authSubmitBtn w-full"
+              >
+                Submit
+              </button>
+            </div>
+
+            {/* Extra: Resend OTP link */}
+            <div className="text-center">
+              <button
+                type="button"
+                className="text-sm text-primary hover:underline"
+              >
+                Didn’t get the code? Resend OTP
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </>
   );
 }
