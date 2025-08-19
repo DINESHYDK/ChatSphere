@@ -2,8 +2,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import authStore from "../../store/authStore";
 import PasswordInput from "../../components/Input/PasswordInput";
-export default function ResetPassword() {
+import Loader1 from "../../components/Loader/Loader1";
 
+export default function ResetPassword() {
   const router = useRouter();
   const { token } = router.query;
   const {
@@ -18,11 +19,11 @@ export default function ResetPassword() {
       return;
     }
     verify_reset_token(token);
-    reset_password(password, token); // *** Global zustand state ***
   }, [router.isReady, token]);
 
   const [password, setPassword] = useState("");
   const [rePassword, setRePassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,7 +31,14 @@ export default function ResetPassword() {
       setRePassword("");
       return;
     }
-    reset_password(password);
+    setLoading(true);
+    try {
+      await reset_password(password, token); // *** Global zustand state ***
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return !is_reset_otp_verified ? (
@@ -73,7 +81,7 @@ export default function ResetPassword() {
                   rePassword.length < 7
                 }
               >
-                Reset Password
+                {loading ? <Loader1 /> : "Reset Password"}
               </button>
             </div>
           </form>

@@ -1,13 +1,14 @@
 import React, { useRef, useState, useEffect } from "react";
 import authStore from "../../store/authStore";
 import VerifyOtpInput from "../../components/Input/OtpInput";
+import Loader1 from "../../components/Loader/Loader1";
 import { useRouter } from "next/router";
 
 export default function VerifyEmail() {
   const router = useRouter();
   const { token } = router.query;
   const {
-    verifyEmail,
+    verify_email,
     is_email_verified,
     is_auth_request_pending,
     verify_otp,
@@ -15,18 +16,25 @@ export default function VerifyEmail() {
 
   useEffect(() => {
     if (!router.isReady && !token) return;
-    verifyEmail(token); // *** Global state ***
+    verify_email(token); // *** Global state ***
   }, [router.isReady, token]);
 
   const [otp, setOtp] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     if (is_auth_request_pending || !otp) return;
-    verify_otp(otp);
+    try {
+      setLoading(true);
+      await verify_otp(otp);
+    } catch (err) {
+      console.log(err);
+    } finally{
+      setLoading(false);
+    }
   }
-  return;
-  !is_email_verified ? (
+  const [loading, setLoading] = useState(false);
+  return !is_email_verified ? (
     <>
       <h1>Loading</h1>
     </>
@@ -40,7 +48,10 @@ export default function VerifyEmail() {
         </div>
 
         <div className="mt-5 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-6 w-full max-w-sm mx-auto" onSubmit={handleSubmit}>
+          <form
+            className="space-y-6 w-full max-w-sm mx-auto"
+            onSubmit={handleSubmit}
+          >
             <div className="text-center space-y-2">
               <p className="text-sm text-muted-foreground">
                 An OTP has been sent to your email. It will expire in{" "}
@@ -60,7 +71,7 @@ export default function VerifyEmail() {
                 disabled={is_auth_request_pending || otp.length < 6}
                 className="authSubmitBtn w-full"
               >
-                Submit
+                {loading ? <Loader1 /> : "Submit"}
               </button>
             </div>
 

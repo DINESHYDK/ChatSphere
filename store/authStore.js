@@ -96,9 +96,11 @@ const authStore = create((set, get) => ({
         body: JSON.stringify({ password }),
       });
       if (!res.ok) {
+        console.log("reset not successful");
         Router.push("/auth/signin");
         return;
       }
+      Router.push('/');
       console.log("Password reset successful");
     } catch (error) {
       console.error(error);
@@ -124,10 +126,11 @@ const authStore = create((set, get) => ({
       console.error(error);
     }
   },
-  verifyEmail: async (token) => {
+  verify_email: async (token) => {
     try {
       if (!token) return;
       let res = await fetch(`/api/auth/verify-email?token=${token}`);
+
       if (!res.ok) {
         Router.push(`/auth/signup`);
         return;
@@ -154,6 +157,7 @@ const authStore = create((set, get) => ({
       }
       const data = await res.json();
       set({ authUser: data.user });
+      // Router.push('/');
       console.log("User verification successful");
     } catch (err) {
       console.log("Error during email verification", err);

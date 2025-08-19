@@ -1,15 +1,24 @@
 import React from "react";
 import { useState } from "react";
 import authStore from "../../store/authStore";
+import Loader1 from "../../components/Loader/Loader1";
 
 const ForgotPassword = () => {
   const { is_auth_request_pending, forgot_password } = authStore();
+  const [loading, setLoading] = useState(false);
 
   const [email, setEmail] = useState("");
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    forgot_password(email);
+    setLoading(true);
+    try {
+      await forgot_password(email);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
@@ -52,7 +61,7 @@ const ForgotPassword = () => {
               className="authSubmitBtn"
               disabled={is_auth_request_pending}
             >
-              Send Reset Link
+              {loading ? <Loader1 /> : "Send Reset Link"}
             </button>
           </div>
         </form>

@@ -2,10 +2,12 @@ import React from "react";
 import { useState } from "react";
 import PasswordInput from "../../components/Input/PasswordInput";
 import GenderInput from "../../components/Input/GenderInput";
+import Loader1 from "../../components/Loader/Loader1";
 import authStore from "../../store/authStore";
 
 const Signup = () => {
   const { SignUp, is_auth_request_pending } = authStore(); // *** Zustand global state ***
+  const [loading, setLoading] = useState(false); // *** local state ***
 
   const [userData, setUserData] = useState({
     userName: "",
@@ -27,7 +29,14 @@ const Signup = () => {
     if (userName == "" || email === "" || password === "") {
       return;
     }
-    SignUp(userData);
+    try {
+      setLoading(true);
+      await SignUp(userData);
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
   }
   return (
     <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
@@ -132,7 +141,7 @@ const Signup = () => {
               className="authSubmitBtn"
               disabled={is_auth_request_pending}
             >
-              Sign In
+              {loading ? <Loader1 /> : "Sign Up"}
             </button>
           </div>
         </form>
