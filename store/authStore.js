@@ -3,7 +3,7 @@ import Router from "next/router";
 
 const authStore = create((set, get) => ({
   is_auth_request_pending: false, //for auth related request
-  is_email_verified: false, // *** so that no outside user can access the OTP  verification ***
+  is_email_verified: false, // *** so that no outside user can access the OTP  verification ***//
   is_reset_otp_verified: false,
   authUser: null,
   setAuthUser: (userData) => {
@@ -157,7 +157,7 @@ const authStore = create((set, get) => ({
       }
       const data = await res.json();
       set({ authUser: data.user });
-      // Router.push('/');
+      Router.push('/');
       console.log("User verification successful");
     } catch (err) {
       console.log("Error during email verification", err);

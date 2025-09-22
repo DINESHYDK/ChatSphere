@@ -1,9 +1,5 @@
 import React, { useState } from "react";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "../ui/input-otp";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "../ui/input-otp";
 
 export default function VerifyOtpInput({ otp, setOtp }) {
   return (
@@ -12,7 +8,7 @@ export default function VerifyOtpInput({ otp, setOtp }) {
       value={otp}
       onChange={setOtp} // *** Logic for this have been already handled by shadCN ***
     >
-      <InputOTPGroup >
+      <InputOTPGroup>
         <InputOTPSlot index={0} />
         <InputOTPSlot index={1} />
         <InputOTPSlot index={2} />

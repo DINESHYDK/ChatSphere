@@ -10,16 +10,20 @@ export default async function verifyOTP(req, res) {
       let user = await UserModel.findOne({
         verifyToken: token,
       }).select("-password");
+      console.log('crossed here');
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });
       }
+      console.log('user1 is ', user);
       if (user.verifyTokenExpiresAt < Date.now()) {
         return res.status(401).json({ message: "Token expired" });
       }
+      console.log('user2 is ', user);
       setTokenAndCookie(res, user._id);
       ((user.isVerified = true),
         (user.verifyToken = undefined),
         (user.verifyTokenExpiresAt = undefined),
+        (user.emailVerificationToken = undefined),
         await user.save());
       return res
         .status(200)

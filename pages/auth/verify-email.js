@@ -26,10 +26,11 @@ export default function VerifyEmail() {
     if (is_auth_request_pending || !otp) return;
     try {
       setLoading(true);
+      console.log("otp is ", otp);
       await verify_otp(otp);
     } catch (err) {
       console.log(err);
-    } finally{
+    } finally {
       setLoading(false);
     }
   }
@@ -63,12 +64,11 @@ export default function VerifyEmail() {
             <div className="flex justify-center">
               <VerifyOtpInput otp={otp} setOtp={setOtp} />
             </div>
-
             {/* Submit Button */}
             <div className="flex justify-center">
               <button
                 type="submit"
-                disabled={is_auth_request_pending || otp.length < 6}
+                disabled={is_auth_request_pending}
                 className="authSubmitBtn w-full"
               >
                 {loading ? <Loader1 /> : "Submit"}

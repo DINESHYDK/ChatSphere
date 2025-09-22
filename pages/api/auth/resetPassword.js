@@ -1,6 +1,7 @@
 import UserModel from "../../../models/User/UserModel";
 import connectToDatabase from "../../../config/mongoose";
 import bcrypt from "bcrypt";
+import setTokenAndCookie from "../../../utils/generateTokenAndCookie";
 
 export default async function resetPassword(req, res) {
   await connectToDatabase();
@@ -11,7 +12,7 @@ export default async function resetPassword(req, res) {
       let user = await UserModel.findOne({
         resetToken: token,
       }).select("-password");
-      
+
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });
       }
@@ -25,7 +26,7 @@ export default async function resetPassword(req, res) {
         (user.resetToken = undefined),
         (user.resetTokenExpiresAt = undefined),
         await user.save());
-
+      setTokenAndCookie(res, user._id);
       return res.status(200).json({ message: "success", user });
     } catch (err) {
       console.log("Something went wrong", err);
