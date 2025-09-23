@@ -18,6 +18,7 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
         required
         autoComplete="current-password"
         className="inputStyle"
+        spellCheck="false"
       />
       {!isTypePassword && (
         <IoMdEye

@@ -28,9 +28,9 @@ const Signup = () => {
       await SignIn(userData); // *** calling SignIn (zustand state) ***
     } catch (err) {
       console.log(err.message);
-      if (err.status === 403){
-        setUserData((prev)=>({email: "",  password: ""}))
-      }else if (err.status == 401){
+      if (err.status === 403) {
+        setUserData((prev) => ({ email: "", password: "" }));
+      } else if (err.status == 401) {
         setUserData((prev) => ({ ...prev, password: "" }));
       }
     } finally {
@@ -70,6 +70,7 @@ const Signup = () => {
                   autoComplete="email"
                   placeholder=""
                   className="inputStyle"
+                  spellCheck={false}
                 />
               </div>
             </div>

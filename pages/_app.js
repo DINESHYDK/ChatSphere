@@ -10,11 +10,15 @@ const inria = Inria_Serif({
 export default function App({ Component, pageProps }) {
   return (
     <>
-    <main className={inria.variable}>
-      <Component {...pageProps} />
-    </main>
-    <ToastContainer
+      <main className={inria.variable}>
+        <Component {...pageProps} />
+      </main>
+      <ToastContainer
         position="top-right"
+        toastClassName="custom-toast"
+        bodyClassName="custom-toast-body"
+        progressClassName="custom-progress"
+        className="react_toast_styling"
         autoClose={2000}
         hideProgressBar
         newestOnTop={false}
@@ -22,6 +26,7 @@ export default function App({ Component, pageProps }) {
         pauseOnFocusLoss
         draggable
         pauseOnHover
+        theme="colored"
       />
     </>
   );

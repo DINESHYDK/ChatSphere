@@ -78,6 +78,7 @@ const Signup = () => {
                 required
                 autoComplete="userName"
                 className="inputStyle"
+                spellCheck={false}
               />
             </div>
           </div>
@@ -99,6 +100,7 @@ const Signup = () => {
                 required
                 autoComplete="email"
                 className="inputStyle"
+                spellCheck={false}
               />
             </div>
           </div>

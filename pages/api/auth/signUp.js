@@ -18,7 +18,7 @@ export default async function signUp(req, res) {
 
       const existingUser = await UserModel.findOne({ email });
       if (existingUser) {
-        return res.status(409).json({ message: "User already exists" });
+        return res.status(409).json({ message: "Email already in use" });
       }
 
       const salt = await bcrypt.genSalt(10);

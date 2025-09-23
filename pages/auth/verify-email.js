@@ -28,7 +28,10 @@ export default function VerifyEmail() {
       setLoading(true);
       await verify_otp(otp);
     } catch (err) {
+      console.log('I am runnning');
       console.log('Verification failed');
+      setOtp("");
+      // if (err.status === 401) setOtp("");
     } finally {
       setLoading(false);
     }
