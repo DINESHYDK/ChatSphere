@@ -1,6 +1,6 @@
 import { Inria_Serif } from "next/font/google";
 import "../styles/globals.css";
-
+import { ToastContainer } from "react-toastify";
 const inria = Inria_Serif({
   subsets: ["latin"],
   weight: ["400", "700"], // choose weights you need
@@ -9,8 +9,20 @@ const inria = Inria_Serif({
 
 export default function App({ Component, pageProps }) {
   return (
+    <>
     <main className={inria.variable}>
       <Component {...pageProps} />
     </main>
+    <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar
+        newestOnTop={false}
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </>
   );
 }

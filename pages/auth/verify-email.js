@@ -26,10 +26,9 @@ export default function VerifyEmail() {
     if (is_auth_request_pending || !otp) return;
     try {
       setLoading(true);
-      console.log("otp is ", otp);
       await verify_otp(otp);
     } catch (err) {
-      console.log(err);
+      console.log('Verification failed');
     } finally {
       setLoading(false);
     }

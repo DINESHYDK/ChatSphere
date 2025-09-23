@@ -14,7 +14,6 @@ export default async function verifyOTP(req, res) {
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });
       }
-      console.log('user1 is ', user);
       if (user.verifyTokenExpiresAt < Date.now()) {
         return res.status(401).json({ message: "Token expired" });
       }
@@ -27,7 +26,7 @@ export default async function verifyOTP(req, res) {
         await user.save());
       return res
         .status(200)
-        .json({ message: "Verification successfull", user });
+        .json({ message: "Email verified", user });
     } catch (err) {
       console.log("Something went wrong", err);
       res.status(500).json({ message: "Internal server error" });

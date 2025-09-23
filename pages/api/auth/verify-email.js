@@ -20,7 +20,7 @@ export default async function verifyEmail(req, res) {
         console.log("Invalid User credentials");
         return res.status(404).json({ message: "Invalid user credentials" });
       }
-      res.status(200).json({ message: "success", user });
+      res.status(200).json({ message: "Success", user });
     } catch (err) {
       console.log("Something went wrong", err);
       res.status(500).json({ message: "Internal server error" });

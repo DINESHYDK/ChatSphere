@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import Router from "next/router";
+import { toast, ToastContainer } from "react-toastify";
 
 const authStore = create((set, get) => ({
   is_auth_request_pending: false, //for auth related request
@@ -22,7 +23,12 @@ const authStore = create((set, get) => ({
       });
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.message || "Something went wrong");
+        if (res.status === 409) {
+          toast.error("Email already in use");
+        } else if (res.status === 500) {
+          toast.error("Something went wrong");
+        }
+        throw { status: res.status, message: data.message || "Unknown error" };
       }
       const { newUser } = data;
       Router.push(`/auth/verify-email?token=${newUser.emailVerificationToken}`);
@@ -45,12 +51,19 @@ const authStore = create((set, get) => ({
         },
         body: JSON.stringify({ userData }),
       });
+      const data = await res.json();
       if (!res.ok) {
         console.log("Invalid credentials");
-        return;
+        if (res.status === 403) {
+          toast.error("Please verify your email first");
+        } else if (res.status === 401) {
+          toast.error("Invalid Credentials");
+        } else if (res.status === 500) {
+          toast.error("Something went wrong");
+        }
+        throw { status: res.status, message: data.message || "Unknown error" };
       }
       console.log("Sign in successful");
-      const data = await res.json();
       set({ authUser: data.user });
       return data;
     } catch (error) {
@@ -100,7 +113,7 @@ const authStore = create((set, get) => ({
         Router.push("/auth/signin");
         return;
       }
-      Router.push('/');
+      Router.push("/");
       console.log("Password reset successful");
     } catch (error) {
       console.error(error);
@@ -130,9 +143,13 @@ const authStore = create((set, get) => ({
     try {
       if (!token) return;
       let res = await fetch(`/api/auth/verify-email?token=${token}`);
-
+      const data = await res.json();
       if (!res.ok) {
         Router.push(`/auth/signup`);
+        if (res.status == 500) {
+          toast.error(data.message);
+        }
+        throw error({ status: res.status, message: data.message });
         return;
       }
       set({ is_email_verified: true });
@@ -151,13 +168,21 @@ const authStore = create((set, get) => ({
         },
         body: JSON.stringify({ token }),
       });
+      const data = await res.json();
       if (!res.ok) {
         console.log("OTP verification failed");
-        return;
+        if (res.status === 401 || res.status === 500) {
+          toast.error(data.message);
+        }else if (res.status === 200) {
+          toast.success(data.message);
+        }
+        throw (
+          { status: res.status, messsage: data.message || "" } ||
+          "Something went wrong"
+        );
       }
-      const data = await res.json();
       set({ authUser: data.user });
-      Router.push('/');
+      Router.push("/");
       console.log("User verification successful");
     } catch (err) {
       console.log("Error during email verification", err);

@@ -33,7 +33,8 @@ const Signup = () => {
       setLoading(true);
       await SignUp(userData);
     } catch (err) {
-      console.log(err);
+      if (err.status === 409)
+        setUserData({ userName: "", email: "", password: "", gender: "male" });
     } finally {
       setLoading(false);
     }
