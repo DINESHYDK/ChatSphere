@@ -15,7 +15,9 @@ const ForgotPassword = () => {
     try {
       await forgot_password(email);
     } catch (err) {
-      console.log(err);
+      if (err.status === 401) {
+        setEmail("");
+      }
     } finally {
       setLoading(false);
     }
@@ -51,6 +53,7 @@ const ForgotPassword = () => {
                 required
                 autoComplete="email"
                 className="inputStyle"
+                spellCheck={false}
               />
             </div>
           </div>
@@ -59,7 +62,7 @@ const ForgotPassword = () => {
             <button
               type="submit"
               className="authSubmitBtn"
-              disabled={is_auth_request_pending}
+              // disabled={is_auth_request_pending}
             >
               {loading ? <Loader1 /> : "Send Reset Link"}
             </button>

@@ -61,12 +61,14 @@ export default function ResetPassword() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter new password"
+                spellCheck={false}
                 required
               />
               <PasswordInput
                 value={rePassword}
                 onChange={(e) => setRePassword(e.target.value)}
                 placeholder="Re-enter new password"
+                spellCheck={false}
                 required
               />
             </div>
@@ -75,11 +77,7 @@ export default function ResetPassword() {
               <button
                 type="submit"
                 className="authSubmitBtn"
-                disabled={
-                  is_auth_request_pending ||
-                  password.length < 7 ||
-                  rePassword.length < 7
-                }
+                disabled={is_auth_request_pending}
               >
                 {loading ? <Loader1 /> : "Reset Password"}
               </button>

@@ -15,10 +15,11 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        required
+        required={true}
         autoComplete="current-password"
         className="inputStyle"
         spellCheck="false"
+        minLength={7}
       />
       {!isTypePassword && (
         <IoMdEye

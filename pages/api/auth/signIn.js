@@ -29,7 +29,7 @@ export default async function signIn(req, res) {
       if (!user.isVerified) {
         return res
           .status(403)
-          .json({ message: "Please verify your email before logging in." });
+          .json({ message: "Please verify your email first" });
       }
       setTokenAndCookie(res, user._id);
       delete user.password;

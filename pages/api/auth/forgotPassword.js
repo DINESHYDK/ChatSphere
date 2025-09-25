@@ -11,7 +11,12 @@ export default async function forgotPassword(req, res) {
 
       let user = await UserModel.findOne({ email }).select("-password");
       if (!user) {
-        return res.status(401).json({ message: "Invalid email" });
+        console.log("Invalid email");
+        return res.status(401).json({ message: "Invalid Credentials" });
+      }
+      if (!user.isVerified) {
+        console.log("Invalid email");
+        return res.status(401).json({ message: "Invalid Credentials" });
       }
       const resetToken = generateAuthToken();
       user.resetToken = resetToken;
@@ -22,7 +27,7 @@ export default async function forgotPassword(req, res) {
 
       return res.status(200).json({ message: "Password reset email sent" });
     } catch (err) {
-      console.log("Something went wrong", err);
+      console.log(err);
       res.status(500).json({ message: "Internal server error" });
     }
   } else {
