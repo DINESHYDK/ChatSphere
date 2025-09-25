@@ -50,6 +50,14 @@ const UserSchema = new mongoose.Schema(
     verifyTokenExpiresAt: Date,
     resetToken: String,
     resetTokenExpiresAt: Date,
+    emailResetRequests: {
+      type: Number,
+      default: 0,
+    },
+    passwordResetRequests: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true }
 );

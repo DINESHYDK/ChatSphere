@@ -3,6 +3,7 @@ import authStore from "../../store/authStore";
 import VerifyOtpInput from "../../components/Input/OtpInput";
 import Loader1 from "../../components/Loader/Loader1";
 import { useRouter } from "next/router";
+import { ROUTES } from "../../store/authStore";
 
 export default function VerifyEmail() {
   const router = useRouter();
@@ -15,7 +16,7 @@ export default function VerifyEmail() {
   } = authStore();
 
   useEffect(() => {
-    if (!router.isReady && !token) return;
+    if (!router.isReady || !token) return;
     verify_email(token); // *** Global state ***
   }, [router.isReady, token]);
 
@@ -28,9 +29,9 @@ export default function VerifyEmail() {
       setLoading(true);
       await verify_otp(otp);
     } catch (err) {
-      if (err.status === 401 || err.status === 500){
+      if (err.status === 401 || err.status === 500) {
         setOtp("");
-      }  
+      }
     } finally {
       setLoading(false);
     }
@@ -78,12 +79,13 @@ export default function VerifyEmail() {
 
             {/* Extra: Resend OTP link */}
             <div className="text-center">
-              <button
-                type="button"
-                className="text-sm text-primary hover:underline"
-              >
-                Didn’t get the code? Resend OTP
-              </button>
+                <button
+                  type="button"
+                  className="text-sm text-primary hover:underline"
+                  onClick={async()=>await verify_email(token, true)}
+                >
+                  Didn’t get the code? Resend OTP
+                </button>
             </div>
           </form>
         </div>

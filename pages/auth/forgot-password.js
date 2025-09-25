@@ -62,10 +62,10 @@ const ForgotPassword = () => {
             <button
               type="submit"
               className="authSubmitBtn"
-              // disabled={is_auth_request_pending}
             >
               {loading ? <Loader1 /> : "Send Reset Link"}
             </button>
+            
           </div>
         </form>
       </div>

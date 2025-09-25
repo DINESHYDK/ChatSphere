@@ -2,7 +2,7 @@ import { create } from "zustand";
 import Router from "next/router";
 import { toast, ToastContainer } from "react-toastify";
 
-const ROUTES = {
+export const ROUTES = {
   HOMEPAGE: "/",
   SIGNUP: "/auth/signup",
   SIGNIN: "/auth/signin",
@@ -10,7 +10,7 @@ const ROUTES = {
   FORGOT_PASSWORD: "/auth/forgot-password",
 };
 
-const API_ENDPOINTS = {
+export const API_ENDPOINTS = {
   AUTH: {
     SIGNUP: "/api/auth/signUp",
     SIGNIN: "/api/auth/signIn",
@@ -78,7 +78,7 @@ const authStore = create((set, get) => ({
       if (!res.ok) {
         console.log("Invalid credentials");
         if (res.status === 403 || res.status === 401 || res.status === 500) {
-          toast.error(res.message);
+          toast.error(data.message);
         }
         throw { status: res.status, message: data.message || "Unknown error" };
       }
@@ -87,7 +87,6 @@ const authStore = create((set, get) => ({
       await Router.push(ROUTES.HOMEPAGE);
       return data;
     } catch (error) {
-      console.error(error);
       throw error;
     } finally {
       set({ is_auth_request_pending: false });
@@ -97,13 +96,12 @@ const authStore = create((set, get) => ({
     await fetch("/api/auth/logout");
   },
   forgot_password: async (email) => {
-    if (
-      get().is_auth_request_pending ||
-      !email 
-       || (is_password_reset_req_pending)
-    )
-      return;
+    if (get().is_auth_request_pending || !email) return;
     try {
+      if (get().is_password_reset_req_pending) {
+        toast.error("To many requests");
+        return;
+      }
       set({ is_auth_request_pending: true });
       set({ is_password_reset_req_pending: true });
       let res = await fetch(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
@@ -143,7 +141,7 @@ const authStore = create((set, get) => ({
         Router.push(ROUTES.SIGNIN);
         return;
       }
-      Router.push("/");
+      await Router.push("/");
       if (res.status === 200) toast.success(data.message);
       console.log("Password reset successful");
     } catch (error) {
@@ -169,13 +167,20 @@ const authStore = create((set, get) => ({
       console.error(error);
     }
   },
-  verify_email: async (token) => {
+  verify_email: async (token, resend = false) => {
     try {
       if (!token) return;
-      let res = await fetch(`${API_ENDPOINTS.AUTH.VERIFY_EMAIL}${token}`);
+      const url = new URL(
+        API_ENDPOINTS.AUTH.VERIFY_EMAIL,
+        window.location.origin
+      );
+      url.searchParams.set("token", token);
+      if (resend) url.searchParams.set("resend", "true");
+      console.log("url is ", url.toString());
+      const res = await fetch(url.toString());
       const data = await res.json();
       if (!res.ok) {
-        Router.push(ROUTES.SIGNUP);
+        Router.push(ROUTES.SIGNIN);
         if (res.status == 500) {
           toast.error(data.message);
         }
@@ -236,3 +241,5 @@ export default authStore;
 // *** { Whenever throw is written, it directly run into catch statement. } ***
 // *** { When a function throws an error, it will propagate up to the nearest catch in the call stack. } ***
 // *** { If you catch it inside the function and don’t rethrow, the caller never sees it. } ***
+
+// *** in Zustand to use one global variable in other, one must have to use get function ***
