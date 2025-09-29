@@ -50,11 +50,11 @@ const UserSchema = new mongoose.Schema(
     verifyTokenExpiresAt: Date,
     resetToken: String,
     resetTokenExpiresAt: Date,
-    emailResetRequests: {
+    email_verification_requests: {
       type: Number,
       default: 0,
     },
-    passwordResetRequests: {
+    password_reset_requests: {
       type: Number,
       default: 0,
     },

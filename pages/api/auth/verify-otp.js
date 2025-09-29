@@ -10,7 +10,7 @@ export default async function verifyOTP(req, res) {
       let user = await UserModel.findOne({
         verifyToken: token,
       }).select("-password");
-      console.log('crossed here');
+      console.log("crossed here");
       if (!user) {
         return res.status(401).json({ message: "Invalid token" });
       }
@@ -22,10 +22,9 @@ export default async function verifyOTP(req, res) {
         (user.verifyToken = undefined),
         (user.verifyTokenExpiresAt = undefined),
         (user.emailVerificationToken = undefined),
+        (user.email_verification_requests = undefined),
         await user.save());
-      return res
-        .status(200)
-        .json({ message: "Email verified", user });
+      return res.status(200).json({ message: "Email verified", user });
     } catch (err) {
       console.log("Something went wrong", err);
       res.status(500).json({ message: "Internal server error" });

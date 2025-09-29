@@ -15,9 +15,12 @@ export default function VerifyEmail() {
     verify_otp,
   } = authStore();
 
+  const hasVerifed = useRef(false); //to prevent calling verify_email twice.
   useEffect(() => {
-    if (!router.isReady || !token) return;
+    if (!router.isReady || !token || hasVerifed.current) return;
+    console.log("I am running twice");
     verify_email(token); // *** Global state ***
+    hasVerifed.current = true;
   }, [router.isReady, token]);
 
   const [otp, setOtp] = useState("");
@@ -79,13 +82,13 @@ export default function VerifyEmail() {
 
             {/* Extra: Resend OTP link */}
             <div className="text-center">
-                <button
-                  type="button"
-                  className="text-sm text-primary hover:underline"
-                  onClick={async()=>await verify_email(token, true)}
-                >
-                  Didn’t get the code? Resend OTP
-                </button>
+              <button
+                type="button"
+                className="text-sm text-primary hover:underline"
+                onClick={async () => await verify_email(token, true)}
+              >
+                Didn’t get the code? Resend OTP
+              </button>
             </div>
           </form>
         </div>
@@ -93,3 +96,14 @@ export default function VerifyEmail() {
     </>
   );
 }
+
+// *** Kaam ki baat ***
+// *** Difference between useRef and useState ***
+// *** useState: when a state changes it causes rerendering of page. ***
+// *** If i wanted a state which i don't have to show on page(while updating) then useRef is best ***
+
+// *** Que. Then i can use UseRef instead of useState everywhere? ***
+// *** Ans. No, const countRef = useRef(0);
+/* <button onClick={() => countRef.current++}>Increment</button> */
+/* <p>Count: {countRef.current}</p> *** */
+// *** Above will not change as useRef doesn't render page. ***

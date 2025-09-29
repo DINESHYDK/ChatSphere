@@ -115,6 +115,8 @@ const authStore = create((set, get) => ({
       if (!res.ok) {
         if (res.status === 401 || res.status === 500) {
           toast.error(data.message);
+        } else if (res.status === 429) {
+          toast.warning(data.message);
         }
         throw { status: res.status, message: res.message || "" };
       }
@@ -176,14 +178,13 @@ const authStore = create((set, get) => ({
       );
       url.searchParams.set("token", token);
       if (resend) url.searchParams.set("resend", "true");
-      console.log("url is ", url.toString());
       const res = await fetch(url.toString());
       const data = await res.json();
       if (!res.ok) {
-        Router.push(ROUTES.SIGNIN);
+        if (res.status === 404) Router.push(ROUTES.SIGNIN);
         if (res.status == 500) {
           toast.error(data.message);
-        }
+        } else if (res.status === 429) toast.warning(data.message);
         throw { status: res.status, message: data.message };
       }
       set({ is_email_verified: true });

@@ -18,12 +18,17 @@ export default async function forgotPassword(req, res) {
         console.log("Invalid email");
         return res.status(401).json({ message: "Invalid Credentials" });
       }
+      if (user.password_reset_requests >= 2) {
+        return res
+          .status(429)
+          .json({ message: "Too many requests, Try again later" });
+      }
       const resetToken = generateAuthToken();
       user.resetToken = resetToken;
       user.resetTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000; // *** valid for 24 hour ***
-      await user.save();
-
       await sendResetPassEmail(email, resetToken);
+      user.password_reset_requests++;
+      await user.save();
 
       return res.status(200).json({ message: "Password reset email sent" });
     } catch (err) {
