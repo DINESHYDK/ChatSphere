@@ -28,7 +28,6 @@ const authStore = create((set, get) => ({
   is_auth_request_pending: false, //for auth related request
   is_email_verified: false, // *** so that no outside user can access the OTP  verification ***//
   is_reset_otp_verified: false,
-  is_password_reset_req_pending: false, // *** { secifically made for password reset request } ***
   authUser: null,
   setAuthUser: (userData) => {
     set({ authUser: userData });
@@ -98,12 +97,8 @@ const authStore = create((set, get) => ({
   forgot_password: async (email) => {
     if (get().is_auth_request_pending || !email) return;
     try {
-      if (get().is_password_reset_req_pending) {
-        toast.error("To many requests");
-        return;
-      }
       set({ is_auth_request_pending: true });
-      set({ is_password_reset_req_pending: true });
+
       let res = await fetch(API_ENDPOINTS.AUTH.FORGOT_PASSWORD, {
         method: "POST",
         headers: {
@@ -187,6 +182,8 @@ const authStore = create((set, get) => ({
         } else if (res.status === 429) toast.warning(data.message);
         throw { status: res.status, message: data.message };
       }
+      if (res.status === 429 && resend === "true")
+        toast.info("Email sent again");
       set({ is_email_verified: true });
     } catch (err) {
       console.log("Error during email verification ", err.message || "");

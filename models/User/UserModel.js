@@ -50,13 +50,21 @@ const UserSchema = new mongoose.Schema(
     verifyTokenExpiresAt: Date,
     resetToken: String,
     resetTokenExpiresAt: Date,
-    email_verification_requests: {
-      type: Number,
-      default: 0,
+    // email_verification_requests: {
+    //   type: Number,
+    //   default: 0,
+    // },
+    // password_reset_requests: {
+    //   type: Number,
+    //   default: 0,
+    // },
+    email_verification: {
+      last_updation_time: { type: Date },
+      no_of_requests: { type: Number, default: 0 },
     },
-    password_reset_requests: {
-      type: Number,
-      default: 0,
+    password_reset: {
+      last_updation_time: { type: Date },
+      no_of_requests: { type: Number, default: 0 },
     },
   },
   { timestamps: true }

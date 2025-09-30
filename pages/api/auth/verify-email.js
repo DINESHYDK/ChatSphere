@@ -1,6 +1,7 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import { sendVerifyUserEmail } from "../../../resend/email";
+import { VERIFY_API_LIMIT } from "../../../utils/verifyApiLimit";
 
 export default async function verifyEmail(req, res) {
   await connectToDatabase();
@@ -19,16 +20,24 @@ export default async function verifyEmail(req, res) {
         console.log("Invalid User credentials");
         return res.status(404).json({ message: "Invalid user credentials" });
       }
-      if (user.email_verification_requests >= 2) {
-        console.log("Too many email verify requests");
-        return res
-          .status(429)
-          .json({ message: "Too many requests, Try again later" });
+      const { no_of_requests } = user.email_verification;
+      if (no_of_requests >= 2) {
+        let { last_updation_time } = user.email_verification;
+        if (!VERIFY_API_LIMIT(last_updation_time)) {
+          console.log("Too many email verify requests");
+          return res
+            .status(429)
+            .json({ message: "Too many requests, Try again later" });
+        }
+        user.email_verification.no_of_requests = 0;
       }
-      if (resend === "true" && user.email_verification_requests < 2) {
+      if (resend === "true" && no_of_requests < 2) {
         await sendVerifyUserEmail(user.email, user.verifyToken);
       }
-      user.email_verification_requests += 1;
+      user.email_verification = {
+        last_updation_time: Date.now(),
+        no_of_requests: no_of_requests + 1,
+      };
       await user.save();
       return res.status(200).json({ message: "Success", user });
     } catch (err) {

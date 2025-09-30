@@ -22,7 +22,6 @@ export default async function verifyOTP(req, res) {
         (user.verifyToken = undefined),
         (user.verifyTokenExpiresAt = undefined),
         (user.emailVerificationToken = undefined),
-        (user.email_verification_requests = undefined),
         await user.save());
       return res.status(200).json({ message: "Email verified", user });
     } catch (err) {
