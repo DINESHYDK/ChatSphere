@@ -1,7 +1,7 @@
 import * as cookie from "cookie";
 
 export default function handler(req, res) {
-  const serialized = cookie.serialize("authToken", "", {
+  const serialized = cookie.serialize("auth", "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",

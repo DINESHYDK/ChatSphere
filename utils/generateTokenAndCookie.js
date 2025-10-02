@@ -9,7 +9,7 @@ export default function setTokenAndCookie(res, userId) {
   });
   res.setHeader(
     "Set-Cookie",
-    serialize("authToken", token, {
+    serialize("auth", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
