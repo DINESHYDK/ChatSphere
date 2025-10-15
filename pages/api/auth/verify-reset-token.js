@@ -1,5 +1,6 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
+import devLog from '../../../utils/logger'
 
 export default async function verfiyResetToken(req, res) {
   await connectToDatabase();
@@ -7,7 +8,7 @@ export default async function verfiyResetToken(req, res) {
     try {
       const { token } = req.query;
       if (!token) {
-        console.log("Invalid credentials");
+        devLog("Invalid credentials");
         res.status(401).json({ message: "Authentication failed" });
       }
 
@@ -15,18 +16,18 @@ export default async function verfiyResetToken(req, res) {
         resetToken: token,
       });
       if (!user) {
-        console.log("Invalid token");
+        devLog("Invalid OTP");
         return res
           .status(401)
           .json({ message: "Invalid Password reset token" });
       }
       if (user.resetTokenExpiresAt < Date.now()) {
-        console.log("Reset token Expired");
+        devLog("Reset Token Expired");
         return res.status(401).json({ message: "Reset token expired" });
       }
       res.status(200).json({ message: "success", user });
     } catch (err) {
-      console.log("Something went wrong", err);
+      devLog("Something went wrong", err);
       res.status(500).json({ message: "Internal server error" });
     }
   } else {

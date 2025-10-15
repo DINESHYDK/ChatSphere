@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import Router from "next/router";
 import { toast, ToastContainer } from "react-toastify";
+import devLog  from "../utils/logger";
 
 export const ROUTES = {
   HOMEPAGE: "/",
@@ -75,13 +76,12 @@ const authStore = create((set, get) => ({
       });
       const data = await res.json();
       if (!res.ok) {
-        console.log("Invalid credentials");
+        devLog("Invalid credentials");
         if (res.status === 403 || res.status === 401 || res.status === 500) {
           toast.error(data.message);
         }
         throw { status: res.status, message: data.message || "Unknown error" };
       }
-      console.log("Sign in successful");
       set({ authUser: data.user });
       await Router.push(ROUTES.HOMEPAGE);
       return data;
@@ -113,7 +113,7 @@ const authStore = create((set, get) => ({
         } else if (res.status === 429) {
           toast.warning(data.message);
         }
-        throw { status: res.status, message: res.message || "" };
+        throw { status: res.status, message: res.message || "" };  //this is an err object
       }
     } catch (err) {
       throw err;
@@ -134,13 +134,12 @@ const authStore = create((set, get) => ({
       });
       const data = await res.json();
       if (!res.ok) {
-        console.log("Password reset unsuccessful");
+        devLog("Password reset unsuccessful");
         Router.push(ROUTES.SIGNIN);
         return;
       }
       await Router.push("/");
       if (res.status === 200) toast.success(data.message);
-      console.log("Password reset successful");
     } catch (error) {
       console.error(error);
     } finally {
@@ -186,7 +185,7 @@ const authStore = create((set, get) => ({
         toast.info("Email sent again");
       set({ is_email_verified: true });
     } catch (err) {
-      console.log("Error during email verification ", err.message || "");
+      devLog("Error during email verification ", err.message || "");
       throw err;
     }
   },
@@ -203,7 +202,7 @@ const authStore = create((set, get) => ({
       });
       const data = await res.json();
       if (!res.ok) {
-        console.log("OTP verification failed");
+        devLog("OTP verification failed");
         if (res.status === 401 || res.status === 500) {
           toast.error(data.message);
         }
@@ -211,9 +210,8 @@ const authStore = create((set, get) => ({
       }
       set({ authUser: data.user });
       await Router.push("/");
-      console.log("User verification successful");
     } catch (err) {
-      console.log("Error during OTP verification ", err.message || "");
+      devLog("Error during OTP verification ", err.message || "");
       throw err;
     } finally {
       set({ is_auth_request_pending: false });
@@ -229,7 +227,7 @@ const authStore = create((set, get) => ({
       }
       set({ is_reset_otp_verified: true });
     } catch (err) {
-      console.log("Error during password reset", err);
+      devLog("Error during password reset", err);
     }
   },
 }));

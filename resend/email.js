@@ -2,6 +2,7 @@ import { Resend } from "resend";
 import { VERIFICATION_EMAIL_TEMPLATE } from "./emailTemplates";
 import { FORGOT_PASSWORD_TEMPLATE } from "./emailTemplates";
 import generateToken from "../utils/generateAuthToken";
+import devLog from '../utils/logger'
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -14,7 +15,7 @@ export const sendVerifyUserEmail = async (mailId, token) => {
   });
 
   if (error) {
-    console.log("Unable to send verification email", error);
+    devLog("Unable to send verification email", error);
   }
 };
 export const sendResetPassEmail = async (mailId, token) => {
@@ -26,6 +27,6 @@ export const sendResetPassEmail = async (mailId, token) => {
   });
 
   if (error) {
-    console.log("Unable to send verification email", error);
+    devLog("Unable to send verification email", error);
   }
 };

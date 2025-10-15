@@ -2,6 +2,7 @@ import UserModel from "../../../models/User/UserModel";
 import connectToDatabase from "../../../config/mongoose";
 import bcrypt from "bcrypt";
 import setTokenAndCookie from "../../../utils/generateTokenAndCookie";
+import devLog from '../../../utils/logger'
 
 export default async function resetPassword(req, res) {
   await connectToDatabase();
@@ -28,7 +29,7 @@ export default async function resetPassword(req, res) {
         .status(200)
         .json({ message: "Password Reset Successful", user });
     } catch (err) {
-      console.log("Something went wrong", err);
+      devLog("Something went wrong", err);
       res.status(500).json({ message: "Internal server error" });
     }
   } else {

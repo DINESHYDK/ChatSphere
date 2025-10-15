@@ -18,7 +18,6 @@ export default function VerifyEmail() {
   const hasVerifed = useRef(false); //to prevent calling verify_email twice.
   useEffect(() => {
     if (!router.isReady || !token || hasVerifed.current) return;
-    console.log("I am running twice");
     verify_email(token); // *** Global state ***
     hasVerifed.current = true;
   }, [router.isReady, token]);

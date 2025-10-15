@@ -3,6 +3,8 @@ import { useState } from "react";
 import authStore from "../../store/authStore";
 import PasswordInput from "../../components/Input/PasswordInput";
 import Loader1 from "../../components/Loader/Loader1";
+import devLog from '../../utils/logger'
+
 const Signup = () => {
   const { SignIn, is_auth_request_pending } = authStore();
   const [loading, setLoading] = useState(false);
@@ -27,7 +29,7 @@ const Signup = () => {
       setLoading(true);
       await SignIn(userData); // *** calling SignIn (zustand state) ***
     } catch (err) {
-      console.log(err.message);
+      devLog(err.message);
       if (err.status === 403) {
         setUserData((prev) => ({ email: "", password: "" }));
       } else if (err.status == 401) {

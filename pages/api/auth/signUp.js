@@ -5,6 +5,8 @@ import { sendVerifyUserEmail } from "../../../resend/email";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 import generateToken from "../../../utils/generateAuthToken";
+import devLog from '../../../utils/logger'
+
 
 export default async function signUp(req, res) {
   await connectToDatabase();
@@ -35,7 +37,7 @@ export default async function signUp(req, res) {
         verifyToken,
         verifyTokenExpiresAt: Date.now() + 24 * 100 * 60 * 60, // *** Will expire in 24 hr ***
       });
-      console.log("new user is ", newUser);
+      devLog("new user is ", newUser);
       await newUser.save();
       delete newUser.password;
       sendVerifyUserEmail(email, verifyToken);

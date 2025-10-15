@@ -35,7 +35,7 @@ export default function ResetPassword() {
     try {
       await reset_password(password, token); // *** Global zustand state ***
     } catch (err) {
-      console.log(err);
+      
     } finally {
       setLoading(false);
     }
