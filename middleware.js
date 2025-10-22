@@ -7,15 +7,14 @@ const authErr = () => {
 };
 
 export async function middleware(req) {
-  const cookie_name = process.env.AUTH_COOKIE;
-
+  const cookie_name = process.env.AUTH_JWT_COOKIE;
   const token = req.cookies.get(cookie_name)?.value;
-  const secret = new TextEncoder().encode(process.env.JWT_SECRET);
+
+  const secretBytes = new TextEncoder().encode(process.env.JWT_SECRET); //required by jose in byts format
   if (!token) authErr();
-
   try {
-    const { payload } = await jwtVerify(token, secret);
-
+    const { payload } = await jwtVerify(token, secretBytes);
+    
     if (!payload) authErr();
     const { userId } = payload;
 
@@ -30,5 +29,7 @@ export async function middleware(req) {
   }
 }
 export const config = {
-  matcher: ["/api/chat/:path*"],
+  matcher: ["/vis"],
 };
+
+ // *** MIDDLEWARE IN NEXT IS RUN IN EDGE RUNTIME DUE TO WHICH MODULES LIKE FS, CRYPTO, BCRYPT DIDN'T WORK HERE. ***

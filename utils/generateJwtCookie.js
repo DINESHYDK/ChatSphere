@@ -1,6 +1,6 @@
 import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import Cryptr from "cryptr";
 
 export default function setTokenAndCookie(res, userId) {
   const jwt_cookie_name = process.env.AUTH_JWT_COOKIE;
@@ -12,8 +12,8 @@ export default function setTokenAndCookie(res, userId) {
     algorithm: "HS256",
   });
 
-  const salt = bcrypt.genSaltSync(10);
-  const AUTH_COOKIE = bcrypt.hashSync(userId, salt);
+  const cryptr = new Cryptr(jwtKey);
+  const AUTH_COOKIE = cryptr.encrypt(userId);
 
   res.setHeader("Set-Cookie", [
     serialize(jwt_cookie_name, JWT_COOKIE, {
