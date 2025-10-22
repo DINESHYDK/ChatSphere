@@ -1,9 +1,9 @@
 import { sendResetPassEmail } from "../../../resend/email";
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
-import generateAuthToken from "../../../utils/generateAuthToken";
+import generateAuthToken from "../../../utils/generateOTP";
 import { VERIFY_API_LIMIT } from "../../../utils/verifyApiLimit";
-import devLog from '../../../utils/logger'
+import devLog from "../../../utils/logger";
 
 export default async function forgotPassword(req, res) {
   await connectToDatabase();

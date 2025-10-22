@@ -9,37 +9,32 @@ const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-
 const io = new Server(server, {
-    cors: {
-        origin: process.env.CORS_ORIGIN || "*",
-        methods: ["GET", "POST"],
-    },
+  cors: {
+    origin: process.env.CORS_ORIGIN || "*",
+    methods: ["GET", "POST"],
+  },
 });
 Socket.on("connection", (socket) => {
-    console.log('User connected', socket.id);
+  console.log("User connected", socket.id);
 
-    Socket.on("join-room", (roomId) => {
-        Socket.join(roomId);
-        console.log('Joined room', roomId);
-    })
-    
-    Socket.on("send-message", ({message, roomId}) => {
-      io.to(roomId).emit("receive-message", message)
-    })
+  Socket.on("join-room", (roomId) => {
+    Socket.join(roomId);
+    console.log("Joined room", roomId);
+  });
 
-    Socket.on("exit-from-room", () => {
-      console.log('User exit from room', socket.id);
-    })
+  Socket.on("send-message", ({ message, roomId }) => {
+    io.to(roomId).emit("receive-message", message);
+  });
 
-    
-})
-app.get("/", (req, res) => {
-res.send("Socket server is live ");
+  Socket.on("exit-from-room", () => {
+    console.log("User exit from room", socket.id);
+  });
 });
-    
-
+app.get("/", (req, res) => {
+  res.send("Socket server is live ");
+});
 
 app.listen(port, () => {
-    console.log(`http://localhost:${port}`)
-})
+  console.log(`http://localhost:${port}`);
+});

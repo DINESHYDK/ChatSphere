@@ -2,7 +2,7 @@ import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import bcrypt from "bcrypt";
 import { serialize } from "cookie";
-import setTokenAndCookie from "../../../utils/generateTokenAndCookie";
+import setTokenAndCookie from "../../../utils/generateJwtCookie";
 
 export default async function signIn(req, res) {
   await connectToDatabase();

@@ -4,9 +4,8 @@ import { sendVerifyUserEmail } from "../../../resend/email";
 
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import generateToken from "../../../utils/generateAuthToken";
-import devLog from '../../../utils/logger'
-
+import generateToken from "../../../utils/generateOTP";
+import devLog from "../../../utils/logger";
 
 export default async function signUp(req, res) {
   await connectToDatabase();

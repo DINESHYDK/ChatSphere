@@ -1,7 +1,7 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
-import setTokenAndCookie from "../../../utils/generateTokenAndCookie";
-import devLog from '../../../utils/logger'
+import setTokenAndCookie from "../../../utils/generateJwtCookie";
+import devLog from "../../../utils/logger";
 
 export default async function verifyOTP(req, res) {
   await connectToDatabase();
@@ -17,7 +17,8 @@ export default async function verifyOTP(req, res) {
       if (user.verifyTokenExpiresAt < Date.now()) {
         return res.status(401).json({ message: "Token expired" });
       }
-      setTokenAndCookie(res, user._id);
+      // console.log("user is ", user._id.toString());
+      setTokenAndCookie(res, user._id.toString());
       ((user.isVerified = true),
         (user.verifyToken = undefined),
         (user.verifyTokenExpiresAt = undefined),

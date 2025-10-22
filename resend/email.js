@@ -1,8 +1,8 @@
 import { Resend } from "resend";
 import { VERIFICATION_EMAIL_TEMPLATE } from "./emailTemplates";
 import { FORGOT_PASSWORD_TEMPLATE } from "./emailTemplates";
-import generateToken from "../utils/generateAuthToken";
-import devLog from '../utils/logger'
+import generateToken from "../utils/generateOTP";
+import devLog from "../utils/logger";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
