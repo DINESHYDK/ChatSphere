@@ -1,4 +1,4 @@
-const { default: mongoose } = require("mongoose");
+import mongoose from "mongoose";
 
 const PollSchema = new mongoose.Schema(
   {
@@ -14,7 +14,10 @@ const PollSchema = new mongoose.Schema(
     pollOptions: [
       {
         content: String, // *** if user have non-image poll ***
-        image: String, // *** if user have a image-involving poll ***
+        imageUrl: {
+          type: String,
+          default: "",
+        },
         votesCount: {
           type: Number,
           default: 0,
@@ -23,12 +26,16 @@ const PollSchema = new mongoose.Schema(
     ],
     pollFor: {
       type: String,
-      enum: ["all", "female", "male"],
-      default: "all",
+      enum: ["A", "F", "M"],
+      default: "A",
     },
     totalVotes: {
       type: Number,
       default: 0,
+    },
+    isDelivered: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }

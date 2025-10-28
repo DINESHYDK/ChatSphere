@@ -11,7 +11,7 @@ export default async function signUp(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { userName, email, password } = req.body.userData;
+      const { userName, email, password, gender } = req.body.userData;
 
       if (!userName || !email || !password) {
         return res.status(400).json({ message: "All fields are required" });
@@ -30,6 +30,7 @@ export default async function signUp(req, res) {
 
       const newUser = new UserModel({
         userName,
+        gender,
         email,
         password: hashedPassword,
         emailVerificationToken: token,

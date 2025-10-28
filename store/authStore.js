@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import Router from "next/router";
 import { toast, ToastContainer } from "react-toastify";
-import devLog  from "../utils/logger";
+import devLog from "../utils/logger";
 
 export const ROUTES = {
   HOMEPAGE: "/",
@@ -34,6 +34,7 @@ const authStore = create((set, get) => ({
     set({ authUser: userData });
   },
   SignUp: async (userData) => {
+    console.log(userData);
     if (get().is_auth_request_pending || !userData) return;
     try {
       set({ is_auth_request_pending: true });
@@ -113,7 +114,7 @@ const authStore = create((set, get) => ({
         } else if (res.status === 429) {
           toast.warning(data.message);
         }
-        throw { status: res.status, message: res.message || "" };  //this is an err object
+        throw { status: res.status, message: res.message || "" }; //this is an err object
       }
     } catch (err) {
       throw err;
@@ -237,5 +238,4 @@ export default authStore;
 // *** { Whenever throw is written, it directly run into catch statement. } ***
 // *** { When a function throws an error, it will propagate up to the nearest catch in the call stack. } ***
 // *** { If you catch it inside the function and don’t rethrow, the caller never sees it. } ***
-
-// *** in Zustand to use one global variable in other, one must have to use get function ***
+// *** in Zustand to use one global variable in other, one must have to use "get()" function ***

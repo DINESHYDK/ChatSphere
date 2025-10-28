@@ -6,13 +6,6 @@ const GlobalMessageSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    senderImage: {
-      type: string,
-    },
-    senderName: {
-      type: String,
-      required: true,
-    },
     content: {
       type: String,
       default: "",

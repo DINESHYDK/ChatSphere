@@ -13,7 +13,7 @@ const Signup = () => {
     userName: "",
     email: "",
     password: "",
-    gender: "male",
+    gender: "M",
   });
   function handleDataChange(e) {
     const { name, value } = e.target;
@@ -34,7 +34,7 @@ const Signup = () => {
       await SignUp(userData);
     } catch (err) {
       if (err.status === 409)
-        setUserData({ userName: "", email: "", password: "", gender: "male" });
+        setUserData({ userName: "", email: "", password: "", gender: "M" });
     } finally {
       setLoading(false);
     }
