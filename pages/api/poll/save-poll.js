@@ -15,7 +15,7 @@ export default async function SavePoll(req, res) {
       const cryptr = new Cryptr(secret);
 
       const pollAutherId = cryptr.decrypt(encryptId);
-      const { pollTitle, pollOptions, pollFor } = req.body;
+      const { pollTitle, pollOptions, pollFor } = req.body.pollData;
       const newPoll = await PollModel.create({
         pollAutherId,
         pollTitle,

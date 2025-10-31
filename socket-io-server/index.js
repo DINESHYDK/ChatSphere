@@ -2,7 +2,7 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
-const { Socket } = require("dgram");
+const devLog = require("../utils/logger");
 
 const app = express();
 const server = http.createServer(app);
@@ -15,26 +15,34 @@ const io = new Server(server, {
     methods: ["GET", "POST"],
   },
 });
-Socket.on("connection", (socket) => {
-  console.log("User connected", socket.id);
+io.on("connection", (socket) => {
+  devLog("User connected", socket.id);
 
-  Socket.on("join-room", (roomId) => {
-    Socket.join(roomId);
-    console.log("Joined room", roomId);
+  socket.on("join-room", (roomId) => {
+    socket.join(roomId);
+    devLog("Joined room", roomId);
   });
 
-  Socket.on("send-message", ({ message, roomId }) => {
+  socket.on("send-message", ({ message, roomId }) => {
     io.to(roomId).emit("receive-message", message);
   });
 
-  Socket.on("exit-from-room", () => {
-    console.log("User exit from room", socket.id);
+  socket.on("exit-from-room", () => {
+    devLog("User exit", socket.id);
   });
+
+  socket.on("poll-update", (data) => {
+    devLog("poll-update")
+    io.emit("poll-update", data);
+  });
+
+  
 });
+
 app.get("/", (req, res) => {
-  res.send("Socket server is live ");
+  res.send("socket server is live ");
 });
 
 app.listen(port, () => {
-  console.log(`http://localhost:${port}`);
+  devLog(`http://localhost:${port}`);
 });

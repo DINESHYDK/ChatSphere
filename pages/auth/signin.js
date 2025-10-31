@@ -3,7 +3,8 @@ import { useState } from "react";
 import authStore from "../../store/authStore";
 import PasswordInput from "../../components/Input/PasswordInput";
 import Loader1 from "../../components/Loader/Loader1";
-import devLog from '../../utils/logger'
+import Link from "next/link";
+import devLog from "../../utils/logger";
 
 const Signup = () => {
   const { SignIn, is_auth_request_pending } = authStore();
@@ -90,12 +91,12 @@ const Signup = () => {
                 </label>
 
                 <div className="text-2sm">
-                  <a
+                  <Link
                     href="/auth/forgot-password"
                     className="font-semibold text-[#6A89A7] hover:text-indigo-500"
                   >
                     Forgot password?
-                  </a>
+                  </Link>
                 </div>
               </div>
 
@@ -119,12 +120,12 @@ const Signup = () => {
 
           <p className="mt-10 text-center text-sm/6 text-gray-500">
             Don't have an account?
-            <a
+            <Link
               href="/auth/signup"
               className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
             >
               Sign Up
-            </a>
+            </Link>
             here
           </p>
         </div>

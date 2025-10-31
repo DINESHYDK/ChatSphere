@@ -1,29 +1,9 @@
 import { create } from "zustand";
 import Router from "next/router";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import devLog from "../utils/logger";
-
-export const ROUTES = {
-  HOMEPAGE: "/",
-  SIGNUP: "/auth/signup",
-  SIGNIN: "/auth/signin",
-  VERIFY_EMAIL: "/auth/verify-email?token=", //*** {Token will be provided in link} ***
-  FORGOT_PASSWORD: "/auth/forgot-password",
-};
-
-export const API_ENDPOINTS = {
-  AUTH: {
-    SIGNUP: "/api/auth/signUp",
-    SIGNIN: "/api/auth/signIn",
-    LOGOUT: "/api/auth/logout",
-    FORGOT_PASSWORD: "/api/auth/forgotPassword",
-    RESET_PASSWORD: "/api/auth/resetPassword?token=", // *** {Token will be provided here} ***
-    VERIFY_EMAIL: "/api/auth/verify-email?token=",
-    VERIFY_OTP: "/api/auth/verify-otp",
-    VERIFY_RESET_TOKEN: "/api/auth/verify-reset-token?token=", // *** {Token will be provided} ***
-    UPDATE_USER: "/api/auth/update",
-  },
-};
+import { ROUTES } from "../constants/page-routes";
+import { API_ENDPOINTS } from "../constants/api-endpoints";
 
 const authStore = create((set, get) => ({
   is_auth_request_pending: false, //for auth related request
@@ -34,7 +14,6 @@ const authStore = create((set, get) => ({
     set({ authUser: userData });
   },
   SignUp: async (userData) => {
-    console.log(userData);
     if (get().is_auth_request_pending || !userData) return;
     try {
       set({ is_auth_request_pending: true });
@@ -147,23 +126,23 @@ const authStore = create((set, get) => ({
       set({ is_auth_request_pending: false });
     }
   },
-  updateUser: async (userData) => {
-    try {
-      let res = await fetch(API_ENDPOINTS.AUTH.UPDATE_USER, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userData }),
-      });
-      if (!res.ok) {
-        return;
-      }
-      const data = await response.json();
-    } catch (error) {
-      console.error(error);
-    }
-  },
+  // updateUser: async (userData) => {
+  //   try {
+  //     let res = await fetch(API_ENDPOINTS.AUTH.UPDATE_USER, {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ userData }),
+  //     });
+  //     if (!res.ok) {
+  //       return;
+  //     }
+  //     const data = await response.json();
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // },
   verify_email: async (token, resend = false) => {
     try {
       if (!token) return;

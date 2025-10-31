@@ -3,6 +3,7 @@ import { useState } from "react";
 import PasswordInput from "../../components/Input/PasswordInput";
 import GenderInput from "../../components/Input/GenderInput";
 import Loader1 from "../../components/Loader/Loader1";
+import Link from "next/link";
 import authStore from "../../store/authStore";
 
 const Signup = () => {
@@ -151,12 +152,12 @@ const Signup = () => {
 
         <p className="mt-3 text-center text-sm/6 text-gray-500">
           Already have an account?
-          <a
+          <Link
             href="/auth/signin"
             className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
           >
             Sign In
-          </a>
+          </Link>
           here
         </p>
       </div>
