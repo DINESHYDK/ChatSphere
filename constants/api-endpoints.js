@@ -10,12 +10,18 @@ export const API_ENDPOINTS = {
     VERIFY_RESET_TOKEN: "/api/auth/verify-reset-token?token=", // *** {Token will be provided} ***
     UPDATE_USER: "/api/auth/update", // to be done
   },
-  MESSAGES: {
-    SAVE_GLOBAL_MESSAGES: "/api/chat/save-global-messages",
-    SAVE_PRIVATE_MESSAGES: "/api/chat/save-private-messages",
-  },
   POLLS: {
     SAVE_POLL: "api/poll/save-poll",
     SAVE_POLL_VOTES: "/api/poll/save-poll-votes",
+  },
+  CHAT: {
+    GLOBAL: {
+      FETCH_GLOBAL_MESSAGES: "api/chat/global/fetch-global-messages",   
+      SAVE_GLOBAL_MESSAGES: "api/chat/global/save-global-messages" 
+    },
+    PRIVATE: {
+      FETCH_MESSAGES: "api/chat/private-chat/fetch-messages",  // *** Limit and skip params will be provided ***
+      SAVE_PRIVATE_MESSAGES: "api/chat/global/save-private-messages",
+    },
   },
 };

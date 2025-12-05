@@ -2,10 +2,10 @@ import mongoose from "mongoose";
 import debug from "debug";
 
 const dbgr = debug("development:mongoose");
-mongoose.set("debug", true); // Shows DB operations in console
+mongoose.set("debug", true);
 
 const MONGODB_URI =
-  process.env.MONGO_URI || "mongodb://localhost:27017/ChatSphere"; // Replace with env var in production
+  process.env.MONGO_URI || "mongodb://localhost:27017/ChatSphere";
 
 let cached = global.mongoose;
 
@@ -23,26 +23,18 @@ export default async function connectToDatabase() {
 
   if (!cached.promise) {
     cached.promise = mongoose
-      .connect(MONGODB_URI, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      })
+      .connect(MONGODB_URI) // no options needed in Mongoose v7+
       .then((mongooseInstance) => {
         dbgr("MongoDB connected successfully.");
-        return mongooseInstance;
+        return mongooseInstance; // <-- NO extra brace
       })
       .catch((err) => {
         dbgr("MongoDB connection error:", err.message);
-        console.error(" MongoDB connection error:", err);
+        console.error("MongoDB connection error:", err);
         throw err;
       });
   }
 
-  try {
-    cached.conn = await cached.promise;
-    return cached.conn;
-  } catch (e) {
-    console.error(" Final DB connection error:", e);
-    throw e;
-  }
+  cached.conn = await cached.promise;
+  return cached.conn;
 }

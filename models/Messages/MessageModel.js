@@ -33,3 +33,9 @@ const MessageSchema = new mongoose.Schema(
 const MessageModel =
   mongoose.models.message || mongoose.model("message", MessageSchema);
 export default MessageModel;
+
+MessageSchema.index({
+  senderId: 1,
+  receiverId: 1,
+  _id: -1,
+});

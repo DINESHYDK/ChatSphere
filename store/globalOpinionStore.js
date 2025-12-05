@@ -1,14 +1,14 @@
 import { create } from "zustand";
 import { API_ENDPOINTS } from "../constants/api-endpoints";
-import devLog from '../utils/logger'
+import devLog from "../utils/logger";
 
 const globalOpinionStore = create((set) => ({
   polls: [],
   myPolls: [],
   createImagePoll: () => {},
   createTextPoll: async (pollData) => {
-    try{
-      const res = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
+    try {
+      const res = await fetch(API_ENDPOINTS.POLLS.SAVE_POLL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -16,11 +16,11 @@ const globalOpinionStore = create((set) => ({
         body: JSON.stringify({ pollData }),
       });
       const data = await res.json();
-      if (!res.ok){
-        
+      if (!res.ok) {
+        throw { message: data.message };
       }
-    }catch(err){
-
+    } catch (err) {
+      console.log(err);
     }
   },
 }));

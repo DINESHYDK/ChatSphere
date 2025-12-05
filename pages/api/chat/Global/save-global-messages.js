@@ -1,5 +1,5 @@
-import connectToDatabase from "../../../config/mongoose";
-import globalMessageModel from "../../../models/Messages/GlobalMessageModel";
+import connectToDatabase from "../../../../config/mongoose";
+import globalMessageModel from "../../../../models/Messages/GlobalMessageModel";
 import Cryptr from "cryptr";
 
 export default async function SaveGlobalMessages(req, res) {
