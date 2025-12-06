@@ -16,12 +16,12 @@ export const API_ENDPOINTS = {
   },
   CHAT: {
     GLOBAL: {
-      FETCH_GLOBAL_MESSAGES: "api/chat/global/fetch-global-messages",   
-      SAVE_GLOBAL_MESSAGES: "api/chat/global/save-global-messages" 
+      FETCH_GLOBAL_MESSAGES: "api/chat/global/fetch-messages", // *** api/chat/global/fetch-messages?limit=...&id=... ***
+      SAVE_GLOBAL_MESSAGES: "api/chat/global/save-messages",
     },
     PRIVATE: {
-      FETCH_MESSAGES: "api/chat/private-chat/fetch-messages",  // *** Limit and skip params will be provided ***
-      SAVE_PRIVATE_MESSAGES: "api/chat/global/save-private-messages",
+      FETCH_MESSAGES: "api/chat/private-chat/fetch-messages", // *** api/chat/private-chat/fetch-messages?limit=...&id=... ***
+      SAVE_PRIVATE_MESSAGES: "api/chat/global/save-messages",
     },
   },
 };
