@@ -2,18 +2,21 @@ import mongoose from "mongoose";
 
 const PollSchema = new mongoose.Schema(
   {
-    pollAutherId: {
+    userId: {
       id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
       type: String,
       required: true,
     },
-    pollTitle: {
+    title: {
       type: String,
       required: true,
     },
-    pollOptions: [
+    pollOptions: [  
       {
-        content: String, // *** if user have non-image poll ***
+        content: {
+          type: String,
+          required: true,
+        },
         imageUrl: {
           type: String,
           default: "",
@@ -24,7 +27,7 @@ const PollSchema = new mongoose.Schema(
         },
       },
     ],
-    pollFor: {
+    gender: {
       type: String,
       enum: ["A", "F", "M"],
       default: "A",
@@ -32,10 +35,6 @@ const PollSchema = new mongoose.Schema(
     totalVotes: {
       type: Number,
       default: 0,
-    },
-    isDelivered: {
-      type: Boolean,
-      default: false,
     },
   },
   { timestamps: true }

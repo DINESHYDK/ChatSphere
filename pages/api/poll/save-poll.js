@@ -4,7 +4,7 @@ import Cryptr from "cryptr";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
-
+  console.log("i am runnning");
   if (req.method === "POST") {
     try {
       const cookie_name = process.env.AUTH_USERID_COOKIE;
@@ -14,14 +14,13 @@ export default async function SavePoll(req, res) {
       const secret = process.env.JWT_SECRET;
       const cryptr = new Cryptr(secret);
 
-      const pollAutherId = cryptr.decrypt(encryptId);
-      const { pollTitle, pollOptions, pollFor } = req.body.pollData;
+      const userId = cryptr.decrypt(encryptId);
+      const { title, gender, pollOptions } = req.body.pollData;
       const newPoll = await PollModel.create({
-        pollAutherId,
-        pollTitle,
+        userId,
+        title,
         pollOptions,
-        pollFor,
-        isDelivered: true,
+        gender,
       });
       return res.status(200).json({ message: "success" });
     } catch (err) {

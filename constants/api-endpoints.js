@@ -11,17 +11,20 @@ export const API_ENDPOINTS = {
     UPDATE_USER: "/api/auth/update", // to be done
   },
   POLLS: {
-    SAVE_POLL: "api/poll/save-poll",
+    SAVE_POLL: "/api/poll/save-poll",
     SAVE_POLL_VOTES: "/api/poll/save-poll-votes",
   },
   CHAT: {
     GLOBAL: {
-      FETCH_GLOBAL_MESSAGES: "api/chat/global/fetch-messages", // *** api/chat/global/fetch-messages?limit=...&id=... ***
-      SAVE_GLOBAL_MESSAGES: "api/chat/global/save-messages",
+      FETCH_GLOBAL_MESSAGES: "/api/chat/global/fetch-messages", // *** api/chat/global/fetch-messages?limit=...&id=... ***
+      SAVE_GLOBAL_MESSAGES: "/api/chat/global/save-messages",
     },
     PRIVATE: {
-      FETCH_MESSAGES: "api/chat/private-chat/fetch-messages", // *** api/chat/private-chat/fetch-messages?limit=...&id=... ***
-      SAVE_PRIVATE_MESSAGES: "api/chat/global/save-messages",
+      FETCH_MESSAGES: "/api/chat/private-chat/fetch-messages", // *** api/chat/private-chat/fetch-messages?limit=...&id=... ***
+      SAVE_PRIVATE_MESSAGES: "/api/chat/global/save-messages",
     },
+  },
+  CLOUDINARY: {
+    GET_SIGNATURE: "/api/cloudinary/get-signature",
   },
 };

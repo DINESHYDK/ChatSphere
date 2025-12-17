@@ -213,9 +213,3 @@ const authStore = create((set, get) => ({
   },
 }));
 export default authStore;
-
-// *** { Kaam ki baat } ***
-// *** { Whenever throw is written, it directly run into catch statement. } ***
-// *** { When a function throws an error, it will propagate up to the nearest catch in the call stack. } ***
-// *** { If you catch it inside the function and don’t rethrow, the caller never sees it. } ***
-// *** in Zustand to use one global variable in other, one must have to use "get()" function ***

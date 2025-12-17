@@ -51,7 +51,7 @@ const messages = [
 
 export default function ChatMessages() {
   return (
-    <div className="flex-1 overflow-y-auto px-2 py-4 space-y-3 bg-muted/30">
+    <div className="flex-1 grow overflow-y-auto px-2 py-4 space-y-3 bg-muted/30">
       {messages.map((message) => (
         <div
           key={message.id}
@@ -66,11 +66,7 @@ export default function ChatMessages() {
           >
             <p className="text-sm leading-relaxed">{message.text}</p>
             <span
-              className={`text-[10px] mt-1 block text-right ${
-                message.sender === "me"
-                  ? "text-primary-foreground/70"
-                  : "text-muted-foreground"
-              }`}
+              className={`text-[10px] mt-1 block text-right ${"text-muted-foreground"}`}
             >
               {message.time}
             </span>
