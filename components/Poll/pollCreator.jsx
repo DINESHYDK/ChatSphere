@@ -14,20 +14,21 @@ const form_alerts = [
 export default function PollCreator({ isOpen = true }) {
   const { uploadPollImages, savePoll } = pollStore(); // ─── State to trigger API ──────────────────
   const [isSavingPoll, setIsSavingPoll] = useState(false);
-  const [gender, setGender] = useState("A");
   const [info, setInfo] = useState({
     title: "",
-    gender: gender,
+    gender: "A",
     options: [
       {
         id: 0,
-        text: "",
-        image: "",
+        content: "",
+        imageUrl: "",
+        rawFile: null,
       },
       {
         id: 1,
-        text: "",
-        image: "",
+        content: "",
+        imageUrl: "",
+        rawFile: null,
       },
     ],
   });
@@ -36,7 +37,7 @@ export default function PollCreator({ isOpen = true }) {
 
   // ─── Function to choose gender ──────────────────
   function setColorAndBg(G) {
-    if (gender === G) return "text-white bg-[#6A89A7] hover:bg-[#204D7D]";
+    if (info.gender === G) return "text-white bg-[#6A89A7] hover:bg-[#204D7D]";
     return "text-black bg-white";
   }
 
@@ -47,9 +48,10 @@ export default function PollCreator({ isOpen = true }) {
       e.preventDefault();
       if (info.options.length < 2 || info.options.length > 6) return;
       for (let option of info.options) {
-        if (option.text === "") return;
+        if (option.content === "") return;
       }
       if (info.title === "") return;
+      console.log("my info is", info);
       await uploadPollImages(info);
       await savePoll(info);
     } catch (err) {
@@ -77,8 +79,9 @@ export default function PollCreator({ isOpen = true }) {
               ...info.options,
               {
                 id: sz,
-                text: "",
-                image: "",
+                content: "",
+                imageUrl: "",
+                rawFile: null,
               },
             ]
           : info.options.slice(0, -1);
@@ -94,18 +97,19 @@ export default function PollCreator({ isOpen = true }) {
 
   // ─── Function to handle Input poll Images ──────────────────
   function handleFileInputChange(e, idx) {
+    // console.log("curr info is", info);
     const file = e.target.files[0];
+    if (!file) return;
     if (
       !file.name.endsWith("png") &&
       !file.name.endsWith("webp") &&
       !file.name.endsWith("jpeg")
     )
       return;
-    console.log("done");
     setInfo({
       ...info,
       options: info.options.map((item, i) =>
-        idx === i ? { ...item, image: file } : item
+        idx === i ? { ...item, rawFile: file } : item
       ),
     });
   }
@@ -151,21 +155,21 @@ export default function PollCreator({ isOpen = true }) {
               <div className="flex gap-2">
                 <button
                   className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-border ${setColorAndBg("A")}`}
-                  onClick={() => setGender("A")}
+                  onClick={() => setInfo({ ...info, gender: "A" })}
                   type="button"
                 >
                   All
                 </button>
                 <button
                   className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-border ${setColorAndBg("B")}`}
-                  onClick={() => setGender("B")}
+                  onClick={() => setInfo({ ...info, gender: "B" })}
                   type="button"
                 >
                   Boys
                 </button>
                 <button
                   className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium  transition-all duration-200 border border-border ${setColorAndBg("G")}`}
-                  onClick={() => setGender("G")}
+                  onClick={() => setInfo({ ...info, gender: "G" })}
                   type="button"
                 >
                   Girls
@@ -187,12 +191,14 @@ export default function PollCreator({ isOpen = true }) {
                       spellCheck={false}
                       placeholder={`Option ${idx + 1}`}
                       className="w-full px-4 py-2.5 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm"
-                      value={info.options[idx]?.text}
+                      value={info.options[idx]?.content ?? ""}
                       onChange={(e) =>
                         setInfo({
                           ...info,
                           options: info.options.map((item, i) =>
-                            idx === i ? { ...item, text: e.target.value } : item
+                            idx === i
+                              ? { ...item, content: e.target.value }
+                              : item
                           ),
                         })
                       }

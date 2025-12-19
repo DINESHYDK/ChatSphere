@@ -36,12 +36,12 @@ const pollStore = create((set, get) => ({
       if (!res.ok) throw err;
       const { signature, timestamp, api_key, cloud_name } = obj;
 
-      const poll_data = pollObj.options?.filter((option) => option.image != "");
+      const poll_data = pollObj.options?.filter((option) => option.rawFile);
       if (poll_data.length == 0) return;
 
       const promiseArr = poll_data.map(async (option) => {
         const formData = new FormData();
-        formData.append("file", option.image);
+        formData.append("file", option.imageUrl);
         formData.append("signature", signature);
         formData.append("api_key", api_key);
         formData.append("timestamp", timestamp);
@@ -55,7 +55,7 @@ const pollStore = create((set, get) => ({
           body: formData,
         });
         const data = await res.json();
-        if (!res.ok) throw err;
+        if (!res.ok) throw data;
 
         return {
           id: option.id,
@@ -64,7 +64,7 @@ const pollStore = create((set, get) => ({
       });
       const result = await Promise.all(promiseArr);
       set({ poll_images: result });
-      console.log("result is ", result);
+      // console.log("result is ", result);
       const { savePoll } = get();
     } catch (err) {
       throw err;
@@ -85,15 +85,18 @@ const pollStore = create((set, get) => ({
         options.length > 6
       )
         throw "Invalid Poll!!";
-
       const pollOptions = options;
+      // console.log('done1');
+
+      // *** RawFile deleted  ***
+      for (let option of pollObj.options) delete option.rawFile;
+
       for (let image of poll_images) {
-        pollOptions[image.id] = {
-          content: pollOptions[image.id].text,
-          imageUrl: image.url,
-        };
+        pollOptions[image.id] = { ...pollOptions[image.id], imageUrl };
       }
+
       const pollData = { title, gender, pollOptions };
+      console.log("final poll data is ", pollData);
       const res = await fetch(API_ENDPOINTS.POLLS.SAVE_POLL, {
         method: "POST",
         headers: {
