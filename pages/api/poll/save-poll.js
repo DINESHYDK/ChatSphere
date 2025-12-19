@@ -1,33 +1,31 @@
-import connectToDatabase from "../../../config/mongoose";
-import PollModel from "../../../models/Polls/PollModel";
-import Cryptr from "cryptr";
+import connectToDatabase from "@/config/mongoose";
+import PollModel from "@/models/Polls/PollModel";
+import checkAuthAndCookie from "@/utils/checkAuth";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const cookie_name = process.env.AUTH_USERID_COOKIE;
-      console.log(cookie_name);
-      const encryptId = req.cookies[cookie_name];
-      if (!encryptId) res.status(401).json({ message: "Unauthorised" });
-      
-      const secret = process.env.JWT_SECRET;
-      const cryptr = new Cryptr(secret);
-      
-      const userId = cryptr.decrypt(encryptId);
+      const obj = await checkAuthAndCookie(req);
+      if (!obj)
+        return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
+      if (obj.statusCode === 401)
+        return res.status(401).json({ message: obj.message });
+
+      const userId = obj._id;
       const { title, gender, pollOptions } = req.body.pollData;
-      console.log('new poll on server side ', pollData);
-      
-      const newPoll = await PollModel.create({
+
+      const newPoll = new PollModel({
         userId,
         title,
         pollOptions,
         gender,
       });
+      await newPoll.save();
 
-      return res.status(200).json({ message: "success" });
+      return res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
-      return res.status(500).json({ message: err });
+      return res.status(500).json({ message: `Something went wrong, ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

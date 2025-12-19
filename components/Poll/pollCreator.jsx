@@ -12,8 +12,7 @@ const form_alerts = [
 ];
 
 export default function PollCreator({ isOpen = true }) {
-  const { uploadPollImages, savePoll } = pollStore(); // ─── State to trigger API ──────────────────
-  const [isSavingPoll, setIsSavingPoll] = useState(false);
+  const { uploadPollImages, savePoll, set_is_saving_poll } = pollStore(); // ─── State to trigger API ──────────────────
   const [info, setInfo] = useState({
     title: "",
     gender: "A",
@@ -44,20 +43,20 @@ export default function PollCreator({ isOpen = true }) {
   // ─── Function to finally  submit the Poll ──────────────────
   const handleSubmit = async (e) => {
     try {
-      setIsSavingPoll(true);
+      set_is_saving_poll(true);
       e.preventDefault();
       if (info.options.length < 2 || info.options.length > 6) return;
       for (let option of info.options) {
         if (option.content === "") return;
       }
       if (info.title === "") return;
-      console.log("my info is", info);
-      await uploadPollImages(info);
-      await savePoll(info);
+
+      await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
+      await savePoll(info); // ─── Saving poll in DB ──────────────────
     } catch (err) {
       devLog("Error while saving poll", err);
     } finally {
-      setIsSavingPoll(false);
+      set_is_saving_poll(false);
     }
   };
 
@@ -97,7 +96,6 @@ export default function PollCreator({ isOpen = true }) {
 
   // ─── Function to handle Input poll Images ──────────────────
   function handleFileInputChange(e, idx) {
-    // console.log("curr info is", info);
     const file = e.target.files[0];
     if (!file) return;
     if (
@@ -115,11 +113,8 @@ export default function PollCreator({ isOpen = true }) {
   }
 
   return (
-    // Semi-transparent dark overlay
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      {/* White rounded box with shadow */}
       <div className="w-full max-w-md bg-background rounded-2xl shadow-2xl overflow-hidden">
-        {/* Header with close button */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground">Create Poll</h2>
           <button className="p-1.5 rounded-full hover:bg-muted transition-colors duration-200">
@@ -127,10 +122,8 @@ export default function PollCreator({ isOpen = true }) {
           </button>
         </div>
 
-        {/* Content */}
         <form onSubmit={handleSubmit}>
           <div className="px-5 py-4 space-y-5">
-            {/* Poll title input */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Poll Title
@@ -141,12 +134,11 @@ export default function PollCreator({ isOpen = true }) {
                 placeholder="Enter your question..."
                 className="w-full px-4 py-3 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                 required
-                value={info.title}
+                value={info.title ?? ""}
                 onChange={(e) => setInfo({ ...info, title: e.target.value })}
               />
             </div>
 
-            {/* Participant selector */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Who can participate?
@@ -177,7 +169,6 @@ export default function PollCreator({ isOpen = true }) {
               </div>
             </div>
 
-            {/* Poll options */}
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Options
@@ -212,9 +203,9 @@ export default function PollCreator({ isOpen = true }) {
                         type="file"
                         id={`input-${idx}`}
                         onChange={(e) => handleFileInputChange(e, idx)}
-                        accept="image/png, image/jpeg, image/webp" // Client-side format filter
-                        multiple={false} // Only allow one file for a poll option
-                        className="hidden" // Hides the default input
+                        accept="image/png, image/jpeg, image/webp"
+                        multiple={false}
+                        className="hidden"
                       />
                       <label htmlFor={`input-${idx}`}>
                         <ImagePlus className="w-5 h-5 cursor-pointer"></ImagePlus>

@@ -1,29 +1,21 @@
-import Cryptr from "cryptr";
-import { cookies } from "next/headers";
-import validateId from "@/utils/validateId";
-
 import MessageModel from "@/models/Messages/MessageModel";
 import connectToDatabase from "@/config/mongoose";
 import UserModel from "@/models/User/UserModel";
+import checkAuthAndCookie from "@/utils/checkAuth";
 
 // *** api/chat/private-chat/fetch-messages?limit=...&id=... ***
 
 export default async function fetchMessages(req, res) {
   await connectToDatabase();
   if (req.method === "GET") {
-    const cookie_name = process.env.AUTH_USERID_COOKIE;
-    const encryptId = req.cookies[cookie_name];
+    const obj = await checkAuthAndCookie(req);
+      if (!obj)
+      return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
+    if (obj.statusCode === 401)
+      return res.status(401).json({ message: obj.message });
 
-    if (!encryptId) return res.status(401).json({ message: "Unauthorized" });
-
-    const key = process.env.JWT_SECRET;
-    const cryptr = new Cryptr(key);
-
-    const user1_id = cryptr.decrypt(encryptId);
+    const user1_id = obj._id;
     const { user2_id } = req.body;
-
-    if (!validateId(user1_id) || !validateId(user2_id))
-      return res.status(400).json({ message: "Invalid request" });
 
     const queryFilter = {
       $or: [
@@ -36,17 +28,14 @@ export default async function fetchMessages(req, res) {
     if (last_msg_id) queryFilter._id = { $lt: last_msg_id };
 
     if (!msg_limit || (last_msg_id && !validateId(last_msg_id)))
-      return res.status(400).json({ message: "Invalid request" });
-
-    const user_1 = await UserModel.findById(user1_id);
-    if (!user_1) return res.status(401).json({ message: "Unauthorised" });
+      return res.status(400).json({ message: "INVALID_REQUEST" });
 
     const user_2 = await UserModel.findById(user2_id);
-    if (!user_2) return res.status(400).json({ message: "Invalid request" });
+    if (!user_2) return res.status(400).json({ message: "INVALID_REQUEST" });
 
     const last_message = await MessageModel.findOne(queryFilter);
     if (!last_message)
-      return res.status(400).json({ message: "Invalid request" });
+      return res.status(400).json({ message: "INVALID_REQUEST" });
 
     const messages = await MessageModel.find(queryFilter)
       .sort({ createdAt: -1 })

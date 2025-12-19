@@ -1,7 +1,6 @@
 import connectToDatabase from "../../../config/mongoose";
 import PollVoteModel from "../../../models/Polls/PollVoteModel";
-import UserModel from "../../../models/User/UserModel";
-import Cryptr from "cryptr";
+import checkAuthAndCookie from "@/utils/checkAuth";
 import PollModel from "../../../models/Polls/PollModel";
 
 export default async function SavePollVotes(req, res) {
@@ -9,34 +8,29 @@ export default async function SavePollVotes(req, res) {
 
   if (req.method === "POST") {
     try {
-      const cookie_name = process.env.AUTH_USERID_COOKIE;
-      const encryptId = req.cookies[cookie_name];
-      if (!encryptId) res.status(401).json({ message: "Unauthorised" });
+      const obj = checkAuthAndCookie(req);
+      if (!obj)
+        return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
+      if (obj.statusCode === 401)
+        return res.status(401).json({ message: obj.message });
 
-      const secret = process.env.JWT_SECRET;
-      const cryptr = new Cryptr(secret);
-
-      const userId = cryptr.decrypt(encryptId);
       const { pollId, optionIndex } = req.body;
 
-      if (!pollId) return res.status(400).json({ message: "Missing data" });
-
-      const user = await UserModel.findById(userId);
-      if (!user) return res.status(404).json({ message: "Unauthorised" });
-      const userGender = user.gender;
+      if (!pollId)
+        return res.status(400).json({ message: "MISSING_REQUIRED_FIELDS" });
 
       const poll = await PollModel.findById(pollId);
-      if (!poll) return res.status(400).json({ message: "Poll not exist" });
+      if (!poll) return res.status(400).json({ message: "INVALID_REQUEST" });
       const pollGender = poll.pollFor;
 
       if (!pollGender || !userGender)
-        return res.status(400).json({ message: "Missing data" });
+        return res.status(400).json({ message: "MISSING_REQUIRED_FIELDS" });
 
       if (pollGender !== "A" && userGender !== pollGender)
-        return res.status(400).json({ message: "Voting not allowed" });
+        return res.status(403).json({ message: "FORBIDDEN_TO_VOTE" });
 
       if (optionIndex >= poll.pollOptions.length)
-        return res.status(400).json({ message: "Invalid" });
+        return res.status(400).json({ message: "INVALID_REQUEST" });
 
       const newPollVote = await PollVoteModel.create({
         pollId,
@@ -45,10 +39,10 @@ export default async function SavePollVotes(req, res) {
         userGender,
       });
 
-      return res.status(200).json({ message: "success" });
+      return res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
       console.log("error is", err);
-      return res.status(500).json({ message: "Internal server error: " });
+      return res.status(500).json({ message: "INTERNAL_SERVER_ERROR" });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

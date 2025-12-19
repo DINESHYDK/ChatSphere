@@ -25,7 +25,11 @@ const pollStore = create((set, get) => ({
   //     console.log(err);
   //   }
   // },
-  poll_images: [], // *** To store the links of images ***
+  poll_images: [], // *** To store the links of images ***,
+  is_saving_poll: false,
+  set_is_saving_poll: () => {
+    set({ is_saving_poll: !is_saving_poll });
+  },
 
   uploadPollImages: async (pollObj) => {
     set({ is_image_fetch_pending: true });
@@ -41,7 +45,7 @@ const pollStore = create((set, get) => ({
 
       const promiseArr = poll_data.map(async (option) => {
         const formData = new FormData();
-        formData.append("file", option.imageUrl);
+        formData.append("file", option.rawFile);
         formData.append("signature", signature);
         formData.append("api_key", api_key);
         formData.append("timestamp", timestamp);
@@ -64,8 +68,6 @@ const pollStore = create((set, get) => ({
       });
       const result = await Promise.all(promiseArr);
       set({ poll_images: result });
-      // console.log("result is ", result);
-      const { savePoll } = get();
     } catch (err) {
       throw err;
     } finally {
@@ -86,17 +88,18 @@ const pollStore = create((set, get) => ({
       )
         throw "Invalid Poll!!";
       const pollOptions = options;
-      // console.log('done1');
 
       // *** RawFile deleted  ***
       for (let option of pollObj.options) delete option.rawFile;
 
       for (let image of poll_images) {
-        pollOptions[image.id] = { ...pollOptions[image.id], imageUrl };
+        pollOptions[image.id] = {
+          ...pollOptions[image.id],
+          imageUrl: image.url,
+        };
       }
 
       const pollData = { title, gender, pollOptions };
-      console.log("final poll data is ", pollData);
       const res = await fetch(API_ENDPOINTS.POLLS.SAVE_POLL, {
         method: "POST",
         headers: {

@@ -1,20 +1,19 @@
 import connectToDatabase from "../../../config/mongoose";
 import messageModel from "../../../models/Messages/MessageModel";
-import Cryptr from "cryptr";
+import checkAuthAndCookie from "@/utils/checkAuth";
 
 export default async function SavePrivateMessages(req, res) {
   await connectToDatabase();
 
   if (req.method === "POST") {
     try {
-      const cookie_name = process.env.AUTH_USERID_COOKIE;
-      const encryptId = req.cookies[cookie_name];
-      if (!encryptId) res.status(401).json({ message: "Unauthorised" });
+      const obj = await checkAuthAndCookie(req);
+      if (!obj || !obj.statusCode || !obj.message)
+        return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
+      if (obj.statusCode === 401)
+        return res.status(401).json({ message: obj.message });
 
-      const secret = process.env.JWT_SECRET;
-      const cryptr = new Cryptr(secret);
-
-      const senderId = cryptr.decrypt(encryptId);
+      const senderId = obj._id;
       const { receiverId, content, imageUrl } = req.body;
       const newMessage = await messageModel.create({
         senderId,
@@ -23,9 +22,9 @@ export default async function SavePrivateMessages(req, res) {
         imageUrl,
         isDelivered: true,
       });
-      return res.status(200).json({ message: "success" });
+      return res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error" });
+      return res.status(500).json({ message: "INTERNAL_SERVER_ERROR" });
     }
   } else {
     res.setHeader("Allow", ["POST"]);
