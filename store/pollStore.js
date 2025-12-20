@@ -28,7 +28,7 @@ const pollStore = create((set, get) => ({
   poll_images: [], // *** To store the links of images ***,
   is_saving_poll: false,
   set_is_saving_poll: () => {
-    set({ is_saving_poll: !is_saving_poll });
+    set({ is_saving_poll: !get().is_saving_poll });
   },
 
   uploadPollImages: async (pollObj) => {

@@ -13,7 +13,7 @@ export default async function SavePrivateMessages(req, res) {
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
-      const senderId = obj._id;
+      const senderId = obj.message._id;
       const { receiverId, content, imageUrl } = req.body;
       const newMessage = await messageModel.create({
         senderId,

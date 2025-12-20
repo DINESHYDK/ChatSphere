@@ -10,8 +10,16 @@ const form_alerts = [
   "• Please fill the above options first",
   "• All options are compulsary.",
 ];
+const isValid = (info) => {
+  return (
+    info.title.trim != "" &&
+    info.options.length >= 2 &&
+    info.options.length <= 6 &&
+    info.options.every((option) => option.content.trim != "")
+  );
+};
 
-export default function PollCreator({ isOpen = true }) {
+export default function PollCreator({ set_is_poll_visible }) {
   const { uploadPollImages, savePoll, set_is_saving_poll } = pollStore(); // ─── State to trigger API ──────────────────
   const [info, setInfo] = useState({
     title: "",
@@ -36,21 +44,18 @@ export default function PollCreator({ isOpen = true }) {
 
   // ─── Function to choose gender ──────────────────
   function setColorAndBg(G) {
-    if (info.gender === G) return "text-white bg-[#6A89A7] hover:bg-[#204D7D]";
+    if (info.gender === G) return "text-white bg-[#6A89A7]";
     return "text-black bg-white";
   }
+  
 
   // ─── Function to finally  submit the Poll ──────────────────
   const handleSubmit = async (e) => {
     try {
-      set_is_saving_poll(true);
       e.preventDefault();
-      if (info.options.length < 2 || info.options.length > 6) return;
-      for (let option of info.options) {
-        if (option.content === "") return;
-      }
-      if (info.title === "") return;
+      set_is_saving_poll(true);
 
+      set_is_poll_visible(false); // ─── Removing CREATE_POLL page ──────────────────
       await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
       await savePoll(info); // ─── Saving poll in DB ──────────────────
     } catch (err) {
@@ -113,12 +118,15 @@ export default function PollCreator({ isOpen = true }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
       <div className="w-full max-w-md bg-background rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-border">
           <h2 className="text-lg font-semibold text-foreground">Create Poll</h2>
           <button className="p-1.5 rounded-full hover:bg-muted transition-colors duration-200">
-            <X className="w-5 h-5 text-muted-foreground" />
+            <X
+              className="w-6 h-6 text-muted-foreground"
+              onClick={() => set_is_poll_visible(false)}
+            />
           </button>
         </div>
 
@@ -173,8 +181,7 @@ export default function PollCreator({ isOpen = true }) {
               <label className="text-sm font-medium text-foreground">
                 Options
               </label>
-
-              <div className="space-y-2.5">
+              <div className="space-y-2.5 overflow-y-scroll max-h-[230px] no-scroll-arrows">
                 {info?.options.map((option, idx) => (
                   <div className="relative" key={idx}>
                     <input

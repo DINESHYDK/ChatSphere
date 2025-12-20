@@ -12,7 +12,9 @@ export default async function SavePoll(req, res) {
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
-      const userId = obj._id;
+      const userId = obj.message._id;
+
+      console.log("your userId is: ", obj);
       const { title, gender, pollOptions } = req.body.pollData;
 
       const newPoll = new PollModel({

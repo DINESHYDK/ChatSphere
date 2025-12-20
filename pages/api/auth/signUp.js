@@ -14,12 +14,12 @@ export default async function signUp(req, res) {
       const { userName, email, password, gender } = req.body.userData;
 
       if (!userName || !email || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+        return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
       }
 
       const existingUser = await UserModel.findOne({ email });
       if (existingUser) {
-        return res.status(409).json({ message: "Email already in use" });
+        return res.status(409).json({ message: "EMAIL_ALREADY_EXISTS" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -47,7 +47,7 @@ export default async function signUp(req, res) {
       });
     } catch (err) {
       console.error("SIGNUP ERROR", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

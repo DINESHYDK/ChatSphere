@@ -6,7 +6,7 @@ const authErr = () => {
   return NextResponse.json({ error: "Unauthorised" }, { status: 401 });
 };
 
-export async function middleware(req) {
+export async function proxy(req) {
   const cookie_name = process.env.AUTH_JWT_COOKIE;
   const token = req.cookies.get(cookie_name)?.value;
 

@@ -14,21 +14,20 @@ export default async function forgotPassword(req, res) {
       let user = await UserModel.findOne({ email }).select("-password");
       if (!user) {
         devLog("Invalid email");
-        return res.status(401).json({ message: "Invalid Credentials" });
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
       if (!user.isVerified) {
         devLog("Invalid email");
-        return res.status(401).json({ message: "Invalid Credentials" });
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
       const { no_of_requests } = user.password_reset;
 
       if (no_of_requests >= 2) {
         let { last_updation_time } = user.password_reset;
         if (!VERIFY_API_LIMIT(last_updation_time)) {
-          devLog("Too many email verify requests");
           return res
             .status(429)
-            .json({ message: "Too many requests, Try again later" });
+            .json({ message: "TOO_MANY_REQUESTS" });
         }
         user.password_reset.no_of_requests = 0;
       }
@@ -43,10 +42,9 @@ export default async function forgotPassword(req, res) {
       };
       await user.save();
 
-      return res.status(200).json({ message: "Password reset email sent" });
+      return res.status(200).json({ message: "PASSWORD RESET EMAIL SENT" });
     } catch (err) {
-      devLog(err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

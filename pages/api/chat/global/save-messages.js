@@ -13,6 +13,7 @@ export default async function SaveGlobalMessages(req, res) {
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
+      const senderid = obj.message._id;
       const { content, imageUrl } = req.body;
 
       const newMessage = await globalMessageModel.create({

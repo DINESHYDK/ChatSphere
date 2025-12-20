@@ -14,7 +14,7 @@ export default async function fetchMessages(req, res) {
     if (obj.statusCode === 401)
       return res.status(401).json({ message: obj.message });
 
-    const user1_id = obj._id;
+    const user1_id = obj.message._id;
     const { user2_id } = req.body;
 
     const queryFilter = {

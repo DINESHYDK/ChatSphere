@@ -11,32 +11,32 @@ export default async function signIn(req, res) {
       const { email, password } = req.body.userData;
 
       if (!email || !password) {
-        return res.status(400).json({ message: "All fields are required" });
+        return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
       }
 
       const user = await UserModel.findOne({ email });
 
       if (!user) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
 
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
       if (!isPasswordCorrect) {
-        return res.status(401).json({ message: "Invalid credentials" });
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
 
       if (!user.isVerified) {
         return res
           .status(403)
-          .json({ message: "Please verify your email first" });
+          .json({ message: "EMAIL_VERIFICATION_REQUIRED" });
       }
       setTokenAndCookie(res, user._id);
       delete user.password;
-      res.status(200).json({ message: "Logged in successfully", user });
+      res.status(200).json({ message: "SUCCESS", user });
     } catch (err) {
       console.error("SIGNIN ERROR", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

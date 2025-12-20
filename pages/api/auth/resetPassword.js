@@ -15,7 +15,7 @@ export default async function resetPassword(req, res) {
       }).select("-password");
 
       if (!user || user.resetTokenExpiresAt < Date.now()) {
-        return res.status(401).json({ message: "Invalid token" });
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
       let salt = await bcrypt.genSalt(10);
       let hashedPassword = await bcrypt.hash(password, salt);
@@ -25,12 +25,9 @@ export default async function resetPassword(req, res) {
         (user.resetTokenExpiresAt = undefined),
         await user.save());
       setTokenAndCookie(res, user._id);
-      return res
-        .status(200)
-        .json({ message: "Password Reset Successful", user });
+      return res.status(200).json({ message: "PASSWORD_RESET" });
     } catch (err) {
-      devLog("Something went wrong", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

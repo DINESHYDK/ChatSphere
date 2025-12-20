@@ -92,7 +92,7 @@ const authStore = create((set, get) => ({
         if (res.status === 401 || res.status === 500) {
           toast.error(data.message);
         } else if (res.status === 429) {
-          toast.warning(data.message);
+          toast.warning("Too many requests, Try again later");
         }
         throw { status: res.status, message: res.message || "" }; //this is an err object
       }
