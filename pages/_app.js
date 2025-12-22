@@ -13,7 +13,7 @@ export default function App({ Component, pageProps }) {
       <main className={inria.variable}>
         <Component {...pageProps} />
       </main>
-      <ToastContainer
+      {/* <ToastContainer
         position="top-right"
         toastClassName="custom-toast"
         bodyClassName="custom-toast-body"
@@ -27,6 +27,21 @@ export default function App({ Component, pageProps }) {
         draggable
         pauseOnHover
         theme="colored"
+      /> */}
+      <ToastContainer
+        position="top-right"
+        autoClose={2000}
+        hideProgressBar={false} // A thin, subtle progress bar looks very modern
+        newestOnTop
+        closeOnClick
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light" // Using light theme as a base for custom CSS
+        className="modern-toast-container"
+        toastClassName="modern-toast"
+        bodyClassName="modern-toast-body"
+        progressClassName="modern-toast-progress"
       />
     </>
   );

@@ -47,7 +47,6 @@ export default function PollCreator({ set_is_poll_visible }) {
     if (info.gender === G) return "text-white bg-[#6A89A7]";
     return "text-black bg-white";
   }
-  
 
   // ─── Function to finally  submit the Poll ──────────────────
   const handleSubmit = async (e) => {
@@ -131,7 +130,7 @@ export default function PollCreator({ set_is_poll_visible }) {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="px-5 py-4 space-y-5">
+          <div className="px-4 py-4 space-y-5">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Poll Title
@@ -181,7 +180,76 @@ export default function PollCreator({ set_is_poll_visible }) {
               <label className="text-sm font-medium text-foreground">
                 Options
               </label>
-              <div className="space-y-2.5 overflow-y-scroll max-h-[230px] no-scroll-arrows">
+              <div className="pt-5 space-y-3 overflow-y-scroll max-h-[230px] no-scroll-arrows">
+                {info?.options.map((option, idx) => (
+                  <div className="relative" key={idx}>
+                    {info.options[idx].rawFile && (
+                      <div className="absolute left-[-3px] top-[7px] -translate-y-1/2 z-10 flex items-center justify-center ">
+                        <div className="relative w-10 h-10 rounded-lg border-2 border-background bg-black  shadow-sm overflow-visible">
+                          <img
+                            src={URL.createObjectURL(info.options[idx].rawFile)}
+                            alt="Preview"
+                            className="w-full h-full object-cover rounded-[6px]"
+                          />
+
+                          <div
+                            className="absolute -top-2 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm border border-background cursor-pointer"
+                            onClick={() =>
+                              setInfo({
+                                ...info,
+                                options: info.options.map((option, i) =>
+                                  idx === i
+                                    ? { ...option, rawFile: null }
+                                    : option
+                                ),
+                              })
+                            }
+                          >
+                            <Minus className="w-4 h-4" />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    <input
+                      type="text"
+                      spellCheck={false}
+                      placeholder={`Option ${idx + 1}`}
+                      className={`w-full ${info.options[idx].rawFile ? "pl-10" : "pl-5"} pr-12 py-2.5 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm`}
+                      value={info.options[idx]?.content ?? ""}
+                      onChange={(e) =>
+                        setInfo({
+                          ...info,
+                          options: info.options.map((item, i) =>
+                            idx === i
+                              ? { ...item, content: e.target.value }
+                              : item
+                          ),
+                        })
+                      }
+                      required
+                    />
+                    <button
+                      type="button"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
+                    >
+                      <input
+                        type="file"
+                        id={`input-${idx}`}
+                        onChange={(e) => handleFileInputChange(e, idx)}
+                        accept="image/png, image/jpeg, image/webp"
+                        multiple={false}
+                        className="hidden"
+                      />
+                      <label htmlFor={`input-${idx}`}>
+                        <ImagePlus className="w-5 h-5 cursor-pointer"></ImagePlus>
+                      </label>
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* <div className="space-y-2.5 overflow-y-scroll max-h-[230px] no-scroll-arrows">
                 {info?.options.map((option, idx) => (
                   <div className="relative" key={idx}>
                     <input
@@ -219,19 +287,16 @@ export default function PollCreator({ set_is_poll_visible }) {
                       </label>
                     </button>
                   </div>
-                ))}
-                {alert_idx > -1 && (
-                  <p className="mt-2 text-sm text-red-600 font-medium">
-                    {form_alerts[alert_idx]}
-                  </p>
-                )}
-                <div className="flex justify-between gap-2 text-muted-foreground">
-                  <Minus
-                    className="w-6 h-6"
-                    onClick={() => handlePMLogic(-1)}
-                  />
-                  <Plus className="w-6 h-6" onClick={() => handlePMLogic(+1)} />
-                </div>
+                ))}  
+                    </div> */}
+              {alert_idx > -1 && (
+                <p className="mt-2 text-sm text-red-600 font-medium">
+                  {form_alerts[alert_idx]}
+                </p>
+              )}
+              <div className="flex justify-between gap-2 text-muted-foreground">
+                <Minus className="w-6 h-6" onClick={() => handlePMLogic(-1)} />
+                <Plus className="w-6 h-6" onClick={() => handlePMLogic(+1)} />
               </div>
             </div>
           </div>

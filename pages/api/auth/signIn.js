@@ -17,19 +17,17 @@ export default async function signIn(req, res) {
       const user = await UserModel.findOne({ email });
 
       if (!user) {
-        return res.status(401).json({ message: "INVALID_REQUEST" });
+        return res.status(401).json({ message: "Invalid Credentials" });
       }
 
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
 
       if (!isPasswordCorrect) {
-        return res.status(401).json({ message: "INVALID_REQUEST" });
+        return res.status(401).json({ message: "Invalid Credentials" });
       }
 
       if (!user.isVerified) {
-        return res
-          .status(403)
-          .json({ message: "EMAIL_VERIFICATION_REQUIRED" });
+        return res.status(403).json({ message: "Email Verification required" });
       }
       setTokenAndCookie(res, user._id);
       delete user.password;

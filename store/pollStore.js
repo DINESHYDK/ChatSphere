@@ -37,7 +37,7 @@ const pollStore = create((set, get) => ({
     try {
       const res = await fetch(API_ENDPOINTS.CLOUDINARY.GET_SIGNATURE);
       const obj = await res.json();
-      if (!res.ok) throw err;
+      if (!res.ok) throw {message: "ERROR_WHILE_UPLOADING_IMAGES"}
       const { signature, timestamp, api_key, cloud_name } = obj;
 
       const poll_data = pollObj.options?.filter((option) => option.rawFile);
