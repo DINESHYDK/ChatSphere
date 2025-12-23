@@ -8,8 +8,7 @@ import ImagePreviewOverlay from "@/components/Poll/imagePreview";
 const Test = () => {
   const [is_poll_visible, set_is_poll_visible] = useState(false);
   const [imgPreviewLink, setImgPreviewLink] = useState("");
-  const [is_preview_visible, set_is_preview_visible] = useState(true);
-  // console.log(imgPreviewLink);
+  const [is_preview_visible, set_is_preview_visible] = useState(true);  // *** Is previewImage component visible? ***
   return (
     <>
       <div className="flex flex-col h-screen">
@@ -28,7 +27,7 @@ const Test = () => {
         )}
         <ChatHeader />
         <ChatMessages />
-        <ChatInput set_is_poll_visible={set_is_poll_visible} />
+        <ChatInput is_poll_visible={is_poll_visible} set_is_poll_visible={set_is_poll_visible} />
       </div>
     </>
   );

@@ -150,7 +150,7 @@ export default function PollCreator({
                 required
                 value={info.title ?? ""}
                 onChange={(e) =>
-                  setInfo((prev) => ({ ...info, title: e.target.value }))
+                  setInfo((prev) => ({ ...prev, title: e.target.value }))
                 }
               />
             </div>
@@ -208,8 +208,9 @@ export default function PollCreator({
                           />
 
                           <div
-                            className="absolute -top-2 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm border border-background cursor-pointer"
-                            onClick={() => {
+                            className="absolute -top-2.5 -right-2.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm border border-background cursor-pointer"
+                            onClick={(e) => {
+                              e.stopPropagation();
                               setInfo((prev) => ({
                                 ...prev,
                                 options: prev.options.map((option, i) =>
@@ -238,11 +239,11 @@ export default function PollCreator({
                         (e) =>
                           setInfo((prev) => ({
                             ...prev,
-                            options: prev.options.map((item, i) => {
+                            options: prev.options.map((item, i) =>
                               idx === i
                                 ? { ...item, content: e.target.value }
-                                : item;
-                            }),
+                                : item
+                            ),
                           }))
                         // setInfo({
                         //   ...info,
