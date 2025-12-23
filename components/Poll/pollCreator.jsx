@@ -19,7 +19,11 @@ const isValid = (info) => {
   );
 };
 
-export default function PollCreator({ set_is_poll_visible }) {
+export default function PollCreator({
+  set_is_poll_visible,
+  setImgPreviewLink, // ─── State for providing blob for image ──────────────────
+  set_is_preview_visible, // ─── Is preview section visible ? ──────────────────
+}) {
   const { uploadPollImages, savePoll, set_is_saving_poll } = pollStore(); // ─── State to trigger API ──────────────────
   const [info, setInfo] = useState({
     title: "",
@@ -30,12 +34,14 @@ export default function PollCreator({ set_is_poll_visible }) {
         content: "",
         imageUrl: "",
         rawFile: null,
+        blobURL: "",
       },
       {
         id: 1,
         content: "",
         imageUrl: "",
         rawFile: null,
+        blobURL: "",
       },
     ],
   });
@@ -88,7 +94,7 @@ export default function PollCreator({ set_is_poll_visible }) {
               },
             ]
           : info.options.slice(0, -1);
-      setInfo({ ...info, options });
+      setInfo((prev) => ({ ...prev, options }));
       return;
     }
     set_alert_idx(len === MAX_LIMIT ? 1 : 0);
@@ -98,7 +104,7 @@ export default function PollCreator({ set_is_poll_visible }) {
     }, 2000);
   }
 
-  // ─── Function to handle Input poll Images ──────────────────
+  // ─── Function to handle Input poll Imag es ──────────────────
   function handleFileInputChange(e, idx) {
     const file = e.target.files[0];
     if (!file) return;
@@ -108,12 +114,13 @@ export default function PollCreator({ set_is_poll_visible }) {
       !file.name.endsWith("jpeg")
     )
       return;
-    setInfo({
-      ...info,
-      options: info.options.map((item, i) =>
-        idx === i ? { ...item, rawFile: file } : item
+    const imgBlobURL = URL.createObjectURL(file);
+    setInfo((prev) => ({
+      ...prev,
+      options: prev.options.map((item, i) =>
+        idx === i ? { ...item, rawFile: file, blobURL: imgBlobURL } : item
       ),
-    });
+    }));
   }
 
   return (
@@ -142,7 +149,9 @@ export default function PollCreator({ set_is_poll_visible }) {
                 className="w-full px-4 py-3 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                 required
                 value={info.title ?? ""}
-                onChange={(e) => setInfo({ ...info, title: e.target.value })}
+                onChange={(e) =>
+                  setInfo((prev) => ({ ...info, title: e.target.value }))
+                }
               />
             </div>
 
@@ -154,21 +163,21 @@ export default function PollCreator({ set_is_poll_visible }) {
               <div className="flex gap-2">
                 <button
                   className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-border ${setColorAndBg("A")}`}
-                  onClick={() => setInfo({ ...info, gender: "A" })}
+                  onClick={() => setInfo((prev) => ({ ...prev, gender: "A" }))}
                   type="button"
                 >
                   All
                 </button>
                 <button
                   className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-border ${setColorAndBg("B")}`}
-                  onClick={() => setInfo({ ...info, gender: "B" })}
+                  onClick={() => setInfo((prev) => ({ ...prev, gender: "B" }))}
                   type="button"
                 >
                   Boys
                 </button>
                 <button
                   className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium  transition-all duration-200 border border-border ${setColorAndBg("G")}`}
-                  onClick={() => setInfo({ ...info, gender: "G" })}
+                  onClick={() => setInfo((prev) => ({ ...prev, gender: "G" }))}
                   type="button"
                 >
                   Girls
@@ -184,26 +193,34 @@ export default function PollCreator({ set_is_poll_visible }) {
                 {info?.options.map((option, idx) => (
                   <div className="relative" key={idx}>
                     {info.options[idx].rawFile && (
-                      <div className="absolute left-[-3px] top-[7px] -translate-y-1/2 z-10 flex items-center justify-center ">
+                      <div
+                        className="absolute left-[-3px] top-[7px] -translate-y-1/2 z-10 flex items-center justify-center cursor-pointer"
+                        onClick={() => {
+                          set_is_preview_visible(true);
+                          setImgPreviewLink(info.options[idx].blobURL);
+                        }}
+                      >
                         <div className="relative w-10 h-10 rounded-lg border-2 border-background bg-black  shadow-sm overflow-visible">
                           <img
-                            src={URL.createObjectURL(info.options[idx].rawFile)}
+                            src={info.options[idx].blobURL}
                             alt="Preview"
                             className="w-full h-full object-cover rounded-[6px]"
                           />
 
                           <div
                             className="absolute -top-2 -right-1.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm border border-background cursor-pointer"
-                            onClick={() =>
-                              setInfo({
-                                ...info,
-                                options: info.options.map((option, i) =>
+                            onClick={() => {
+                              setInfo((prev) => ({
+                                ...prev,
+                                options: prev.options.map((option, i) =>
                                   idx === i
                                     ? { ...option, rawFile: null }
                                     : option
                                 ),
-                              })
-                            }
+                              }));
+                              set_is_preview_visible(false);
+                              setImgPreviewLink("");
+                            }}
                           >
                             <Minus className="w-4 h-4" />
                           </div>
@@ -217,15 +234,24 @@ export default function PollCreator({ set_is_poll_visible }) {
                       placeholder={`Option ${idx + 1}`}
                       className={`w-full ${info.options[idx].rawFile ? "pl-10" : "pl-5"} pr-12 py-2.5 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm`}
                       value={info.options[idx]?.content ?? ""}
-                      onChange={(e) =>
-                        setInfo({
-                          ...info,
-                          options: info.options.map((item, i) =>
-                            idx === i
-                              ? { ...item, content: e.target.value }
-                              : item
-                          ),
-                        })
+                      onChange={
+                        (e) =>
+                          setInfo((prev) => ({
+                            ...prev,
+                            options: prev.options.map((item, i) => {
+                              idx === i
+                                ? { ...item, content: e.target.value }
+                                : item;
+                            }),
+                          }))
+                        // setInfo({
+                        //   ...info,
+                        //   options: info.options.map((item, i) =>
+                        // idx === i
+                        //   ? { ...item, content: e.target.value }
+                        //   : item
+                        //   ),
+                        // })
                       }
                       required
                     />
@@ -249,46 +275,6 @@ export default function PollCreator({ set_is_poll_visible }) {
                 ))}
               </div>
 
-              {/* <div className="space-y-2.5 overflow-y-scroll max-h-[230px] no-scroll-arrows">
-                {info?.options.map((option, idx) => (
-                  <div className="relative" key={idx}>
-                    <input
-                      type="text"
-                      spellCheck={false}
-                      placeholder={`Option ${idx + 1}`}
-                      className="w-full px-4 py-2.5 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm"
-                      value={info.options[idx]?.content ?? ""}
-                      onChange={(e) =>
-                        setInfo({
-                          ...info,
-                          options: info.options.map((item, i) =>
-                            idx === i
-                              ? { ...item, content: e.target.value }
-                              : item
-                          ),
-                        })
-                      }
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                    >
-                      <input
-                        type="file"
-                        id={`input-${idx}`}
-                        onChange={(e) => handleFileInputChange(e, idx)}
-                        accept="image/png, image/jpeg, image/webp"
-                        multiple={false}
-                        className="hidden"
-                      />
-                      <label htmlFor={`input-${idx}`}>
-                        <ImagePlus className="w-5 h-5 cursor-pointer"></ImagePlus>
-                      </label>
-                    </button>
-                  </div>
-                ))}  
-                    </div> */}
               {alert_idx > -1 && (
                 <p className="mt-2 text-sm text-red-600 font-medium">
                   {form_alerts[alert_idx]}
