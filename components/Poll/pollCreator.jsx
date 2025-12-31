@@ -3,6 +3,7 @@ import { X, Plus, CloudCog, Minus, ImagePlus } from "lucide-react";
 import { toast } from "react-toastify";
 import pollStore from "@/store/pollStore";
 import devLog from "@/utils/logger";
+import isValidImage from "@/utils/isImageValid";
 
 const form_alerts = [
   "• Atleast 2 options are required !!",
@@ -105,16 +106,12 @@ export default function PollCreator({
   }
 
   // ─── Function to handle Input poll Imag es ──────────────────
-  function handleFileInputChange(e, idx) {
-    const file = e.target.files[0];
-    if (!file) return;
-    if (
-      !file.name.endsWith("png") &&
-      !file.name.endsWith("webp") &&
-      !file.name.endsWith("jpeg")
-    )
-      return;
-    const imgBlobURL = URL.createObjectURL(file);
+  async function handleFileInputChange(e, idx) {
+      const file = e.target.files[0];
+    let isImageValid = await isValidImage(file);
+    if (!isImageValid) return; // ─── Checking signature for file ──────────────────
+
+    const imgBlobURL = URL.createObjectURL(new Blob([file]));
     setInfo((prev) => ({
       ...prev,
       options: prev.options.map((item, i) =>
@@ -235,24 +232,15 @@ export default function PollCreator({
                       placeholder={`Option ${idx + 1}`}
                       className={`w-full ${info.options[idx].rawFile ? "pl-10" : "pl-5"} pr-12 py-2.5 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm`}
                       value={info.options[idx]?.content ?? ""}
-                      onChange={
-                        (e) =>
-                          setInfo((prev) => ({
-                            ...prev,
-                            options: prev.options.map((item, i) =>
-                              idx === i
-                                ? { ...item, content: e.target.value }
-                                : item
-                            ),
-                          }))
-                        // setInfo({
-                        //   ...info,
-                        //   options: info.options.map((item, i) =>
-                        // idx === i
-                        //   ? { ...item, content: e.target.value }
-                        //   : item
-                        //   ),
-                        // })
+                      onChange={(e) =>
+                        setInfo((prev) => ({
+                          ...prev,
+                          options: prev.options.map((item, i) =>
+                            idx === i
+                              ? { ...item, content: e.target.value }
+                              : item
+                          ),
+                        }))
                       }
                       required
                     />
@@ -264,7 +252,7 @@ export default function PollCreator({
                         type="file"
                         id={`input-${idx}`}
                         onChange={(e) => handleFileInputChange(e, idx)}
-                        accept="image/png, image/jpeg, image/webp"
+                        accept="image/jpg, image/png, image/jpeg, image/webp"
                         multiple={false}
                         className="hidden"
                       />

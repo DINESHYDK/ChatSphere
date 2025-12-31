@@ -11,7 +11,7 @@ export const sendVerifyUserEmail = async (mailId, token) => {
     from: "Your App <onboarding@resend.dev>",
     to: mailId,
     subject: "Verify your email",
-    html: VERIFICATION_EMAIL_TEMPLATE(token),
+  html: VERIFICATION_EMAIL_TEMPLATE(token),
   });
 
   if (error) {
