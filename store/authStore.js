@@ -5,7 +5,6 @@ import devLog from "../utils/logger";
 import { ROUTES } from "../constants/page-routes";
 import { API_ENDPOINTS } from "../constants/api-endpoints";
 
-
 const authStore = create((set, get) => ({
   is_auth_request_pending: false, //for auth related request
   is_email_verified: false, // *** so that no outside user can access the OTP  verification ***//
