@@ -62,9 +62,10 @@ export default function PollCreator({
       set_is_saving_poll(true);
 
       set_is_poll_visible(false); // ─── Removing CREATE_POLL page ──────────────────
-      
+
       await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
-      // await savePoll(info); // ─── Saving poll in DB ──────────────────
+      await savePoll(info); // ─── Saving poll in DB ──────────────────
+      console.log("all set");
     } catch (err) {
       devLog("Error while saving poll", err);
     } finally {
