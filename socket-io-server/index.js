@@ -32,10 +32,15 @@ io.on("connection", (socket) => {
   });
 
   socket.on("poll-update", (data) => {
-    devLog("poll-update")
+    devLog("poll-update");
     io.emit("poll-update", data);
   });
 
+  // *** POLL ***
+  socket.on("update-idx", (data) => {
+    io.emit("update-idx", data);
+  });
+  
   
 });
 

@@ -62,8 +62,9 @@ export default function PollCreator({
       set_is_saving_poll(true);
 
       set_is_poll_visible(false); // ─── Removing CREATE_POLL page ──────────────────
+      
       await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
-      await savePoll(info); // ─── Saving poll in DB ──────────────────
+      // await savePoll(info); // ─── Saving poll in DB ──────────────────
     } catch (err) {
       devLog("Error while saving poll", err);
     } finally {
@@ -107,7 +108,7 @@ export default function PollCreator({
 
   // ─── Function to handle Input poll Imag es ──────────────────
   async function handleFileInputChange(e, idx) {
-      const file = e.target.files[0];
+    const file = e.target.files[0];
     let isImageValid = await isValidImage(file);
     if (!isImageValid) return; // ─── Checking signature for file ──────────────────
 
@@ -115,7 +116,7 @@ export default function PollCreator({
     setInfo((prev) => ({
       ...prev,
       options: prev.options.map((item, i) =>
-        idx === i ? { ...item, rawFile: file, blobURL: imgBlobURL } : item
+        idx === i ? { ...item, rawFile: file, blobURL: imgBlobURL } : item,
       ),
     }));
   }
@@ -213,7 +214,7 @@ export default function PollCreator({
                                 options: prev.options.map((option, i) =>
                                   idx === i
                                     ? { ...option, rawFile: null }
-                                    : option
+                                    : option,
                                 ),
                               }));
                               set_is_preview_visible(false);
@@ -238,7 +239,7 @@ export default function PollCreator({
                           options: prev.options.map((item, i) =>
                             idx === i
                               ? { ...item, content: e.target.value }
-                              : item
+                              : item,
                           ),
                         }))
                       }

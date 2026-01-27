@@ -30,7 +30,6 @@ const PollSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["A", "B", "G"],
-      default: "A",
     },
     totalVotes: {
       type: Number,
