@@ -36,8 +36,8 @@ const pollStore = create((set, get) => ({
   compressImages: async (poll_data) => {
     const promiseArr = poll_data.map(async (option) => {
       const imageFile = option.rawFile;
-      console.log("originalFile instanceof Blob", imageFile instanceof Blob); // true
-      console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
+      // console.log("originalFile instanceof Blob", imageFile instanceof Blob); // true
+      // console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
 
       const myOptions = {
         maxSizeMB: 1,
@@ -51,13 +51,19 @@ const pollStore = create((set, get) => ({
             ? imageFile
             : await imageCompression(option.rawFile, myOptions);
 
-        console.log(
-          "compressedFile instanceof Blob",
-          compressedFile instanceof Blob,
-        ); // true
-        console.log(
-          `compressedFile size ${compressedFile.size / 1024 / 1024} MB`,
-        ); // smaller than maxSizeMB
+        // console.log(
+        //   "compressedFile instanceof Blob",
+        //   compressedFile instanceof Blob,
+        // ); // true
+        // console.log(
+        //   `        // console.log(
+        //   "compressedFile instanceof Blob",
+        //   compressedFile instanceof Blob,
+        // ); // true
+        // console.log(
+        //   `compressedFile size ${compressedFile.size / 1024 / 1024} MB`,
+        // ); // smaller than maxSizeMBcompressedFile size ${compressedFile.size / 1024 / 1024} MB`,
+        // ); // smaller than maxSizeMB
 
         return { ...option, rawFile: compressedFile };
       } catch (error) {
@@ -83,9 +89,6 @@ const pollStore = create((set, get) => ({
       if (poll_data.length == 0) return;
 
       poll_data = await compressImages(poll_data);
-      // console.log("final data is ", poll_data);
-
-      // return;
 
       // parallelly uploading images on cloudinary
       const promiseArr = poll_data.map(async (option) => {
