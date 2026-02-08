@@ -40,7 +40,10 @@ export default async function SavePoll(req, res) {
         let str = String.fromCharCode(65 + i);
         optionObj = { ...optionObj, [str]: 0 };
       }
-      const optionHash = await client.hSet(newPoll._id.toString(), optionObj);
+      const optionHash = await client.hSet(
+        `poll:${newPoll._id.toString()}_votes`,
+        optionObj,
+      );
 
       return res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
