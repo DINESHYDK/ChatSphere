@@ -3,6 +3,7 @@ import PollVoteModel from "../../../models/Polls/PollVoteModel";
 import UserModel from "../../../models/User/UserModel";
 import PollModel from "../../../models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
+import client from '../../../config/redis'
 
 export default async function SavePollVotes(req, res) {
   await connectToDatabase();
@@ -15,15 +16,15 @@ export default async function SavePollVotes(req, res) {
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
-      const userId = obj.message._id;
+      // const userId = obj.message._id;
 
       const { pollId, optionIndex } = req.body;
 
       if (!pollId) return res.status(400).json({ message: "MISSING_POLL_ID" });
 
-      const user = await UserModel.findById(userId);
-      if (!user) return res.status(404).json({ message: "UNAUTHORIZED" });
-      const userGender = user.gender;
+      // const user = await UserModel.findById(userId);
+      // if (!user) return res.status(404).json({ message: "UNAUTHORIZED" });
+      const userGender = obj.gender;
 
       const poll = await PollModel.findById(pollId);
 
@@ -43,7 +44,8 @@ export default async function SavePollVotes(req, res) {
         poll.pollOptions[optionIndex].votesCount + 1;
       poll.totalVotes = poll.totalVotes + 1;
       await poll.save();
-
+      
+     
       const newPollVote = await PollVoteModel.create({
         pollId,
         userId,

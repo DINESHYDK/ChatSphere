@@ -56,13 +56,13 @@ const pollStore = create((set, get) => ({
         //   compressedFile instanceof Blob,
         // ); // true
         // console.log(
-        //   `        // console.log(
+        //   `         console.log(
         //   "compressedFile instanceof Blob",
         //   compressedFile instanceof Blob,
-        // ); // true
+        // ); 
         // console.log(
         //   `compressedFile size ${compressedFile.size / 1024 / 1024} MB`,
-        // ); // smaller than maxSizeMBcompressedFile size ${compressedFile.size / 1024 / 1024} MB`,
+        // ); 
         // ); // smaller than maxSizeMB
 
         return { ...option, rawFile: compressedFile };

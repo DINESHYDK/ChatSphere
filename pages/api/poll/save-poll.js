@@ -41,7 +41,7 @@ export default async function SavePoll(req, res) {
         optionObj = { ...optionObj, [str]: 0 };
       }
       const optionHash = await client.hSet(
-        `poll:${newPoll._id.toString()}_votes`,
+        `poll_${newPoll._id.toString()}_votes`,
         optionObj,
       );
 

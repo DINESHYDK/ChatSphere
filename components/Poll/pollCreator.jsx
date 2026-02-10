@@ -66,7 +66,6 @@ export default function PollCreator({
       await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
       await savePoll(info); // ─── Saving poll in DB ──────────────────
       console.log('done');
-      console.log("all set");
     } catch (err) {
       devLog("Error while saving poll", err);
     } finally {

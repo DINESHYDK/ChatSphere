@@ -30,7 +30,11 @@ export default async function checkAuthAndCookie(req) {
     const { userId } = payload;
     if (!userId) return new visError(401, "UNAUTHETICATED");
 
-    const user = await UserModel.findById(userId);
+    const userObj = await UserModel.findById(userId);
+    
+    const {userName, gender}  = userObj;
+    const user = {userName, gender};
+
     if (!user) return new visError(401, "UNAUTHENTICATED");
     delete user.password;
 
