@@ -3,6 +3,7 @@ import PollModel from "@/models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 import isValidUrl from "@/utils/isValidURL";
 import client from "@/config/redis";
+import fs from "fs";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
@@ -35,17 +36,20 @@ export default async function SavePoll(req, res) {
       });
       await newPoll.save();
 
-      let optionObj = {};
-      for (let i = 0; i < pollOptions.length; i++) {
-        let str = String.fromCharCode(65 + i);
-        optionObj = { ...optionObj, [str]: 0 };
-      }
-      const optionHash = await client.hSet(
-        `poll_${newPoll._id.toString()}_votes`,
-        optionObj,
-      );
+      const poll_name = `poll_${newPoll._id.toString()}_votes`;
+      const len = pollOptions.length;
 
-      return res.status(200).json({ message: "SUCCESS" });
+      fs.readFile(
+        "/home/vishesh/chatsphere/redis-scripts/add-poll.lua",
+        "utf-8",
+        async (err, data) => {
+          const result = await client.eval(data, {
+            keys: [poll_name],
+            arguments: [len.toString()],
+          });
+          return res.status(200).json({ result: result });
+        },
+      );
     } catch (err) {
       return res.status(500).json({ message: `Something went wrong, ${err}` });
     }
