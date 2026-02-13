@@ -4,6 +4,7 @@ import checkAuthAndCookie from "@/utils/checkAuth";
 import isValidUrl from "@/utils/isValidURL";
 import client from "@/config/redis";
 import fs from "fs";
+import { ROOT_DIR } from "@/config/paths";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
@@ -26,8 +27,6 @@ export default async function SavePoll(req, res) {
           return res.status(400).send("INVALID REQUEST");
       }
 
-      // const poll_votes_hash = await client.hSet("poll_votes", {});
-
       const newPoll = new PollModel({
         userId,
         title,
@@ -36,20 +35,24 @@ export default async function SavePoll(req, res) {
       });
       await newPoll.save();
 
-      const poll_name = `poll_${newPoll._id.toString()}_votes`;
+      // calling lua script
+      const file_path = `${ROOT_DIR}/redis-scripts/add-poll.lua`;
+      const poll_name = `poll_${newPoll._id.toString()}`;
       const len = pollOptions.length;
 
-      fs.readFile(
-        "/home/vishesh/chatsphere/redis-scripts/add-poll.lua",
-        "utf-8",
-        async (err, data) => {
+      fs.readFile(file_path, "utf-8", async (err, data) => {
+        if (err)
+          return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
+        try {
           const result = await client.eval(data, {
             keys: [poll_name],
             arguments: [len.toString()],
           });
-          return res.status(200).json({ result: result });
-        },
-      );
+          return res.status(200).json({ message: "SUCCESS" });
+        } catch (err) {
+          return res.status(400).json({ error: err.message });
+        }
+      });
     } catch (err) {
       return res.status(500).json({ message: `Something went wrong, ${err}` });
     }

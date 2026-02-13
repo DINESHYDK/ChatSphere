@@ -34,7 +34,7 @@ const pollStore = create((set, get) => ({
   },
 
   compressImages: async (poll_data) => {
-    const promiseArr = poll_data.map(async (option) => {
+    const promiseArr = poll_data.map(async (option, idx) => {
       const imageFile = option.rawFile;
       // console.log("originalFile instanceof Blob", imageFile instanceof Blob); // true
       // console.log(`originalFile size ${imageFile.size / 1024 / 1024} MB`);
@@ -51,6 +51,8 @@ const pollStore = create((set, get) => ({
             ? imageFile
             : await imageCompression(option.rawFile, myOptions);
 
+
+        console.log(`image ${idx} size : ${compressedFile.size / 1024 / 1024}`);
         // console.log(
         //   "compressedFile instanceof Blob",
         //   compressedFile instanceof Blob,
