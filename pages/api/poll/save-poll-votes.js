@@ -43,10 +43,13 @@ export default async function SavePollVotes(req, res) {
             keys: [hash_name, poll_name, userId],
             arguments: ["B"],
           });
-          return res.status(200).json({ message: "SUCCESS" });
+
+          const resObj = JSON.parse(result);
+          const statusCode = parseInt(resObj.status);
+
+          return res.status(statusCode).json({ message: resObj.message });
         } catch (err) {
-          // if (err)
-          // return res.status(400).json({ error: err.message });
+          return res.status(400).json({ error: err.message });
         }
       });
     } catch (err) {

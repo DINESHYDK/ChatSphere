@@ -48,10 +48,13 @@ export default async function SavePoll(req, res) {
             keys: [poll_name, newPoll._id.toString()],
             arguments: [len.toString(), gender],
           });
-          return res.status(200).json({ message: "SUCCESS" });
+          // if (result == "200")
+          //   return res.status(200).json({ message: "SUCCESS" });
+          // if (result == "400") return res.status(400).json({message: "BAD_REQUEST"});
+
         } catch (err) {
           // const message =  err.message.split(" ")[1];
-          console.log('obj is ', JSON.parse(message));
+          // console.log("obj is ", JSON.parse(message));
           return res.status(400).json({ error: err.message });
         }
       });
