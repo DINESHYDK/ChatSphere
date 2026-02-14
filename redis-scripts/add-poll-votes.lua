@@ -1,18 +1,40 @@
-local hash_name = KEYS[1]; -- poll_123_votes
-local poll_name = KEYS[2]; -- poll_123
+local hash_name = KEYS[1]; -- poll_123_voters
+local poll_name = KEYS[2]; -- poll_123_votes
 local user_id = KEYS[3];
-local curr_option = ARGV[1];
+local poll_id = KEYS[4];
+local curr_option = tonumber(ARGV[1]);
+local user_gender = ARGV[2];
 
-if not hash_name or not poll_name or not user_id or not curr_option then
-    redis.error_reply("MISSING KEYS OR ARGUMENT");
+if not hash_name or not poll_name or not user_id or not curr_option or not user_gender then
+    return redis.error_reply("400");
 end
 
+if redis.call("EXISTS", poll_name) == 0 then
+    return redis.error_reply("400");
+end
+
+-- valid poll_option logic
+local total_option = redis.call("HLEN", poll_name);
 local prev_option = redis.call("HGET", hash_name, user_id);
+if ((prev_option and (prev_option < 0 or prev_option >= total_option)) or (curr_option < 0 or curr_option >= total_option)) then
+    return redis.error_reply("400");
+end
+if prev_option and prev_option == curr_option then
+    return "200"
+end
+
+-- user gender logic
+local poll_gender = redis.call("HGET", "poll_metadata", poll_id);
+if (poll_gender ~= "A" and user_gender ~= poll_gender) then
+   return redis.error_reply("403");
+end
+
 
 if prev_option then
     redis.call("HINCRBY", poll_name, prev_option, -1);
     redis.call("HDEL", hash_name, user_id);
 end
-
 redis.call("HINCRBY", poll_name, curr_option, 1);
 redis.call("HSET", hash_name, user_id, curr_option);
+
+return "200"

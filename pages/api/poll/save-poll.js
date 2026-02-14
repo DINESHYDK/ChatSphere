@@ -37,7 +37,7 @@ export default async function SavePoll(req, res) {
 
       // calling lua script
       const file_path = `${ROOT_DIR}/redis-scripts/add-poll.lua`;
-      const poll_name = `poll_${newPoll._id.toString()}`;
+      const poll_name = `poll_${newPoll._id.toString()}_votes`;
       const len = pollOptions.length;
 
       fs.readFile(file_path, "utf-8", async (err, data) => {
@@ -45,11 +45,13 @@ export default async function SavePoll(req, res) {
           return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
         try {
           const result = await client.eval(data, {
-            keys: [poll_name],
-            arguments: [len.toString()],
+            keys: [poll_name, newPoll._id.toString()],
+            arguments: [len.toString(), gender],
           });
           return res.status(200).json({ message: "SUCCESS" });
         } catch (err) {
+          // const message =  err.message.split(" ")[1];
+          console.log('obj is ', JSON.parse(message));
           return res.status(400).json({ error: err.message });
         }
       });
