@@ -20,11 +20,10 @@ export default async function SavePoll(req, res) {
 
       const { title, gender, pollOptions } = req.body.pollData;
       if (!title || !gender || !pollOptions)
-        return res.status(400).send("INVALID REQUEST");
-
+        return res.status(400).json({ message: "MISSING_INPUT" });
       for (let options of pollOptions) {
         if (options.imageUrl !== "" && !isValidUrl(options.imageUrl))
-          return res.status(400).send("INVALID REQUEST");
+          return res.status(400).json({ message: "INVALID_IMAGE_URL" });
       }
 
       const newPoll = new PollModel({
@@ -48,13 +47,12 @@ export default async function SavePoll(req, res) {
             keys: [poll_name, newPoll._id.toString()],
             arguments: [len.toString(), gender],
           });
-          // if (result == "200")
-          //   return res.status(200).json({ message: "SUCCESS" });
-          // if (result == "400") return res.status(400).json({message: "BAD_REQUEST"});
 
+          const resObj = JSON.parse(result);
+          const resStatus = parseInt(resObj.status);
+
+          return res.status(resStatus).json({ message: resObj.message });
         } catch (err) {
-          // const message =  err.message.split(" ")[1];
-          // console.log("obj is ", JSON.parse(message));
           return res.status(400).json({ error: err.message });
         }
       });

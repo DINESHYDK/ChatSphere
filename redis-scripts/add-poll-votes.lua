@@ -1,10 +1,12 @@
 local hash_name = KEYS[1]; -- poll_123_voters
+local poll_name = KEYS[2]; --poll_123_votes
 local user_id = KEYS[3];
 local poll_id = KEYS[4];
 local curr_option = tonumber(ARGV[1]);
 local user_gender = ARGV[2];
 
-if not hash_name or not poll_name or not user_id or not curr_option or not user_gender then
+
+if not KEYS[1] or not KEYS[2] or not KEYS[3] or not KEYS[4] or not ARGV[1] or not ARGV[2] then
     return '{"status":"400", "message":"MISSING_INPUT"}'
 end
 
