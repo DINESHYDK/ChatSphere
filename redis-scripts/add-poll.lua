@@ -1,3 +1,5 @@
+local json = require("json");
+
 local poll_name = KEYS[1]; --poll_123_votes
 local poll_id = KEYS[2];
 local total_option = tonumber(ARGV[1]);
@@ -16,4 +18,4 @@ end
 
 redis.call("HSET", "poll_metadata", poll_id, poll_gender);
 
-return '{"status":"200", "message":"SUCCESS"}'
+return '{"status":"200", "message":"SUCCESS"}';
