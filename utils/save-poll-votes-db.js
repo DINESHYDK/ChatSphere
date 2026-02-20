@@ -1,26 +1,36 @@
 // import PollVoteModel from "@/models/Polls/PollVoteModel";
-// import PollModel from "@/models/Polls/PollModel";
+import PollModel from "@/models/Polls/PollModel";
 import client from "@/config/redis";
+import connectToDatabase from "@/config/mongoose";
 
-// export default async function savePollVotesDB(poll_arr) {
 export default async function savePollVotesDB() {
-  console.log("running");
-  // const len = poll_arr.length;
-  if (length == 0) return;
-  // for (let poll_id of poll_arr) {
-  //   const poll_votes_sync_hash = `${poll_id}_sync_votes`; // key->option value->no_of_votes
-  //   const poll_voters_sync_hash = `${poll_id}_sync_votes`; // key->user_id value->option
-
-  // }
   try {
-    const res7 = await client.hSet("myhash", "field1", "foo");
-    console.log(res7); // 1
-    // const option = await client.
-    //  const scan4Res2 = await client.hScan("poll_6991b03a62732d8272e238ee_votes", "0");
+    await connectToDatabase();
+    const SYNC_HASH_NAME = "polls_to_sync";
+
+    for await (const IDs of client.sScanIterator(SYNC_HASH_NAME)) {
+      IDs.forEach(async (id) => {
+        const POLL_VOTES_SYNC_HASH_NAME = `${id}_sync_votes`;
+        const POLL_VOTERS_SYNC_HASH_NAME = `${id}_sync_voters`;
+
+        // console.log(POLL_VOTERS_SYNC_HASH_NAME);
+        let poll = await PollModel.findById(id);
+        console.log('poll is ', poll);
+
+        const option_length = poll.pollOptions.length;
+        for (let i = 0; i < option_length; i++) {
+          let new_votes = await client.hGet(POLL_VOTES_SYNC_HASH_NAME, toString(i));
+          
+          poll.pollOptions[i] = {
+            ...poll.pollOptions[i],
+            votesCount: poll.pollOptions[i].votesCount + new_votes,
+          };
+        }
+        await poll.save();
+        console.log('done');
+      });
+    }
   } catch (err) {
     console.log("err is ", err);
   }
-  console.log(scan4Res2.entries);
-  // const syncArr = JSON.parse(poll_arr_json_string);
-  // const poll_sync_votes_hash = ``;
 }

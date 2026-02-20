@@ -39,15 +39,15 @@ redis.call("HINCRBY", poll_name, curr_option, 1);
 redis.call("HSET", hash_name, user_id, curr_option);
 
 
-local poll_sync_votes_hash = poll_id .. "_sync_votes";
-local poll_sync_voters_hash = poll_id .. "_sync_voters";
+local poll_votes_sync_hash = poll_id .. "_sync_votes";
+local poll_voters_sync_hash = poll_id .. "_sync_voters";
 
-redis.call("HINCRBY", poll_sync_voters_hash, curr_option, 1);
-redis.call("SADD", poll_sync_votes_hash, user_id);
-redis.call("HSET", "polls_to_sync", poll_id);
+redis.call("HINCRBY", poll_votes_sync_hash, curr_option, 1);
+redis.call("SADD", poll_voters_sync_hash, user_id);
+redis.call("SADD", "polls_to_sync", poll_id);
 
 
-local redis_sync_set_size = redis.call("SCARD", "poll_to_sync");
+local redis_sync_set_size = redis.call("SCARD", "polls_to_sync");
 if redis_sync_set_size > 10 then
   local sync_arr = {};
 
