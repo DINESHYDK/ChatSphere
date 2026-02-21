@@ -3,6 +3,12 @@ import client from "@/config/redis";
 
 export default async function handler(req, res) {
   try {
+    // const result = await client.hScan("699085aad465739acaa69f22_sync_votes", '0');
+    // console.log(result);
+
+    // result.entries.forEach((val) => {
+    //   console.log(val.value);
+    // });
     await savePollVotesDB();
     return res.status(200).json({ message: "hello" });
   } catch (err) {

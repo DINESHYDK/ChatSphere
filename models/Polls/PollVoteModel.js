@@ -7,10 +7,10 @@ const PollVoteSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
-    userGender: {
-      type: String,
-      enum: ["M", "F"],
-    },
+    // userGender: {
+    //   type: String,
+    //   enum: ["M", "F"],
+    // },
   },
   { timeStampe: true }
 );
