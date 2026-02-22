@@ -14,20 +14,22 @@ export default async function savePollVotesDB() {
         const POLL_VOTERS_SYNC_HASH_NAME = `${pollId}_sync_voters`;
 
         let poll = await PollModel.findById(pollId);
+        let curr_total_votes = poll.totalVotes;
 
-        const poll_promiseArr = poll.pollOptions.map(async (option, idx) => {
-          let new_votes_str = await client.hGet(
-            POLL_VOTES_SYNC_HASH_NAME,
-            idx.toString(),
-          );
-          const new_votes = parseInt(new_votes_str || "0", 10);
-          option = { ...option, votesCount: option.votesCount + new_votes };
+        const votes_set = await client.hScan(POLL_VOTES_SYNC_HASH_NAME, "0");
+        votes_set.entries.forEach((tuple, idx) => {
+          const prev_option = poll.pollOptions[option_idx].toObject();
 
-          return option;
+          poll.pollOptions[idx] = {
+            ...prev_option,
+            votesCount: prev_option.votesCount + parseInt(tuple.value, 10),
+          };
+          curr_total_votes += parseInt(tuple.value, 10);
         });
+        
 
-        poll.pollOptions = await Promise.all(poll_promiseArr);
-        // await poll.save();
+        poll.totalVotes = curr_total_votes;
+        await poll.save();
 
         const voters_hash = await client.hScan(POLL_VOTERS_SYNC_HASH_NAME, "0");
         let pollObjArr = [];
@@ -40,8 +42,9 @@ export default async function savePollVotesDB() {
 
           pollObjArr.push(currObj);
         });
-        
-        console.log(pollObjArr);
+
+        PollVoteModel.insertMany(pollObjArr);
+
       });
     }
   } catch (err) {
