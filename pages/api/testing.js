@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     // result.entries.forEach((val) => {
     //   console.log(val.value);
     // });
-    await savePollVotesDB();
+    // await savePollVotesDB();
     return res.status(200).json({ message: "hello" });
   } catch (err) {
     res.status(404).json({ message: "X" });

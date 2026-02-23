@@ -3,6 +3,7 @@ import PollVoteModel from "@/models/Polls/PollVoteModel";
 import UserModel from "@/models/User/UserModel";
 import PollModel from "../../../models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
+import handleSync from "@/utils/handleSync";
 import { ROOT_DIR } from "@/config/paths";
 import fs from "fs";
 
@@ -34,9 +35,8 @@ export default async function SavePollVotes(req, res) {
 
           const resObj = JSON.parse(result);
           const statusCode = parseInt(resObj.status);
-          // const start_sync = resObj.start_sync ? true : false;
-          
-          // if (start_sync) // call
+
+          await handleSync();
           return res.status(statusCode).json({ message: resObj.message });
         } catch (err) {
           return res.status(400).json({ error: err.message });

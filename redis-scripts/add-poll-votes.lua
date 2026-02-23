@@ -1,5 +1,5 @@
-local hash_name = KEYS[1]; -- poll_123_voters
-local poll_name = KEYS[2]; --poll_123_votes
+local hash_name = KEYS[1]; -- poll_123_voters -->stores which voters give which vote
+local poll_name = KEYS[2]; --poll_123_votes --> stores no of votes for each option
 local user_id = KEYS[3];
 local poll_id = KEYS[4];
 local curr_option = tonumber(ARGV[1]);
@@ -39,17 +39,10 @@ redis.call("HINCRBY", poll_name, curr_option, 1);
 redis.call("HSET", hash_name, user_id, curr_option);
 
 
-local poll_votes_sync_hash = poll_id .. "_sync_votes";
 local poll_voters_sync_hash = poll_id .. "_sync_voters";
 
-redis.call("HINCRBY", poll_votes_sync_hash, curr_option, 1);
-redis.call("SADD", poll_voters_sync_hash, user_id);
 redis.call("SADD", "polls_to_sync", poll_id);
+redis.call("HSET", poll_voters_sync_hash, user_id, curr_option);
 
 
-local redis_sync_set_size = redis.call("SCARD", "polls_to_sync");
-if redis_sync_set_size > 10 then
-  local sync_arr = {};
-
-end
-return '{"status":"200", "startSync": "0", "message":"SUCCESS"}';
+return '{"status":"200", "message":"SUCCESS"}';

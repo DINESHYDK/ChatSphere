@@ -36,7 +36,7 @@ export default async function SavePoll(req, res) {
 
       // calling lua script
       const file_path = `${ROOT_DIR}/redis-scripts/add-poll.lua`;
-      const poll_name = `poll_${newPoll._id.toString()}_votes`;
+      const poll_name = `poll_${newPoll._id.toString()})_votes`;
       const len = pollOptions.length;
 
       fs.readFile(file_path, "utf-8", async (err, data) => {

@@ -1,6 +1,4 @@
-local json = require("json");
-
-local poll_name = KEYS[1]; --poll_123_votes
+local poll_name = KEYS[1]; --poll_123_votes --> stores no of votes for each option
 local poll_id = KEYS[2];
 local total_option = tonumber(ARGV[1]);
 local poll_gender = ARGV[2];

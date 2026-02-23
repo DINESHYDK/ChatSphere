@@ -10,26 +10,26 @@ export default async function savePollVotesDB() {
 
     for await (const POLL_IDs of client.sScanIterator(SYNC_HASH_NAME)) {
       POLL_IDs.forEach(async (pollId) => {
-        const POLL_VOTES_SYNC_HASH_NAME = `${pollId}_sync_votes`;
         const POLL_VOTERS_SYNC_HASH_NAME = `${pollId}_sync_voters`;
+        const POLL_VOTES_HASH_NAME = `poll_${pollId}_votes`;
+        const POLL_VOTERS_HASH_NAME = `poll_${pollId}_voters`;
 
         let poll = await PollModel.findById(pollId);
-        let curr_total_votes = poll.totalVotes;
+        let total_votes = 0;
 
-        const votes_set = await client.hScan(POLL_VOTES_SYNC_HASH_NAME, "0");
+        const votes_set = await client.hScan(POLL_VOTES_HASH_NAME, "0");
         votes_set.entries.forEach((tuple, idx) => {
-          const prev_option = poll.pollOptions[option_idx].toObject();
-
+          const prev_option = poll.pollOptions[idx].toObject();
           poll.pollOptions[idx] = {
             ...prev_option,
-            votesCount: prev_option.votesCount + parseInt(tuple.value, 10),
+            votesCount: parseInt(tuple.value, 10),
           };
-          curr_total_votes += parseInt(tuple.value, 10);
+          total_votes += parseInt(tuple.value, 10);
         });
-        
 
-        poll.totalVotes = curr_total_votes;
-        await poll.save();
+        poll.totalVotes = total_votes;
+
+        // await poll.save();
 
         const voters_hash = await client.hScan(POLL_VOTERS_SYNC_HASH_NAME, "0");
         let pollObjArr = [];
@@ -43,10 +43,14 @@ export default async function savePollVotesDB() {
           pollObjArr.push(currObj);
         });
 
-        PollVoteModel.insertMany(pollObjArr);
+        await client.rename(POLL_VOTERS_SYNC_HASH_NAME, `${pollId}_sync_processing`);
+        // await PollVoteModel.insertMany(pollObjArr);
+        await client.del(`${pollId}_sync_processing`);
 
+        await client.sRem(SYNC_HASH_NAME, pollId);
       });
     }
+   await client.del(SYNC_HASH_NAME);
   } catch (err) {
     throw err;
   }
