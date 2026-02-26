@@ -3,7 +3,11 @@ import client from "@/config/redis";
 
 export default async function handler(req, res) {
   try {
-    // const result = await client.hScan("699085aad465739acaa69f22_sync_votes", '0');
+    await client.hSet("poll_metadata", "699085aad465739acaa69f22", "G");
+
+    const res3 = await client.hSet("699085aad465739acaa69f22_sync_voters", {
+      "697606ea3d55907aa7ef5845": "1",
+    }); // const result = await client.hScan("699085aad465739acaa69f22_sync_votes", '0');
     // console.log(result);
 
     // result.entries.forEach((val) => {

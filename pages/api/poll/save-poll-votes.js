@@ -3,7 +3,7 @@ import PollVoteModel from "@/models/Polls/PollVoteModel";
 import UserModel from "@/models/User/UserModel";
 import PollModel from "../../../models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
-import handleSync from "@/utils/handleSync";
+import { handleSync } from "@/utils/handleSync";
 import { ROOT_DIR } from "@/config/paths";
 import fs from "fs";
 
