@@ -1,7 +1,8 @@
 import { Inria_Serif } from "next/font/google";
 import "../styles/globals.css";
 import { ToastContainer } from "react-toastify";
-import { checkSync } from "@/utils/handleSync";
+import { startTimer } from "@/utils/handleSync";
+import { useEffect } from "react";
 const inria = Inria_Serif({
   subsets: ["latin"],
   weight: ["400", "700"], // choose weights you need
@@ -9,13 +10,10 @@ const inria = Inria_Serif({
 });
 
 export default function App({ Component, pageProps }) {
-  /*  
-
-  const myInterval = setInterval(() => { 
-    checkSync();
-  }, 2 * 60 * 1000); 
-
-  */
+  useEffect(() => {
+    const interval = startTimer();
+    clearInterval(interval);
+  }, []);
   return (
     <>
       <main className={inria.variable}>

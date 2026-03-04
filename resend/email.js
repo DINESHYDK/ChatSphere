@@ -8,7 +8,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export const sendVerifyUserEmail = async (mailId, token) => {
   const { data, error } = await resend.emails.send({
-    from: "Your App <onboarding@resend.dev>",
+    from: "Your App <onboarding@resend.dev>", // to be changed
     to: mailId,
     subject: "Verify your email",
   html: VERIFICATION_EMAIL_TEMPLATE(token),
@@ -20,7 +20,7 @@ export const sendVerifyUserEmail = async (mailId, token) => {
 };
 export const sendResetPassEmail = async (mailId, token) => {
   const { data, error } = await resend.emails.send({
-    from: "Your App <onboarding@resend.dev>",
+    from: "Your App <onboarding@resend.dev>",  // to be changed
     to: mailId,
     subject: "Reset your password",
     html: FORGOT_PASSWORD_TEMPLATE(token),

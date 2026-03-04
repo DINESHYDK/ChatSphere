@@ -4,30 +4,36 @@ import savePollVotesDB from "./save-poll-votes-db";
 const MAX_TIME_LIMIT = 2 * 60 * 1000;
 const MAX_SYNC_SET_SIZE = 100;
 
+let myInterval;
+export async function startTimer() {
+  myInterval = setInterval(() => {
+    startSync();
+  }, MAX_TIME_LIMIT);
+  return myInterval;
+}
+
 export async function handleSync() {
   try {
     const sync_set_sz = (await client.scard("poll_to_sync")) || 0;
+    if (sync_set_sz < MAX_SYNC_SET_SIZE) return;
 
-    if (sync_set_sz > MAX_SYNC_SET_SIZE) {
-      await savePollVotesDB();
-      await client.set("last_sync_time", Date.now());
-    }
+    await savePollVotesDB();
+    await client.set("last_sync_time", Date.now());
+    clearInterval(myInterval);
   } catch (err) {
     throw err;
   }
 }
 
-export async function startSyncTime() {
+export async function startSync() {
   try {
-    const myInterval = setInterval(() => {
-
-    }, MAX_TIME_LIMIT);
+    clearInterval(myInterval);
+    // const let_sync_time = await client.get("last_sync_time");
     
-    const last_sync_time = (await client.get("last_sync_time")) || 0;
-    if (Date.now() - last_sync_time > MAX_TIME_LIMIT) {
-      await savePollVotesDB();
-      await client.set("last_sync_time", Date.now());
-    }
+
+    await savePollVotesDB();
+    await client.set("last_sync_time", Date.now());
+    startTimer();
   } catch (err) {
     throw err;
   }
