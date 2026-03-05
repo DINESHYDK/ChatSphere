@@ -1,3 +1,5 @@
+local json = cjson;
+
 local hash_name = KEYS[1]; -- poll_123_voters -->stores which voters give which vote
 local poll_name = KEYS[2]; --poll_123_votes --> stores no of votes for each option
 local user_id = KEYS[3];
@@ -16,7 +18,7 @@ end
 
 -- valid poll_option logic
 local total_option = redis.call("HLEN", poll_name);
-local prev_option = redis.call("HGET", hash_name, user_id);
+local prev_option = tonumber(json.decode(redis.call("HGET", hash_name, user_id)).o);
 if ((prev_option and (prev_option < 0 or prev_option >= total_option)) or (curr_option < 0 or curr_option >= total_option)) then
     return '{"status":"400", "message":"INVALID_REQUEST"}'
 end
@@ -30,19 +32,24 @@ if (poll_gender ~= "A" and user_gender ~= poll_gender) then
     return '{"status":"403", "message":"FORBIDDEN_TO_VOTE"}'
 end
 
+local poll_vote_obj = {
+    o = curr_option,
+    g = user_gender
+}
 
 if prev_option then
     redis.call("HINCRBY", poll_name, prev_option, -1);
     redis.call("HDEL", hash_name, user_id);
 end
 redis.call("HINCRBY", poll_name, curr_option, 1);
-redis.call("HSET", hash_name, user_id, curr_option);
+redis.call("HSET", hash_name, user_id, json.encode(poll_vote_obj));
 
 
 local poll_voters_sync_hash = poll_id .. "_sync_voters";
 
 redis.call("SADD", "polls_to_sync", poll_id);
-redis.call("HSET", poll_voters_sync_hash, user_id, curr_option);
+
+redis.call("HSET", poll_voters_sync_hash, user_id, json.encode(poll_vote_obj));
 
 
 return '{"status":"200", "message":"SUCCESS"}';

@@ -10,9 +10,9 @@ export default async function savePollVotesDB() {
 
     for await (const POLL_IDs of client.sScanIterator(SYNC_HASH_NAME)) {
       POLL_IDs.forEach(async (pollId) => {
-        const POLL_VOTERS_SYNC_HASH_NAME = `${pollId}_sync_voters`;    // for syncing
-        const POLL_VOTES_HASH_NAME = `poll_${pollId}_votes`;  // map == key -> option, value -> votes
-        const POLL_VOTERS_HASH_NAME = `poll_${pollId}_voters`;  // map == key -> user, value -> option
+        const POLL_VOTERS_SYNC_HASH_NAME = `${pollId}_sync_voters`; // for syncing
+        const POLL_VOTES_HASH_NAME = `poll_${pollId}_votes`; // map == key -> option, value -> votes
+        const POLL_VOTERS_HASH_NAME = `poll_${pollId}_voters`; // map == key -> user, value -> option
 
         let poll = await PollModel.findById(pollId);
         let total_votes = 0;
@@ -29,15 +29,18 @@ export default async function savePollVotesDB() {
 
         poll.totalVotes = total_votes;
 
-        // await poll.save();
+        console.log("new poll is ", poll);
+        await poll.save();
 
         const voters_hash = await client.hScan(POLL_VOTERS_SYNC_HASH_NAME, "0");
         let pollObjArr = [];
         voters_hash.entries.forEach((tuple) => {
+          let { g, o } = JSON.parse(tuple.value);
           let currObj = {
             pollId,
             userId: tuple.field,
-            optionIdx: parseInt(tuple.value, 10),
+            optionIndex: parseInt(o, 10),
+            userGender: g,
           };
 
           pollObjArr.push(currObj);
@@ -45,7 +48,7 @@ export default async function savePollVotesDB() {
 
         const NEW_HASH_NAME = `${pollId}_sync_processing`;
         await client.rename(POLL_VOTERS_SYNC_HASH_NAME, NEW_HASH_NAME);
-        // await PollVoteModel.insertMany(pollObjArr);
+        await PollVoteModel.insertMany(pollObjArr);
         await client.del(NEW_HASH_NAME);
 
         await client.sRem(SYNC_HASH_NAME, pollId);
