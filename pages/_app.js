@@ -1,7 +1,6 @@
 import { Inria_Serif } from "next/font/google";
 import "../styles/globals.css";
 import { ToastContainer } from "react-toastify";
-// import { startTimer } from "@/utils/handleSync";
 import { useEffect } from "react";
 const inria = Inria_Serif({
   subsets: ["latin"],
@@ -11,9 +10,13 @@ const inria = Inria_Serif({
 
 export default function App({ Component, pageProps }) {
   // useEffect(() => {
-  //   const interval = startTimer();
+  //   const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME;
+  //   const interval = setInterval(() => {
+  //     fetch("/api/poll/handleSync.js");
+  //   }, MAX_SYNC_TIME);
   //   clearInterval(interval);
   // }, []);
+
   return (
     <>
       <main className={inria.variable}>
