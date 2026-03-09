@@ -13,7 +13,10 @@ export default async function handler(req, res) {
     //   console.log(val.value);
     // });
 
-    await savePollVotesDB();
+
+    const res1 = await client.sAdd('polls_to_sync', '69af074745d2a07d716ee197');
+
+    // await savePollVotesDB();
     console.log('hello');
     return res.status(200).json({ message: "hello" });
   } catch (err) {

@@ -7,7 +7,6 @@ export default async function savePollVotesDB() {
   try {
     await connectToDatabase();
     const SYNC_HASH_NAME = "polls_to_sync";
-
     for await (const POLL_IDs of client.sScanIterator(SYNC_HASH_NAME)) {
       POLL_IDs.forEach(async (pollId) => {
         const POLL_VOTERS_SYNC_HASH_NAME = `${pollId}_sync_voters`; // for syncing
@@ -29,13 +28,15 @@ export default async function savePollVotesDB() {
 
         poll.totalVotes = total_votes;
 
-        console.log("new poll is ", poll);
         await poll.save();
 
         const voters_hash = await client.hScan(POLL_VOTERS_SYNC_HASH_NAME, "0");
+
+        console.log('voters hash is ', voters_hash);
         let pollObjArr = [];
         voters_hash.entries.forEach((tuple) => {
           let { g, o } = JSON.parse(tuple.value);
+          console.log('g and o are ', g, o);
           let currObj = {
             pollId,
             userId: tuple.field,

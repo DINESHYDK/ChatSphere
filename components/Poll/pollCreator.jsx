@@ -64,10 +64,12 @@ export default function PollCreator({
       set_is_poll_visible(false); // ─── Removing CREATE_POLL page ──────────────────
 
       await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
+
+      console.log('info is ', info);
       await savePoll(info); // ─── Saving poll in DB ──────────────────
       console.log('done');
     } catch (err) {
-      devLog("Error while saving poll", err);
+      devLog("Error while saving poll", err)
     } finally {
       set_is_saving_poll(false);
     }

@@ -7,6 +7,7 @@ import client from "@/config/redis";
 import { ROOT_DIR } from "@/config/paths";
 import fs from "fs";
 import savePollVotesDB from "@/utils/save-poll-votes-db";
+import validateId from "@/utils/validateId";
 
 export default async function SavePollVotes(req, res) {
   await connectToDatabase();
@@ -23,6 +24,10 @@ export default async function SavePollVotes(req, res) {
       const user_id = _id.toString();
 
       const { poll_id, option_idx } = req.body;
+
+      if (!validateId(poll_id) || typeof option_idx != 'number') {
+        return res.status(400).json({ message: "INVALID_REQUEST" });
+      }
 
       const file_path = `${ROOT_DIR}/redis-scripts/add-poll-votes.lua`;
       const hash_name = `poll_${poll_id}_voters`;
