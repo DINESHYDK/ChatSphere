@@ -25,7 +25,7 @@ export default async function SavePollVotes(req, res) {
 
       const { poll_id, option_idx } = req.body;
 
-      if (!validateId(poll_id) || typeof option_idx != 'number') {
+      if (!validateId(poll_id) || typeof option_idx != "number") {
         return res.status(400).json({ message: "INVALID_REQUEST" });
       }
 
@@ -46,7 +46,7 @@ export default async function SavePollVotes(req, res) {
           const statusCode = parseInt(resObj.status);
 
           const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
-          const sync_set_sz = (await client.scard("polls_to_sync")) || 0;
+          const sync_set_sz = (await client.sCard("polls_to_sync")) || 0;
           if (sync_set_sz > parseInt(MAX_SYNC_SET_SIZE, 10)) {
             await savePollVotesDB();
             await client.set("last_sync_time", Date.now());
@@ -54,11 +54,11 @@ export default async function SavePollVotes(req, res) {
 
           return res.status(statusCode).json({ message: resObj.message });
         } catch (err) {
+          console.log(err);
           return res.status(400).json({ error: err.message });
         }
       });
     } catch (err) {
-      console.log("error is", err);
       return res.status(500).json({ message: "Internal server error: " });
     }
   } else {

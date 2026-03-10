@@ -17,6 +17,8 @@ export default async function savePollVotesDB() {
         let total_votes = 0;
 
         const votes_set = await client.hScan(POLL_VOTES_HASH_NAME, "0");
+
+        // console.log(POLL_VOTERS_HASH_NAME, POLL_VOTERS_SYNC_HASH_NAME, POLL_VOTES_HASH_NAME);
         votes_set.entries.forEach((tuple, idx) => {
           const prev_option = poll.pollOptions[idx].toObject();
           poll.pollOptions[idx] = {
@@ -32,15 +34,14 @@ export default async function savePollVotesDB() {
 
         const voters_hash = await client.hScan(POLL_VOTERS_SYNC_HASH_NAME, "0");
 
-        console.log('voters hash is ', voters_hash);
+        console.log("hash is ", voters_hash);
         let pollObjArr = [];
         voters_hash.entries.forEach((tuple) => {
-          let { g, o } = JSON.parse(tuple.value);
-          console.log('g and o are ', g, o);
+          const { g, o } = JSON.parse(tuple.value);
           let currObj = {
             pollId,
             userId: tuple.field,
-            optionIndex: parseInt(o, 10),
+            optionIndex: o,
             userGender: g,
           };
 

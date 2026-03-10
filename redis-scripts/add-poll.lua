@@ -11,7 +11,7 @@ if total_option > 6 then
   return '{"status":"400", "message":"INVALID_REQUEST"}'
 end
 for i = 0, total_option - 1, 1 do
-  redis.call("HSET", poll_name, i, 0);
+  redis.call("HSET", poll_name, i, 0);   -- i got converted to string automatically
 end
 
 redis.call("HSET", "poll_metadata", poll_id, poll_gender);

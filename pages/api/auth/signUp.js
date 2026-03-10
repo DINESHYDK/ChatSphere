@@ -11,9 +11,17 @@ export default async function signUp(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { userName, email, password, gender } = req.body.userData;
+      if (!req.body.userData)
+        return res.status(400).json({ message: "BAD_REQUEST" });
 
-      if (!userName || !email || !password) {
+      const { userName, email, password } = req.body.userData;
+      const gender = req.body.userData.gender
+        ? req.body.userData.gender === "M"
+          ? "B"
+          : "G"
+        : null;
+
+      if (!userName || !email || !password || !gender) {
         return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
       }
 

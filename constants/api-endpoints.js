@@ -13,6 +13,7 @@ export const API_ENDPOINTS = {
   POLLS: {
     SAVE_POLL: "/api/poll/save-poll",
     SAVE_POLL_VOTES: "/api/poll/save-poll-votes",
+    HANDLE_SYNC: "/api/poll/handleSync",
   },
   CHAT: {
     GLOBAL: {

@@ -22,6 +22,11 @@ export default async function getSignature(req, res) {
       });
     } catch (err) {
       devLog("ERROR_UPLOADING_IMAGE", err);
+      return res
+        .status(500)
+        .json({
+          message: `ERROR_FETCHING_CLOUDINARY SIGNATURE: ${err.message}`,
+        });
     }
   } else {
     res.setHeader("Allow", ["GET"]);
