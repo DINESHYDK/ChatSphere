@@ -26,7 +26,7 @@ async function FETCH_SYNC_API() {
     await fetch(process.env.NEXT_APP_API_ENDPOINT, {
       method: "GET",
       headers: {
-        Authorization: `Bearer ${process.env.CRON_API_SECRET}`,
+        Authorization: `Bearer ${process.env.API_SECRET_HEADER}`,
         "Content-Type": "application/json",
       },
     });

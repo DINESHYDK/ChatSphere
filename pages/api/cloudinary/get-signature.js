@@ -9,7 +9,7 @@ export default async function getSignature(req, res) {
       const obj = await checkAuthAndCookie(req);
       if (!obj)
         return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
-      if (obj.statusCode === 401)
+      if (obj.statusCode === 401 || obj.statusCode === 500)
         return res.status(401).json({ message: obj.message });
 
       const myObj = generateSignature();
@@ -22,11 +22,9 @@ export default async function getSignature(req, res) {
       });
     } catch (err) {
       devLog("ERROR_UPLOADING_IMAGE", err);
-      return res
-        .status(500)
-        .json({
-          message: `ERROR_FETCHING_CLOUDINARY SIGNATURE: ${err.message}`,
-        });
+      return res.status(500).json({
+        message: `ERROR_FETCHING_CLOUDINARY SIGNATURE: ${err.message}`,
+      });
     }
   } else {
     res.setHeader("Allow", ["GET"]);

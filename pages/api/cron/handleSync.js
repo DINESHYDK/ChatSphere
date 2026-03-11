@@ -3,7 +3,7 @@ import savePollVotesDB from "@/utils/save-poll-votes-db";
 
 export default async function handleSync(req, res) {
   try {
-    const CRON_API_SECRET = process.env.CRON_API_SECRET;
+    const CRON_API_SECRET = process.env.API_SECRET_HEADER;
 
     if (req.headers.authorization !== `Bearer ${CRON_API_SECRET}`)
       return res.status(403).json({ message: "NOT_ALLOWED" });

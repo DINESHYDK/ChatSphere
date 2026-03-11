@@ -32,7 +32,9 @@ export default async function signIn(req, res) {
       if (!user.isVerified) {
         return res.status(403).json({ message: "EMAIL_VERIFICATION_PENDING" });
       }
-      setTokenAndCookie(res, user._id);
+
+      const { _id, userName, gender } = user;
+      setTokenAndCookie(res, { _id, userName, gender });
 
       const newUser = user.toObject();
       delete newUser.password;

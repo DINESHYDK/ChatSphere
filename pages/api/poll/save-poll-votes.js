@@ -1,14 +1,11 @@
 import connectToDatabase from "@/config/mongoose";
-import PollVoteModel from "@/models/Polls/PollVoteModel";
-import UserModel from "@/models/User/UserModel";
-import PollModel from "../../../models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 import client from "@/config/redis";
 import fs from "fs";
 import savePollVotesDB from "@/utils/save-poll-votes-db";
 import validateId from "@/utils/validateId";
 import GET_STATUS_AND_MESSAGE from "@/constants/get-status-and-message";
-import { ABSOLUTE_PATHS } from "@/constants/api-endpoints";
+import { ABSOLUTE_PATHS } from "@/constants/absolute-paths";
 
 export default async function SavePollVotes(req, res) {
   await connectToDatabase();
@@ -17,16 +14,17 @@ export default async function SavePollVotes(req, res) {
     try {
       const obj = await checkAuthAndCookie(req);
       if (!obj)
-        return res.status(500).json({ message: "SOMETHING_WENT_WRONG(AUTH)" });
+        return res.status(500).json({ message: "SOMETHING_WENT_WRONG_AUTH" });
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
       const { _id, gender } = obj.message;
       const USER_ID = _id.toString();
 
-      const { POLL_ID, option_idx } = req.body || {};
+      const POLL_ID = req.body.poll_id;
+      const OPTION_IDX = req.body.option_idx;
 
-      if (!validateId(POLL_ID) || typeof option_idx != "number") {
+      if (!validateId(POLL_ID) || typeof OPTION_IDX != "number") {
         return res.status(400).json({ message: "INVALID_REQUEST" });
       }
 
@@ -40,7 +38,7 @@ export default async function SavePollVotes(req, res) {
         try {
           const result = await client.eval(data, {
             keys: [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
-            arguments: [option_idx.toString(), gender],
+            arguments: [OPTION_IDX.toString(), gender],
           });
 
           const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
@@ -58,8 +56,7 @@ export default async function SavePollVotes(req, res) {
         }
       });
     } catch (err) {
-      console.log(err);
-      return res.status(500).json({ message: "Internal server error: " });
+      return res.status(500).json({ message: err.message });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

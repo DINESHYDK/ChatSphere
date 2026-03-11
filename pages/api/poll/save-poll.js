@@ -4,7 +4,7 @@ import checkAuthAndCookie from "@/utils/checkAuth";
 import isValidUrl from "@/utils/isValidURL";
 import client from "@/config/redis";
 import fs from "fs";
-import { ABSOLUTE_PATHS } from "@/constants/api-endpoints";
+import { ABSOLUTE_PATHS } from "@/constants/absolute-paths";
 import GET_STATUS_AND_MESSAGE from "@/constants/get-status-and-message";
 
 export default async function SavePoll(req, res) {

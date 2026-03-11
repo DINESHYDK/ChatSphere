@@ -24,7 +24,10 @@ export default async function resetPassword(req, res) {
         (user.resetToken = undefined),
         (user.resetTokenExpiresAt = undefined),
         await user.save());
-      setTokenAndCookie(res, user._id);
+
+      const { _id, userName, gender } = user;
+
+      setTokenAndCookie(res, { _id, userName, gender });
       return res.status(200).json({ message: "PASSWORD_RESET" });
     } catch (err) {
       res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });

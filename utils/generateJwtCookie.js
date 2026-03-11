@@ -2,18 +2,19 @@ import { serialize } from "cookie";
 import jwt from "jsonwebtoken";
 import Cryptr from "cryptr";
 
-export default function setTokenAndCookie(res, userId) {
+export default function setTokenAndCookie(res, userObj) {
   const jwt_cookie_name = process.env.AUTH_JWT_COOKIE;
   const auth_cookie_name = process.env.AUTH_USERID_COOKIE;
   const jwtKey = process.env.JWT_SECRET;
 
-  const JWT_COOKIE = jwt.sign({ userId }, jwtKey, {
+  const JWT_COOKIE = jwt.sign(userObj, jwtKey, {
     expiresIn: "24h",
     algorithm: "HS256",
   });
 
+  const { _id } = userObj;
   const cryptr = new Cryptr(jwtKey);
-  const AUTH_COOKIE = cryptr.encrypt(userId);
+  const AUTH_COOKIE = cryptr.encrypt(_id);
 
   res.setHeader("Set-Cookie", [
     serialize(jwt_cookie_name, JWT_COOKIE, {
@@ -33,4 +34,3 @@ export default function setTokenAndCookie(res, userId) {
     }),
   ]);
 }
-
