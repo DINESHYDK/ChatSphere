@@ -42,22 +42,21 @@ export default async function SavePoll(req, res) {
       const POLL_NAME = `poll_${newPoll._id.toString()}_votes`;
       const len = pollOptions.length;
 
-      fs.readFile(LUA_FILE_PATH, "utf-8", async (err, data) => {
-        if (err)
-          return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
-        try {
-          const result = await client.eval(data, {
-            keys: [POLL_NAME, newPoll._id.toString()],
-            arguments: [len.toString(), gender],
-          });
+      try {
+        const data = await fs.readFileSync(LUA_FILE_PATH, "utf-8");
+        const result = await client.eval(data, {
+          keys: [POLL_NAME, newPoll._id.toString()],
+          arguments: [len.toString(), gender],
+        });
 
-          const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
+        const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
 
-          return res.status(STATUS_CODE).json({ message: MESSAGE });
-        } catch (err) {
-          return res.status(400).json({ error: err.message });
-        }
-      });
+        return res.status(STATUS_CODE).json({ message: MESSAGE });
+      } catch {
+        return res
+          .status(500)
+          .json({ message: `SOMETHING WENT WRONG: ${err.message}` });
+      }
     } catch (err) {
       return res.status(500).json({ message: `Something went wrong, ${err}` });
     }

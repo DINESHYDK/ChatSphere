@@ -32,29 +32,27 @@ export default async function SavePollVotes(req, res) {
       const HASH_NAME = `poll_${POLL_ID}_voters`;
       const POLL_NAME = `poll_${POLL_ID}_votes`;
 
-      fs.readFile(LUA_FILE_PATH, "utf-8", async (err, data) => {
-        if (err)
-          return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
-        try {
-          const result = await client.eval(data, {
-            keys: [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
-            arguments: [OPTION_IDX.toString(), gender],
-          });
+      try {
+        const data = await fs.readFileSync(LUA_FILE_PATH, "utf-8");
+        const result = await client.eval(data, {
+          keys: [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
+          arguments: [OPTION_IDX.toString(), gender],
+        });
 
-          const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
-          const sync_set_sz = (await client.sCard("polls_to_sync")) || 0;
-          if (sync_set_sz > parseInt(MAX_SYNC_SET_SIZE, 10)) {
-            await savePollVotesDB();
-            await client.set("last_sync_time", Date.now());
-          }
-
-          const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
-          return res.status(STATUS_CODE).json({ message: MESSAGE });
-        } catch (err) {
-          console.log(err);
-          return res.status(400).json({ error: err.message });
+        const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
+        const sync_set_sz = (await client.sCard("polls_to_sync")) || 0;
+        if (sync_set_sz > parseInt(MAX_SYNC_SET_SIZE, 10)) {
+          await savePollVotesDB();
+          await client.set("last_sync_time", Date.now());
         }
-      });
+
+        const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
+        return res.status(STATUS_CODE).json({ message: MESSAGE });
+      } catch (err) {
+        return res
+          .status(500)
+          .json({ message: `SOMETHING WENT WRONG: ${err.message}` });
+      }
     } catch (err) {
       return res.status(500).json({ message: err.message });
     }
