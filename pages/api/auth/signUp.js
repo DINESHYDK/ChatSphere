@@ -12,9 +12,9 @@ export default async function signUp(req, res) {
   if (req.method === "POST") {
     try {
       if (!req.body.userData)
-        return res.status(400).json({ message: "BAD_REQUEST" });
+        return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
 
-      const { userName, email, password } = req.body.userData;
+      const { userName, email, password } = req.body.userData || {};
       const gender = req.body.userData.gender
         ? req.body.userData.gender === "M"
           ? "B"
@@ -50,8 +50,7 @@ export default async function signUp(req, res) {
       sendVerifyUserEmail(email, verifyToken);
 
       res.status(201).json({
-        message: "User created successfully. Please verify your email.",
-        newUser,
+        message: "ACCOUNT_CREATED, PLEASE_VERIFY_YOUR_EMAIL",
       });
     } catch (err) {
       console.error("SIGNUP ERROR", err);

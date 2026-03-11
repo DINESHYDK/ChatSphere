@@ -1,3 +1,5 @@
+import { ROOT_DIR } from "@/config/paths";
+
 export const API_ENDPOINTS = {
   AUTH: {
     SIGNUP: "/api/auth/signUp",
@@ -13,7 +15,7 @@ export const API_ENDPOINTS = {
   POLLS: {
     SAVE_POLL: "/api/poll/save-poll",
     SAVE_POLL_VOTES: "/api/poll/save-poll-votes",
-    HANDLE_SYNC: "/api/poll/handleSync",
+    HANDLE_SYNC: "/api/cron/handleSync",
   },
   CHAT: {
     GLOBAL: {
@@ -27,5 +29,12 @@ export const API_ENDPOINTS = {
   },
   CLOUDINARY: {
     GET_SIGNATURE: "/api/cloudinary/get-signature",
+  },
+};
+
+export const ABSOLUTE_PATHS = {
+  LUA: {
+    ADD_POLL: `${ROOT_DIR}/redis-scripts/add-poll.lua`,
+    ADD_POLL_VOTES: `${ROOT_DIR}/redis-scripts/add-poll-votes.lua`,
   },
 };

@@ -8,6 +8,9 @@ export default async function signIn(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
+      if (!req.body.userData) {
+        return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
+      }
       const { email, password } = req.body.userData;
 
       if (!email || !password) {
@@ -34,7 +37,6 @@ export default async function signIn(req, res) {
       const newUser = user.toObject();
       delete newUser.password;
       res.status(200).json({ message: "SUCCESS", newUser });
-
     } catch (err) {
       console.error("SIGNIN ERROR", err);
       res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });

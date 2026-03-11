@@ -4,10 +4,11 @@ import UserModel from "@/models/User/UserModel";
 import PollModel from "../../../models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 import client from "@/config/redis";
-import { ROOT_DIR } from "@/config/paths";
 import fs from "fs";
 import savePollVotesDB from "@/utils/save-poll-votes-db";
 import validateId from "@/utils/validateId";
+import GET_STATUS_AND_MESSAGE from "@/constants/get-status-and-message";
+import { ABSOLUTE_PATHS } from "@/constants/api-endpoints";
 
 export default async function SavePollVotes(req, res) {
   await connectToDatabase();
@@ -21,29 +22,26 @@ export default async function SavePollVotes(req, res) {
         return res.status(401).json({ message: obj.message });
 
       const { _id, gender } = obj.message;
-      const user_id = _id.toString();
+      const USER_ID = _id.toString();
 
-      const { poll_id, option_idx } = req.body;
+      const { POLL_ID, option_idx } = req.body || {};
 
-      if (!validateId(poll_id) || typeof option_idx != "number") {
+      if (!validateId(POLL_ID) || typeof option_idx != "number") {
         return res.status(400).json({ message: "INVALID_REQUEST" });
       }
 
-      const file_path = `${ROOT_DIR}/redis-scripts/add-poll-votes.lua`;
-      const hash_name = `poll_${poll_id}_voters`;
-      const poll_name = `poll_${poll_id}_votes`;
+      const LUA_FILE_PATH = ABSOLUTE_PATHS.LUA.ADD_POLL_VOTES;
+      const HASH_NAME = `poll_${POLL_ID}_voters`;
+      const POLL_NAME = `poll_${POLL_ID}_votes`;
 
-      fs.readFile(file_path, "utf-8", async (err, data) => {
+      fs.readFile(LUA_FILE_PATH, "utf-8", async (err, data) => {
         if (err)
           return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
         try {
           const result = await client.eval(data, {
-            keys: [hash_name, poll_name, user_id, poll_id.toString()],
+            keys: [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
             arguments: [option_idx.toString(), gender],
           });
-
-          const resObj = JSON.parse(result);
-          const statusCode = parseInt(resObj.status);
 
           const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
           const sync_set_sz = (await client.sCard("polls_to_sync")) || 0;
@@ -52,13 +50,15 @@ export default async function SavePollVotes(req, res) {
             await client.set("last_sync_time", Date.now());
           }
 
-          return res.status(statusCode).json({ message: resObj.message });
+          const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
+          return res.status(STATUS_CODE).json({ message: MESSAGE });
         } catch (err) {
           console.log(err);
           return res.status(400).json({ error: err.message });
         }
       });
     } catch (err) {
+      console.log(err);
       return res.status(500).json({ message: "Internal server error: " });
     }
   } else {

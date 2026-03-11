@@ -1,0 +1,15 @@
+const GET_STATUS_AND_MESSAGE = {
+  "0_400": {
+    STATUS_CODE: 400,
+    MESSAGE: "INVALID_REQUEST",
+  },
+  "0_403": {
+    STATUS_CODE: 403,
+    MESSAGE: "FORBIDDEN_TO_VOTE",
+  },
+  "1_200": {
+    STATUS_CODE: 200,
+    MESSAGE: "SUCCESS",
+  },
+};
+export default GET_STATUS_AND_MESSAGE;

@@ -67,10 +67,9 @@ setInterval(async () => {
 // });
 
 app.get("/", (req, res) => {
-  res.send("socket server is live ");
+  res.send("SERVER_IS_RUNNING");
 });
 
 app.listen(port, () => {
-  console.log(process.env.PORT);
   console.log(`http://localhost:${port}`);
 });

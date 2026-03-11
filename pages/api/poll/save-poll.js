@@ -4,7 +4,8 @@ import checkAuthAndCookie from "@/utils/checkAuth";
 import isValidUrl from "@/utils/isValidURL";
 import client from "@/config/redis";
 import fs from "fs";
-import { ROOT_DIR } from "@/config/paths";
+import { ABSOLUTE_PATHS } from "@/constants/api-endpoints";
+import GET_STATUS_AND_MESSAGE from "@/constants/get-status-and-message";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
@@ -18,13 +19,16 @@ export default async function SavePoll(req, res) {
 
       const userId = obj.message._id;
 
-      const { title, gender, pollOptions } = req.body.pollData;
+      const { title, gender, pollOptions } = req.body.pollData || {};
       if (!title || !gender || !pollOptions)
         return res.status(400).json({ message: "MISSING_INPUT" });
       for (let options of pollOptions) {
         if (options.imageUrl !== "" && !isValidUrl(options.imageUrl))
-          return res.status(400).json({ message: "INVALID_IMAGE_URL" });
+          return res.status(400).json({ message: "INVALID_REQUEST" });
       }
+
+      if (pollOptions.length > 6)
+        return res.status(400).json({ message: "INVALID_REQUEST" });
 
       const newPoll = new PollModel({
         userId,
@@ -34,24 +38,22 @@ export default async function SavePoll(req, res) {
       });
       await newPoll.save();
 
-      // calling lua script
-      const file_path = `${ROOT_DIR}/redis-scripts/add-poll.lua`;
-      const poll_name = `poll_${newPoll._id.toString()}_votes`;
+      const LUA_FILE_PATH = ABSOLUTE_PATHS.LUA.ADD_POLL;
+      const POLL_NAME = `poll_${newPoll._id.toString()}_votes`;
       const len = pollOptions.length;
 
-      fs.readFile(file_path, "utf-8", async (err, data) => {
+      fs.readFile(LUA_FILE_PATH, "utf-8", async (err, data) => {
         if (err)
           return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
         try {
           const result = await client.eval(data, {
-            keys: [poll_name, newPoll._id.toString()],
+            keys: [POLL_NAME, newPoll._id.toString()],
             arguments: [len.toString(), gender],
           });
 
-          const resObj = JSON.parse(result);
-          const resStatus = parseInt(resObj.status);
+          const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
 
-          return res.status(resStatus).json({ message: resObj.message });
+          return res.status(STATUS_CODE).json({ message: MESSAGE });
         } catch (err) {
           return res.status(400).json({ error: err.message });
         }
