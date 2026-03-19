@@ -49,8 +49,14 @@ export default async function signUp(req, res) {
       delete newUser.password;
       sendVerifyUserEmail(email, verifyToken);
 
+      const new_user_res_obj = {
+        userName,
+        gender,
+        emailVerificationToken: token,
+      };
       res.status(201).json({
         message: "ACCOUNT_CREATED, PLEASE_VERIFY_YOUR_EMAIL",
+        newUser: new_user_res_obj,
       });
     } catch (err) {
       console.error("SIGNUP ERROR", err);
