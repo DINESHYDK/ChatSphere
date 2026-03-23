@@ -84,7 +84,7 @@ export default function VerifyEmail() {
               <button
                 type="button"
                 className="text-sm text-primary hover:underline"
-                onClick={async () => await verify_email(token, true)}
+                onClick={() => verify_email(token, true)}
               >
                 Didn’t get the code? Resend OTP
               </button>

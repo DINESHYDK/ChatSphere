@@ -12,24 +12,26 @@ export default async function verifyOTP(req, res) {
         verifyToken: token,
       }).select("-password");
       if (!user) {
-        return res.status(401).json({ message: "Invalid OTP" });
+        return res.status(401).json({ message: "INVALID_OTP" });
       }
       if (user.verifyTokenExpiresAt < Date.now()) {
-        return res.status(401).json({ message: "Token expired" });
+        return res.status(401).json({ message: "OTP_EXPIRED" });
       }
 
       const { _id, userName, gender } = user;
 
       setTokenAndCookie(res, { _id, userName, gender });
       ((user.isVerified = true),
-        (user.verifyToken = undefined),
-        (user.verifyTokenExpiresAt = undefined),
-        (user.emailVerificationToken = undefined),
+        delete user.verifyToken,
+        delete user.verifyTokenExpiresAt,
+        delete user.emailVerificationToken,
+        delete user.email_verification,
         await user.save());
-      return res.status(200).json({ message: "Email verified", user });
+      return res
+        .status(200)
+        .json({ message: "EMAIL_VERIFICATION_SUCCESS", user });
     } catch (err) {
-      devLog("Something went wrong", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: `SOMETHING_WENT_WRONG: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

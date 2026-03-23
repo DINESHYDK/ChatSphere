@@ -32,7 +32,6 @@ const authStore = create((set, get) => ({
         throw { status: res.status, message: data.message || "Unknown error" };
       }
       const { newUser } = data;
-      console.log("new usr is ", newUser);
       await Router.push(
         `${ROUTES.VERIFY_EMAIL}${newUser.emailVerificationToken}`,
       );

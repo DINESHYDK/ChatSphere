@@ -43,7 +43,7 @@ export default async function signUp(req, res) {
         password: hashedPassword,
         emailVerificationToken: token,
         verifyToken,
-        verifyTokenExpiresAt: Date.now() + 24 * 100 * 60 * 60, // *** Will expire in 24 hr ***
+        verifyTokenExpiresAt: Date.now() + 15 * 60 * 1000, /* 15 minutes */
       });
       await newUser.save();
       delete newUser.password;
