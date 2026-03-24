@@ -22,25 +22,31 @@ export default async function forgotPassword(req, res) {
       }
       const { no_of_requests } = user.password_reset;
 
-      if (no_of_requests >= 2) {
+      if (no_of_requests > 1) {
         let { last_updation_time } = user.password_reset;
         if (!VERIFY_API_LIMIT(last_updation_time)) {
-          return res
-            .status(429)
-            .json({ message: "TOO_MANY_REQUESTS" });
+          return res.status(429).json({ message: "TOO_MANY_REQUESTS" });
         }
         user.password_reset.no_of_requests = 0;
       }
       const resetToken = generateAuthToken();
-      user.resetToken = resetToken;
-      user.resetTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000; // *** valid for 24 hour ***
       await sendResetPassEmail(email, resetToken);
 
       user.password_reset = {
         last_updation_time: Date.now(),
         no_of_requests: no_of_requests + 1,
       };
-      await user.save();
+
+      await UserModel.updateOne(
+        { _id: user._id },
+        {
+          $set: {
+            resetToken,
+            resetTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
+            password_reset: user.password_reset,
+          },
+        },
+      );
 
       return res.status(200).json({ message: "PASSWORD RESET EMAIL SENT" });
     } catch (err) {

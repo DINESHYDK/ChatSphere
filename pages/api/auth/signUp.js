@@ -46,7 +46,6 @@ export default async function signUp(req, res) {
         verifyTokenExpiresAt: Date.now() + 15 * 60 * 1000, /* 15 minutes */
       });
       await newUser.save();
-      delete newUser.password;
       sendVerifyUserEmail(email, verifyToken);
 
       const new_user_res_obj = {

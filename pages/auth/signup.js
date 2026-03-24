@@ -5,6 +5,7 @@ import GenderInput from "../../components/Input/GenderInput";
 import Loader1 from "../../components/Loader/Loader1";
 import Link from "next/link";
 import authStore from "../../store/authStore";
+import { ROUTES } from "@/constants/page-routes";
 
 const Signup = () => {
   const { SignUp, is_auth_request_pending } = authStore(); // *** Zustand global state ***
@@ -153,7 +154,7 @@ const Signup = () => {
         <p className="mt-3 text-center text-sm/6 text-gray-500">
           Already have an account?
           <Link
-            href="/auth/signin"
+            href={ROUTES.SIGNIN}
             className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
           >
             Sign In

@@ -5,6 +5,7 @@ import PasswordInput from "../../components/Input/PasswordInput";
 import Loader1 from "../../components/Loader/Loader1";
 import Link from "next/link";
 import devLog from "../../utils/logger";
+import { ROUTES } from "@/constants/page-routes";
 
 const Signup = () => {
   const { SignIn, is_auth_request_pending } = authStore();
@@ -40,10 +41,6 @@ const Signup = () => {
       setLoading(false);
     }
   }
-  // *** Async-await will stop the execution the downwards just wait for the SignIn to done
-  //   if promise if fulfilled then move to the next line else jump directly to catch block
-  // finally will run every time don't depend on whether request will succeed or failed
-  //  ***
   return (
     <>
       <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
@@ -71,7 +68,7 @@ const Signup = () => {
                   onChange={handleDataChange}
                   required
                   autoComplete="email"
-                  placeholder=""
+                  placeholROUTESder=""
                   className="inputStyle"
                   spellCheck={false}
                 />
@@ -92,7 +89,7 @@ const Signup = () => {
 
                 <div className="text-2sm">
                   <Link
-                    href="/auth/forgot-password"
+                    href={ROUTES.FORGOT_PASSWORD}
                     className="font-semibold text-[#6A89A7] hover:text-indigo-500"
                   >
                     Forgot password?
@@ -121,7 +118,7 @@ const Signup = () => {
           <p className="mt-10 text-center text-sm/6 text-gray-500">
             Don't have an account?
             <Link
-              href="/auth/signup"
+              href={ROUTES.SIGNUP}
               className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
             >
               Sign Up

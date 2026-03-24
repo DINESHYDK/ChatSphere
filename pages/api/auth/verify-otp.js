@@ -21,15 +21,23 @@ export default async function verifyOTP(req, res) {
       const { _id, userName, gender } = user;
 
       setTokenAndCookie(res, { _id, userName, gender });
-      ((user.isVerified = true),
-        delete user.verifyToken,
-        delete user.verifyTokenExpiresAt,
-        delete user.emailVerificationToken,
-        delete user.email_verification,
-        await user.save());
-      return res
-        .status(200)
-        .json({ message: "EMAIL_VERIFICATION_SUCCESS", user });
+
+      await UserModel.updateOne(
+        { _id: _id },
+        {
+          $set: { isVerified: true },
+          $unset: {
+            verifyToken: "",
+            verifyTokenExpiresAt: "",
+            emailVerificationToken: "",
+            email_verification: "",
+          },
+        },
+      );
+      return res.status(200).json({
+        message: "SUCCESS",
+        user: { _id, userName, gender },
+      });
     } catch (err) {
       res.status(500).json({ message: `SOMETHING_WENT_WRONG: ${err}` });
     }

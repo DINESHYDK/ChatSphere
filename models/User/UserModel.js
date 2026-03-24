@@ -39,13 +39,6 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    blockedUsers: {
-      type: Array,
-      id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    },
-    totalOpinionSubmit: {
-      type: Number,
-    },
     verifyToken: String,
     verifyTokenExpiresAt: Date,
     resetToken: String,
@@ -62,4 +55,5 @@ const UserSchema = new mongoose.Schema(
   { timestamps: true },
 );
 const UserModel = mongoose.models.user || mongoose.model("user", UserSchema);
-export default UserModel;201
+export default UserModel;
+201;

@@ -1,6 +1,5 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
-import devLog from '../../../utils/logger'
 
 export default async function verfiyResetToken(req, res) {
   await connectToDatabase();
@@ -8,27 +7,21 @@ export default async function verfiyResetToken(req, res) {
     try {
       const { token } = req.query;
       if (!token) {
-        devLog("Invalid credentials");
-        res.status(401).json({ message: "Authentication failed" });
+        res.status(401).json({ message: "INVALID_REQUEST" });
       }
 
       let user = await UserModel.findOne({
         resetToken: token,
       });
       if (!user) {
-        devLog("Invalid OTP");
-        return res
-          .status(401)
-          .json({ message: "Invalid Password reset token" });
+        return res.status(401).json({ message: "INVALID_RESET_TOKEN" });
       }
       if (user.resetTokenExpiresAt < Date.now()) {
-        devLog("Reset Token Expired");
-        return res.status(401).json({ message: "Reset token expired" });
+        return res.status(401).json({ message: "OUTDATED_RESET_TOKEN" });
       }
-      res.status(200).json({ message: "success", user });
+      res.status(200).json({ message: "SUCCESS", user });
     } catch (err) {
-      devLog("Something went wrong", err);
-      res.status(500).json({ message: "Internal server error" });
+      res.status(500).json({ message: `INTERNAL_ERROR: ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["GET"]);

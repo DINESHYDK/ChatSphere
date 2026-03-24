@@ -21,13 +21,15 @@ export default async function verifyEmail(req, res) {
         return res.status(404).json({ message: "INVALID_REQUEST" });
       }
       const { no_of_requests } = user.email_verification;
-      if (no_of_requests > 2) {
+
+      if (no_of_requests > 1) {
         let { last_updation_time } = user.email_verification;
         if (!VERIFY_API_LIMIT(last_updation_time)) {
           return res.status(429).json({ message: "TOO_MANY_REQUESTS" });
         }
         user.email_verification.no_of_requests = 0;
       }
+
       if (resend === "true" && no_of_requests < 2) {
         await sendVerifyUserEmail(user.email, user.verifyToken);
       }
@@ -36,8 +38,12 @@ export default async function verifyEmail(req, res) {
         no_of_requests: no_of_requests + 1,
       };
 
-      await user.save();
-      delete user.password;
+      await UserModel.updateOne(
+        { _id: user._id },
+        {
+          $set: { email_verification: user.email_verification },
+        },
+      );
       return res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
       res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
