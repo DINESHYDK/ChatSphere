@@ -8,10 +8,9 @@ export default async function FetchGlobalMessages(req, res) {
 
   if (req.method === "GET") {
     const obj = await checkAuthAndCookie(req);
-      if (!obj)
-      return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
     if (obj.statusCode === 401)
       return res.status(401).json({ message: obj.message });
+    if (obj.statusCode === 500) throw obj;
 
     const { last_message_id } = req.body.id;
     const { msg_limit } = parseInt(req.body.limit);

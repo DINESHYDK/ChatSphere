@@ -21,7 +21,7 @@ export default async function verfiyResetToken(req, res) {
       }
       res.status(200).json({ message: "SUCCESS", user });
     } catch (err) {
-      res.status(500).json({ message: `INTERNAL_ERROR: ${err.message}` });
+      res.status(500).json({ message: `INTERNAL_ERROR, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["GET"]);

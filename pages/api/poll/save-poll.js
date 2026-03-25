@@ -6,16 +6,16 @@ import client from "@/config/redis";
 import fs from "fs";
 import { ABSOLUTE_PATHS } from "@/constants/absolute-paths";
 import GET_STATUS_AND_MESSAGE from "@/constants/get-status-and-message";
+import { resolveSoa } from "dns";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
       const obj = await checkAuthAndCookie(req);
-      if (!obj)
-        return res.status(500).json({ message: "SOMETHING_WENT_WRONG(AUTH)" });
       if (obj.statusCode === 401)
-        return res.status(401).json({ message: obj.message });
+        return res.status(401).json({ message: obj.message }); 
+      if (obj.statusCode === 500) throw obj;
 
       const userId = obj.message._id;
 
@@ -55,10 +55,10 @@ export default async function SavePoll(req, res) {
       } catch {
         return res
           .status(500)
-          .json({ message: `SOMETHING WENT WRONG: ${err.message}` });
+          .json({ message: `SOMETHING WENT WRONG, ${err.message}` });
       }
     } catch (err) {
-      return res.status(500).json({ message: `Something went wrong, ${err}` });
+      return res.status(500).json({ message: `SOMETHING WENT WRONG, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

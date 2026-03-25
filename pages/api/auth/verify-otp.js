@@ -39,7 +39,7 @@ export default async function verifyOTP(req, res) {
         user: { _id, userName, gender },
       });
     } catch (err) {
-      res.status(500).json({ message: `SOMETHING_WENT_WRONG: ${err}` });
+      res.status(500).json({ message: `SOMETHING_WENT_WRONG, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

@@ -13,16 +13,15 @@ export default async function SavePollVotes(req, res) {
   if (req.method === "POST") {
     try {
       const obj = await checkAuthAndCookie(req);
-      if (!obj)
-        return res.status(500).json({ message: "SOMETHING_WENT_WRONG_AUTH" });
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
+      if (obj.statusCode === 500) throw obj;
 
       const { _id, gender } = obj.message;
       const USER_ID = _id.toString();
 
       const POLL_ID = req.body.poll_id;
-      const OPTION_IDX = req.body.option_idx;
+      const OPTION_IDX = parseInt(req.body.option_idx, 10);
 
       if (!validateId(POLL_ID) || typeof OPTION_IDX != "number") {
         return res.status(400).json({ message: "INVALID_REQUEST" });
@@ -33,7 +32,7 @@ export default async function SavePollVotes(req, res) {
       const POLL_NAME = `poll_${POLL_ID}_votes`;
 
       try {
-        const data = await fs.readFileSync(LUA_FILE_PATH, "utf-8");
+        const data = fs.readFileSync(LUA_FILE_PATH, "utf-8");
         const result = await client.eval(data, {
           keys: [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
           arguments: [OPTION_IDX.toString(), gender],
@@ -54,7 +53,10 @@ export default async function SavePollVotes(req, res) {
           .json({ message: `SOMETHING WENT WRONG: ${err.message}` });
       }
     } catch (err) {
-      return res.status(500).json({ message: err.message });
+      console.log(err);
+      return res
+        .status(500)
+        .json({ message: `SOMETHING WENT WRONG, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

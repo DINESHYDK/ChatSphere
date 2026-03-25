@@ -50,7 +50,9 @@ export default async function forgotPassword(req, res) {
 
       return res.status(200).json({ message: "PASSWORD RESET EMAIL SENT" });
     } catch (err) {
-      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
+      res
+        .status(500)
+        .json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

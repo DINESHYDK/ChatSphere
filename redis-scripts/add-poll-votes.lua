@@ -51,4 +51,4 @@ redis.call("SADD", "polls_to_sync", poll_id);
 
 redis.call("HSET", poll_voters_sync_hash, user_id, json.encode(poll_vote_obj));
 
-return "0_200"
+return "1_200"
