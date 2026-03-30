@@ -8,10 +8,7 @@ export default async function signIn(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      if (!req.body.userData) {
-        return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
-      }
-      const { email, password } = req.body.userData;
+      const { email, password } = req.body.userData ?? {};
 
       if (!email || !password) {
         return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });

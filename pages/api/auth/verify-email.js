@@ -8,7 +8,7 @@ export default async function verifyEmail(req, res) {
   await connectToDatabase();
   if (req.method === "GET") {
     try {
-      const { token, resend } = req.query;
+      const { token, resend } = req.query ?? {};
       if (!token) {
         return res.status(401).json({ message: "INVALID_REQUEST" });
       }
@@ -46,7 +46,9 @@ export default async function verifyEmail(req, res) {
       );
       return res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
-      res.status(500).json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
+      res
+        .status(500)
+        .json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["GET"]);

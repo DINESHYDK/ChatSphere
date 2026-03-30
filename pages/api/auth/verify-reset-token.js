@@ -5,7 +5,7 @@ export default async function verfiyResetToken(req, res) {
   await connectToDatabase();
   if (req.method === "GET") {
     try {
-      const { token } = req.query;
+      const { token } = req.query ?? {};
       if (!token) {
         res.status(401).json({ message: "INVALID_REQUEST" });
       }

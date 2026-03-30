@@ -11,17 +11,14 @@ export default async function signUp(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      if (!req.body.userData)
-        return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
-
       const { userName, email, password } = req.body.userData || {};
 
       let gender;
       switch (req.body.userData.gender) {
-        case M:
+        case "M":
           gender = "B";
           break;
-        case value2:
+        case "F":
           gender = "G";
           break;
         default:
@@ -34,7 +31,9 @@ export default async function signUp(req, res) {
 
       const existingUser = await UserModel.findOne({ email });
       if (existingUser) {
-        return res.status(409).json({ message: "EMAIL_ALREADY_EXISTS" });
+        if (existingUser.isVerified)
+          return res.status(409).json({ message: "INVALID_REQUEST" });
+        await UserModel.deleteOne({ email });
       }
 
       const salt = await bcrypt.genSalt(10);

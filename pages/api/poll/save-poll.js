@@ -14,12 +14,12 @@ export default async function SavePoll(req, res) {
     try {
       const obj = await checkAuthAndCookie(req);
       if (obj.statusCode === 401)
-        return res.status(401).json({ message: obj.message }); 
+        return res.status(401).json({ message: obj.message });
       if (obj.statusCode === 500) throw obj;
 
       const userId = obj.message._id;
 
-      const { title, gender, pollOptions } = req.body.pollData || {};
+      const { title, gender, pollOptions } = req.body.pollData ?? {};
       if (!title || !gender || !pollOptions)
         return res.status(400).json({ message: "MISSING_INPUT" });
       for (let options of pollOptions) {
@@ -58,7 +58,9 @@ export default async function SavePoll(req, res) {
           .json({ message: `SOMETHING WENT WRONG, ${err.message}` });
       }
     } catch (err) {
-      return res.status(500).json({ message: `SOMETHING WENT WRONG, ${err.message}` });
+      return res
+        .status(500)
+        .json({ message: `SOMETHING WENT WRONG, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

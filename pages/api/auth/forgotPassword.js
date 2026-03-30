@@ -8,7 +8,7 @@ export default async function forgotPassword(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { email } = req.body || {};
+      const { email } = req.body ?? {};
 
       if (!email) return res.status(400).json({ messsage: "INVALID REQUEST" });
       let user = await UserModel.findOne({ email }).select("-password");

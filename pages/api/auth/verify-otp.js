@@ -7,7 +7,9 @@ export default async function verifyOTP(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { token } = req.body;
+      const { token } = req.body || {};
+
+      if (!token) return res.status(400).json({ message: "TOKEN  REQUIRED" });
       let user = await UserModel.findOne({
         verifyToken: token,
       }).select("-password");

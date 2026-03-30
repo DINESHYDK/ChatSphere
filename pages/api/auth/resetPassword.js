@@ -7,8 +7,8 @@ export default async function resetPassword(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { token } = req.query || {};
-      const { password } = req.body || {};
+      const { token } = req.query ?? {};
+      const { password } = req.body ?? {};
 
       if (!token || !password)
         return res.status(400).json({ message: "INVALID_REQUEST" });
