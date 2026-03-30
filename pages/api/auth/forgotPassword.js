@@ -3,22 +3,24 @@ import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import generateAuthToken from "../../../utils/generateOTP";
 import { VERIFY_API_LIMIT } from "../../../utils/verifyApiLimit";
-import devLog from "../../../utils/logger";
 
 export default async function forgotPassword(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { email } = req.body;
+      const { email } = req.body || {};
 
+      if (!email) return res.status(400).json({ messsage: "INVALID REQUEST" });
       let user = await UserModel.findOne({ email }).select("-password");
       if (!user) {
-        devLog("Invalid email");
-        return res.status(401).json({ message: "INVALID_REQUEST" });
+        return res
+          .status(401)
+          .json({ message: "INVALID_REQUEST: INVALID_EMAIL" });
       }
       if (!user.isVerified) {
-        devLog("Invalid email");
-        return res.status(401).json({ message: "INVALID_REQUEST" });
+        return res
+          .status(401)
+          .json({ message: "INVALID_REQUEST: EMAIL_NOT_VERIFIED_YET" });
       }
       const { no_of_requests } = user.password_reset;
 

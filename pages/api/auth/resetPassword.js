@@ -2,16 +2,16 @@ import UserModel from "../../../models/User/UserModel";
 import connectToDatabase from "../../../config/mongoose";
 import bcrypt from "bcrypt";
 import setTokenAndCookie from "../../../utils/generateJwtCookie";
-import devLog from "../../../utils/logger";
 
 export default async function resetPassword(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      if (!req.body)
-        return res.status(401).json({ message: "INVALID_REQUEST" });
-      const { token } = req.query;
-      const { password } = req.body;
+      const { token } = req.query || {};
+      const { password } = req.body || {};
+
+      if (!token || !password)
+        return res.status(400).json({ message: "INVALID_REQUEST" });
       let user = await UserModel.findOne({
         resetToken: token,
       }).select("-password");

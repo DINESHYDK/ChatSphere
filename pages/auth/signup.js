@@ -46,10 +46,7 @@ const Signup = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl  sm:text-3xl/9  tracking-tight font-inria ">
           Welcome to
-          <span
-            href="/auth/signin"
-            className=" text-4xl font-semibold text-[#6A89A7]  mx-1 "
-          >
+          <span className=" text-4xl font-semibold text-[#6A89A7]  mx-1 ">
             SiteName
           </span>
         </h2>

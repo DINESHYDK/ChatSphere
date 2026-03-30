@@ -15,11 +15,18 @@ export default async function signUp(req, res) {
         return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
 
       const { userName, email, password } = req.body.userData || {};
-      const gender = req.body.userData.gender
-        ? req.body.userData.gender === "M"
-          ? "B"
-          : "G"
-        : null;
+
+      let gender;
+      switch (req.body.userData.gender) {
+        case M:
+          gender = "B";
+          break;
+        case value2:
+          gender = "G";
+          break;
+        default:
+          gender = null;
+      }
 
       if (!userName || !email || !password || !gender) {
         return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
@@ -43,7 +50,7 @@ export default async function signUp(req, res) {
         password: hashedPassword,
         emailVerificationToken: token,
         verifyToken,
-        verifyTokenExpiresAt: Date.now() + 15 * 60 * 1000, /* 15 minutes */
+        verifyTokenExpiresAt: Date.now() + 15 * 60 * 1000 /* 15 minutes */,
       });
       await newUser.save();
       sendVerifyUserEmail(email, verifyToken);
@@ -59,7 +66,9 @@ export default async function signUp(req, res) {
       });
     } catch (err) {
       console.error("SIGNUP ERROR", err);
-      res.status(500).json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
+      res
+        .status(500)
+        .json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

@@ -18,7 +18,8 @@ export default async function handleSync(req, res) {
 
     return res.status(200).json({ message: "POLL_SYNCED" });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "ERROR_SYNCING_POLLS" });
+    return res
+      .status(500)
+      .json({ message: `ERROR_SYNCING_POLLS, ${err.message}` });
   }
 }

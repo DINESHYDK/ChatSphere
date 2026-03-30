@@ -50,7 +50,7 @@ export default async function SavePollVotes(req, res) {
       } catch (err) {
         return res
           .status(500)
-          .json({ message: `SOMETHING WENT WRONG: ${err.message}` });
+          .json({ message: `SOMETHING WENT WRONG, ${err.message}` });
       }
     } catch (err) {
       console.log(err);
