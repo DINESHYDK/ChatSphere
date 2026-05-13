@@ -43,8 +43,8 @@ export default async function SavePoll(req, res) {
       const len = pollOptions.length;
 
       try {
-        const data = await fs.readFileSync(LUA_FILE_PATH, "utf-8");
-        const result = await client.eval(data, {
+        const data =  fs.readFileSync(LUA_FILE_PATH, "utf-8");
+        const result =  client.eval(data, {
           keys: [POLL_NAME, newPoll._id.toString()],
           arguments: [len.toString(), gender],
         });

@@ -31,7 +31,7 @@ export default async function signIn(req, res) {
       }
 
       const { _id, userName, gender } = user;
-      setTokenAndCookie(res, { _id, userName, gender });
+      // setTokenAndCookie(res, { _id, userName, gender });
 
       const newUser = user.toObject();
       delete newUser.password;
