@@ -19,7 +19,8 @@ const io = new Server(server, {
   },
 });
 
-const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || 120000;
+// const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || 120000;
+const MAX_SYNC_TIME = 5000;
 
 async function FETCH_SYNC_API() {
   try {
@@ -36,6 +37,7 @@ async function FETCH_SYNC_API() {
 }
 setInterval(async () => {
   await FETCH_SYNC_API();
+  console.log('i am running');
 }, MAX_SYNC_TIME);
 
 // io.on("connection", (socket) => {
