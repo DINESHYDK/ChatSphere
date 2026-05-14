@@ -5,11 +5,12 @@ import checkAuthAndCookie from "@/utils/checkAuth";
 export default async function getSignature(req, res) {
   if (req.method === "GET") {
     try {
-      const obj = await checkAuthAndCookie(req);
-      if (obj.statusCode === 401)
-        return res.status(401).json({ message: obj.message });
-      if (obj.statusCode === 500) throw obj;
-
+      // const obj = await checkAuthAndCookie(req);
+      // if (obj.statusCode === 401)
+      //   return res.status(401).json({ message: obj.message });
+      // if (obj.statusCode === 500) throw obj;
+      
+      console.log(JSON.parse(req.headers.session_info));
       const myObj = generateSignature();
       const { signature, timestamp, api_key, cloud_name } = myObj;
       return res.status(200).json({

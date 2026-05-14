@@ -1,7 +1,7 @@
 import UserModel from "../../../models/User/UserModel";
 import connectToDatabase from "../../../config/mongoose";
 import bcrypt from "bcrypt";
-import setTokenAndCookie from "../../../utils/generateJwtCookie";
+import setTokenAndCookie from "../../../utils/generateCookie";
 
 export default async function resetPassword(req, res) {
   await connectToDatabase();

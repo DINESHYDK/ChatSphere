@@ -1,19 +1,22 @@
 import MessageModel from "@/models/Messages/MessageModel";
 import connectToDatabase from "@/config/mongoose";
 import UserModel from "@/models/User/UserModel";
-import checkAuthAndCookie from "@/utils/checkAuth";
+// import checkAuthAndCookie from "@/utils/checkAuth";
 
 // *** api/chat/private-chat/fetch-messages?limit=...&id=... ***
 
 export default async function fetchMessages(req, res) {
   await connectToDatabase();
   if (req.method === "GET") {
-    const obj = await checkAuthAndCookie(req);
-    if (obj.statusCode === 401)
-      return res.status(401).json({ message: obj.message });
-    if (obj.statusCode === 500) throw obj;
+    // const obj = await checkAuthAndCookie(req);
+    // if (obj.statusCode === 401)
+    //   return res.status(401).json({ message: obj.message });
+    // if (obj.statusCode === 500) throw obj;
 
-    const user1_id = obj.message._id;
+    // const user1_id = obj.message._id;
+    const user1_id = JSON.parse(req.headers.session_info ?? "{}")._id;
+    if (!user1_id) return res.status(401).json({ message: "UNAUTHENTICATED" });
+
     const { user2_id } = req.body;
 
     const queryFilter = {

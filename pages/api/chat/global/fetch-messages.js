@@ -1,5 +1,5 @@
 import GlobalMessageModel from "@/models/Messages/GlobalMessageModel";
-import checkAuthAndCookie from "@/utils/checkAuth";
+// import checkAuthAndCookie from "@/utils/checkAuth";
 import connectToDatabase from "@/config/mongoose";
 
 // *** api/chat/global/fetch-messages?limit=...&id=... ***
@@ -7,10 +7,10 @@ export default async function FetchGlobalMessages(req, res) {
   await connectToDatabase();
 
   if (req.method === "GET") {
-    const obj = await checkAuthAndCookie(req);
-    if (obj.statusCode === 401)
-      return res.status(401).json({ message: obj.message });
-    if (obj.statusCode === 500) throw obj;
+    // const obj = await checkAuthAndCookie(req);
+    // if (obj.statusCode === 401)
+    //   return res.status(401).json({ message: obj.message });
+    // if (obj.statusCode === 500) throw obj;
 
     const { last_message_id } = req.body.id;
     const { msg_limit } = parseInt(req.body.limit);

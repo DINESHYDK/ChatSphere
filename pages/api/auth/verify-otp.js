@@ -1,6 +1,6 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
-import setTokenAndCookie from "../../../utils/generateJwtCookie";
+import generateCookie from "../../../utils/generateCookie";
 import devLog from "../../../utils/logger";
 
 export default async function verifyOTP(req, res) {
@@ -22,7 +22,7 @@ export default async function verifyOTP(req, res) {
 
       const { _id, userName, gender } = user;
 
-      setTokenAndCookie(res, { _id, userName, gender });
+      setTokenAndCookie(res,  _id);
 
       await UserModel.updateOne(
         { _id: _id },

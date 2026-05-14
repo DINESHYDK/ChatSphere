@@ -1,5 +1,5 @@
 import connectToDatabase from "@/config/mongoose";
-import checkAuthAndCookie from "@/utils/checkAuth";
+// import checkAuthAndCookie from "@/utils/checkAuth";
 import client from "@/config/redis";
 import fs from "fs";
 import savePollVotesDB from "@/utils/save-poll-votes-db";
@@ -12,12 +12,14 @@ export default async function SavePollVotes(req, res) {
 
   if (req.method === "POST") {
     try {
-      const obj = await checkAuthAndCookie(req);
-      if (obj.statusCode === 401)
-        return res.status(401).json({ message: obj.message });
-      if (obj.statusCode === 500) throw obj;
-
-      const { _id, gender } = obj.message;
+      // const obj = await checkAuthAndCookie(req);
+      // if (obj.statusCode === 401)
+      //   return res.status(401).json({ message: obj.message });
+      // if (obj.statusCode === 500) throw obj;
+ 
+      const { _id, gender } = JSON.parse(req.headers.session_info ?? "{}");
+      if (!_id || !gender)
+        return res.status(401).json({ message: "UNAUTHENTICATED" });
       const USER_ID = _id.toString();
 
       const POLL_ID = req.body.poll_id;
@@ -33,10 +35,11 @@ export default async function SavePollVotes(req, res) {
 
       try {
         const data = fs.readFileSync(LUA_FILE_PATH, "utf-8");
-        const result = await client.eval(data, {
-          keys: [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
-          arguments: [OPTION_IDX.toString(), gender],
-        });
+        const result = await client.eval(
+          data,
+          [HASH_NAME, POLL_NAME, USER_ID, POLL_ID.toString()],
+          [OPTION_IDX.toString(), gender],
+        );
 
         const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
         const sync_set_sz = (await client.sCard("polls_to_sync")) || 0;

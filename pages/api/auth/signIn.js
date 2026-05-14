@@ -2,7 +2,7 @@ import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import bcrypt from "bcrypt";
 import { serialize } from "cookie";
-import setTokenAndCookie from "../../../utils/generateJwtCookie";
+import generateCookie from "../../../utils/generateCookie";
 
 export default async function signIn(req, res) {
   await connectToDatabase();
@@ -30,12 +30,10 @@ export default async function signIn(req, res) {
         return res.status(403).json({ message: "EMAIL_VERIFICATION_PENDING" });
       }
 
-      const { _id, userName, gender } = user;
-      // setTokenAndCookie(res, { _id, userName, gender });
+      const { _id, gender } = user;
+      await generateCookie(res, _id.toString(), gender);
 
-      const newUser = user.toObject();
-      delete newUser.password;
-      res.status(200).json({ message: "SUCCESS", newUser });
+      res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
       console.error("SIGNIN ERROR", err);
       res
