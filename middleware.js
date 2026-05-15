@@ -17,7 +17,6 @@ export async function middleware(request) {
   }
 
   const res = await client.get(cookie);
-  console.log('res is ', res);
   if (!res) {
     return NextResponse.redirect(new URL("/", request.url));
   }
@@ -28,9 +27,7 @@ export async function middleware(request) {
   }
 
   const requestHeaders = new Headers(request.headers);
-  requestHeaders.set("session_info", JSON.stringify({ _id, gender }), {
-    keepSerializer: true,
-  });
+  requestHeaders.set("session_info", JSON.stringify({ _id, gender }));
 
   // Pass the new headers to the response
   return NextResponse.next({

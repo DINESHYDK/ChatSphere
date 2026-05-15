@@ -13,11 +13,14 @@ export default async function handleSync(req, res) {
 
     if (last_sync_time && Date.now() - parseInt(last_sync_time) < MAX_SYNC_TIME)
       return res.status(200).json({ message: "POLL_SYNCED" });
+
     await savePollVotesDB();
+
     await client.set("last_sync_time", Date.now());
 
     return res.status(200).json({ message: "POLL_SYNCED" });
   } catch (err) {
+    console.log(err);
     return res
       .status(500)
       .json({ message: `ERROR_SYNCING_POLLS, ${err.message}` });

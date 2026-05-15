@@ -1,5 +1,6 @@
+// runs when user cast their vote ie will save these votes to redis
+
 import connectToDatabase from "@/config/mongoose";
-// import checkAuthAndCookie from "@/utils/checkAuth";
 import client from "@/config/redis";
 import fs from "fs";
 import savePollVotesDB from "@/utils/save-poll-votes-db";
@@ -12,11 +13,6 @@ export default async function SavePollVotes(req, res) {
 
   if (req.method === "POST") {
     try {
-      // const obj = await checkAuthAndCookie(req);
-      // if (obj.statusCode === 401)
-      //   return res.status(401).json({ message: obj.message });
-      // if (obj.statusCode === 500) throw obj;
- 
       const { _id, gender } = JSON.parse(req.headers.session_info ?? "{}");
       if (!_id || !gender)
         return res.status(401).json({ message: "UNAUTHENTICATED" });
@@ -42,13 +38,15 @@ export default async function SavePollVotes(req, res) {
         );
 
         const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
-        const sync_set_sz = (await client.sCard("polls_to_sync")) || 0;
+        const sync_set_sz = (await client.scard("polls_to_sync")) || 0;
+
         if (sync_set_sz > parseInt(MAX_SYNC_SET_SIZE, 10)) {
           await savePollVotesDB();
           await client.set("last_sync_time", Date.now());
         }
 
         const { STATUS_CODE, MESSAGE } = GET_STATUS_AND_MESSAGE[result];
+
         return res.status(STATUS_CODE).json({ message: MESSAGE });
       } catch (err) {
         return res

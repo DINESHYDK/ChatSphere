@@ -22,7 +22,7 @@ export default async function verifyOTP(req, res) {
 
       const { _id, userName, gender } = user;
 
-      setTokenAndCookie(res,  _id);
+      generateCookie(res, _id, gender);
 
       await UserModel.updateOne(
         { _id: _id },

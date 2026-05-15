@@ -19,9 +19,7 @@ const io = new Server(server, {
   },
 });
 
-// const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || 120000;
-const MAX_SYNC_TIME = 5000;
-
+const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || 120000;
 async function FETCH_SYNC_API() {
   try {
     await fetch(process.env.NEXT_APP_API_ENDPOINT, {
@@ -35,9 +33,9 @@ async function FETCH_SYNC_API() {
     console.log(err.message);
   }
 }
+
 setInterval(async () => {
   await FETCH_SYNC_API();
-  console.log('i am running');
 }, MAX_SYNC_TIME);
 
 // io.on("connection", (socket) => {
