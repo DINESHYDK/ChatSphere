@@ -1,5 +1,5 @@
-import connectToDatabase from "../../../config/mongoose";
-import messageModel from "../../../models/Messages/MessageModel";
+import connectToDatabase from "@/config/mongoose";
+import messageModel from "@/models/Messages/MessageModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 
 export default async function SavePrivateMessages(req, res) {

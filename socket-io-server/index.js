@@ -3,6 +3,9 @@ const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
 
+const fs = require("fs");
+const sharp = require("sharp");
+
 require("dotenv").config();
 
 const app = express();
@@ -19,24 +22,31 @@ const io = new Server(server, {
   },
 });
 
-const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || 120000;
-async function FETCH_SYNC_API() {
-  try {
-    await fetch(process.env.NEXT_APP_API_ENDPOINT, {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.API_SECRET_HEADER}`,
-        "Content-Type": "application/json",
-      },
-    });
-  } catch (err) {
-    console.log(err.message);
-  }
-}
+img = fs.readFile("download.png", async (err, data) => {
+  await sharp(data)
+    .webp({ quality: 75 }) // Compress with 75% quality using high-efficiency WebP format
+    .toFile("vis.png");
+  //  console.log(data);
+});
+console.log(img);
+// const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || 120000;
+// async function FETCH_SYNC_API() {
+//   try {
+//     await fetch(process.env.NEXT_APP_API_ENDPOINT, {
+//       method: "GET",
+//       headers: {
+//         Authorization: `Bearer ${process.env.API_SECRET_HEADER}`,
+//         "Content-Type": "application/json",
+//       },
+//     });
+//   } catch (err) {
+//     console.log(err.message);
+//   }
+// }
 
-setInterval(async () => {
-  await FETCH_SYNC_API();
-}, MAX_SYNC_TIME);
+// setInterval(async () => {
+//   await FETCH_SYNC_API();
+// }, MAX_SYNC_TIME);
 
 // io.on("connection", (socket) => {
 //   devLog("User connected", socket.id);

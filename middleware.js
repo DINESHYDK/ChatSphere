@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import client from "./config/redis";
-import devLog from "./utils/logger";
 
 export async function middleware(request) {
   const SESSION_COOKIE = process.env.AUTH_SESSION_COOKIE;
-  let cookie = request.cookies.get(SESSION_COOKIE)?.value;
 
+  let cookie = request.cookies.get(SESSION_COOKIE)?.value;
+   
   if (!cookie) {
     if (request.nextUrl.pathname.startsWith("/api")) {
       return new NextResponse(JSON.stringify({ message: "UNAUTHENTICATED" }), {
@@ -15,8 +15,9 @@ export async function middleware(request) {
     }
     return NextResponse.redirect(new URL("/", request.url));
   }
-
+   
   const res = await client.get(cookie);
+
   if (!res) {
     return NextResponse.redirect(new URL("/", request.url));
   }
