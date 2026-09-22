@@ -34,30 +34,32 @@ export default async function SavePoll(req, res) {
       });
       await newPoll.save();
 
+      let response_obj = {};
+      let response_status;
+
       // calling lua script
       const file_path = `${ROOT_DIR}/redis-scripts/add-poll.lua`;
-      const poll_name = `poll_${newPoll._id.toString()})_votes`;
+      const poll_name = `poll_${newPoll._id.toString()}_votes`;
       const len = pollOptions.length;
 
-      fs.readFile(file_path, "utf-8", async (err, data) => {
-        if (err)
-          return res.status(404).json({ error: "ERROR_READING_LUA_FILE" });
-        try {
-          const result = await client.eval(data, {
-            keys: [poll_name, newPoll._id.toString()],
-            arguments: [len.toString(), gender],
-          });
+      try {
+        const content = fs.readFileSync(file_path, "utf-8");
+        const result_string = await client.eval(content, {
+          keys: [poll_name, newPoll._id.toString()],
+          arguments: [len.toString(), gender],
+        });
 
-          const resObj = JSON.parse(result);
-          const resStatus = parseInt(resObj.status);
+        response_obj = JSON.parse(result_string);
+        response_status = parseInt(response_obj.status);
+      } catch (err) {
+        return res.status(400).json({ error: err.message });
+      }
 
-          return res.status(resStatus).json({ message: resObj.message });
-        } catch (err) {
-          return res.status(400).json({ error: err.message });
-        }
-      });
+      return res
+        .status(response_status)
+        .json({ message: response_obj?.message ?? "SOMETHING_WENT_WRONG" });
     } catch (err) {
-      return res.status(500).json({ message: `Something went wrong, ${err}` });
+      return res.status(500).json({ message: `Something went wrong ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

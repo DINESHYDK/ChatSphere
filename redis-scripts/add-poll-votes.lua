@@ -6,9 +6,9 @@ local curr_option = tonumber(ARGV[1]);
 local user_gender = ARGV[2];
 
 
-if not KEYS[1] or not KEYS[2] or not KEYS[3] or not KEYS[4] or not ARGV[1] or not ARGV[2] then
-    return '{"status":"400", "message":"MISSING_INPUT"}'
-end
+-- if not KEYS[1] or not KEYS[2] or not KEYS[3] or not KEYS[4] or not ARGV[1] or not ARGV[2] then
+--     return '{"status":"400", "message":"MISSING_INPUT"}'
+-- end
 
 if redis.call("EXISTS", poll_name) == 0 then
     return '{"status":"400", "message":"INVALID_REQUEST"}'
