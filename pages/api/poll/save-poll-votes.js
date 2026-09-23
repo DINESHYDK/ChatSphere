@@ -1,22 +1,11 @@
 import connectToDatabase from "@/config/mongoose";
 import PollVoteModel from "@/models/Polls/PollVoteModel";
-import UserModel from "@/models/User/UserModel";
 import PollModel from "@/models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 import handleSync from "@/utils/handleSync";
 import { ROOT_DIR } from "@/config/paths";
 import client from "@/config/redis";
 import fs from "fs";
-import { hash } from "crypto";
-
-// function checkRedisEdgeCases(keys, args) {
-//   for (const key of keys) {
-//     if (!key || typeof key != "string") return false;
-//   }
-//   for (const arg of args) {
-//     if (!arg || typeof arg != "string") return false;
-//   }
-// }
 
 export default async function SavePollVotes(req, res) {
   await connectToDatabase();
@@ -24,13 +13,29 @@ export default async function SavePollVotes(req, res) {
   if (req.method === "POST") {
     try {
       const obj = await checkAuthAndCookie(req);
-      if (!obj)
-        return res.status(500).json({ message: "SOMETHING_WENT_WRONG(AUTH)" });
+      if (!obj) return res.status(500).json({ message: "AUTH_ERROR" });
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
-      const { _id, gender } = obj.message; // *** _id already a string ***
-      const { poll_id, option_idx } = req.body;
+      const { _id, userName, gender } = obj.message; // *** _id already a string ***
+      const { poll_id, option_idx } = req.body; // *** option_idx is a string ***
+  
+      if (typeof poll_id !== "string" || typeof option_idx !== "number")
+        return res.status(400).json({ message: "INVALID_REQUEST" });
+
+      // const t1 = Date.now()
+      const poll = await PollModel.findById(poll_id);
+      if (!poll) return res.status(400).json({ message: "INVALID_REQUEST" });
+      // console.log("t1: ", Date.now() - t1);
+
+      // *** Gender-Check  ***
+      const poll_gender = poll.gender;
+      if (poll_gender != "A" && gender != poll_gender)
+        return res.status(400).json({ message: "INVALID_REQUEST" });
+
+      // *** Invalid-option check ***
+      if (option_idx < 0 || option_idx > poll.pollOptions.length - 1)
+        return res.status(400).json({ message: "INVALID_REQUEST" });
 
       const file_path = `${ROOT_DIR}/redis-scripts/add-poll-votes.lua`;
       const hash_name = `poll_${poll_id}_voters`;
@@ -38,20 +43,39 @@ export default async function SavePollVotes(req, res) {
 
       let response_obj = {};
       let response_status;
+ 
+      // const t2 = Date.now()
+      const user_vote = await PollVoteModel.findOne({
+        pollId: poll_id,
+        userId: _id,
+      });
+      // console.log("t2: ", Date.now() - t2);
+
+      if (user_vote) {
+        if (user_vote.optionIdx == option_idx)
+          return res.status(200).json({ message: "SUCCESS, VOTE_POLLED" });
+
+        // const t3 = Date.now()
+        await PollVoteModel.deleteOne(user_vote);
+        client.hIncrBy(poll_name, user_vote.option_idx.toString(), -1);
+        // console.log("t3: ", Date.now() - t3);
+      }
 
       try {
         const content = fs.readFileSync(file_path, "utf-8");
+        const keys = [hash_name, poll_name, _id, poll_id];
+        const args = [option_idx.toString(), gender];
+        
+        // const t4 = Date.now()
         const result_string = await client.eval(content, {
-          keys: [hash_name, poll_name, _id, poll_id],
-          arguments: [option_idx, gender],
+          keys,
+          arguments: args,
         });
+        // console.log("t4: ", Date.now() - t4);
 
         response_obj = JSON.parse(result_string);
         response_status = parseInt(response_obj.status);
-
-        // const t1 = Date.now()
         // await handleSync();
-        // console.log(Date.now() - t1);
       } catch (err) {
         return res.status(400).json({ error: err.message });
       }
@@ -59,7 +83,7 @@ export default async function SavePollVotes(req, res) {
         .status(response_status)
         .json({ message: response_obj.message });
     } catch (err) {
-      return res.status(500).json({ message: "Internal server error: " });
+      return res.status(500).json({ message: `Internal server error: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

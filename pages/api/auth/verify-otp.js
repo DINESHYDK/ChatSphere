@@ -17,8 +17,12 @@ export default async function verifyOTP(req, res) {
       if (user.verifyTokenExpiresAt < Date.now()) {
         return res.status(401).json({ message: "Token expired" });
       }
+
+      const { _id, userName, gender } = user;
+      setTokenAndCookie(res, { _id: _id.toString(), userName, gender });
+
       // console.log("user is ", user._id.toString());
-      setTokenAndCookie(res, user._id.toString());
+      // setTokenAndCookie(res, user._id.toString());
       ((user.isVerified = true),
         (user.verifyToken = undefined),
         (user.verifyTokenExpiresAt = undefined),

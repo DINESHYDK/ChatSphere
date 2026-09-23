@@ -11,7 +11,7 @@ const PollSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    pollOptions: [  
+    pollOptions: [
       {
         content: {
           type: String,
@@ -30,13 +30,15 @@ const PollSchema = new mongoose.Schema(
     gender: {
       type: String,
       enum: ["A", "B", "G"],
+      required: true,
+      index: true,
     },
     totalVotes: {
       type: Number,
       default: 0,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const PollModel = mongoose.models.poll || mongoose.model("poll", PollSchema);
 export default PollModel;

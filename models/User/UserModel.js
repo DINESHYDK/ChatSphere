@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["M", "F"],
+      enum: ["B", "G"],
     },
     email: {
       type: String,
@@ -59,7 +59,7 @@ const UserSchema = new mongoose.Schema(
       no_of_requests: { type: Number, default: 0 },
     },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 const UserModel = mongoose.models.user || mongoose.model("user", UserSchema);
 export default UserModel;
