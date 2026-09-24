@@ -2,7 +2,7 @@ import connectToDatabase from "@/config/mongoose";
 import PollVoteModel from "@/models/Polls/PollVoteModel";
 import PollModel from "@/models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
-import handleSync from "@/utils/handleSync";
+import savePollVotesDB from "@/utils/save-poll-votes-db";
 import { ROOT_DIR } from "@/config/paths";
 import client from "@/config/redis";
 import fs from "fs";
@@ -19,10 +19,10 @@ export default async function SavePollVotes(req, res) {
 
       const { _id, userName, gender } = obj.message; // *** _id already a string ***
       const { poll_id, option_idx } = req.body; // *** option_idx is a string ***
-  
+
       if (typeof poll_id !== "string" || typeof option_idx !== "number")
         return res.status(400).json({ message: "INVALID_REQUEST" });
-
+       
       // const t1 = Date.now()
       const poll = await PollModel.findById(poll_id);
       if (!poll) return res.status(400).json({ message: "INVALID_REQUEST" });
@@ -43,7 +43,7 @@ export default async function SavePollVotes(req, res) {
 
       let response_obj = {};
       let response_status;
- 
+
       // const t2 = Date.now()
       const user_vote = await PollVoteModel.findOne({
         pollId: poll_id,
@@ -65,7 +65,7 @@ export default async function SavePollVotes(req, res) {
         const content = fs.readFileSync(file_path, "utf-8");
         const keys = [hash_name, poll_name, _id, poll_id];
         const args = [option_idx.toString(), gender];
-        
+
         // const t4 = Date.now()
         const result_string = await client.eval(content, {
           keys,
@@ -75,10 +75,21 @@ export default async function SavePollVotes(req, res) {
 
         response_obj = JSON.parse(result_string);
         response_status = parseInt(response_obj.status);
-        // await handleSync();
+
+        // await savePollVotesDB();
+        const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
+        const SYNC_SET_SIZE =
+          (await client.scard("polls")) || 1 + MAX_SYNC_SET_SIZE;
+
+        if (SYNC_SET_SIZE > parseInt(MAX_SYNC_SET_SIZE, 10)) {
+          await savePollVotesDB();
+          await client.set("last_sync_time", Date.now());
+        }
       } catch (err) {
         return res.status(400).json({ error: err.message });
       }
+
+      // console.log(response_obj);
       return res
         .status(response_status)
         .json({ message: response_obj.message });

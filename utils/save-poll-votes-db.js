@@ -2,55 +2,78 @@ import PollVoteModel from "@/models/Polls/PollVoteModel";
 import PollModel from "@/models/Polls/PollModel";
 import client from "@/config/redis";
 import connectToDatabase from "@/config/mongoose";
+import mongoose from "mongoose";
 
 export default async function savePollVotesDB() {
   try {
     await connectToDatabase();
-    const SYNC_HASH_NAME = "polls_to_sync";
 
-    for await (const POLL_IDs of client.sScanIterator(SYNC_HASH_NAME)) {
-      POLL_IDs.forEach(async (pollId) => {
-        const POLL_VOTERS_SYNC_HASH_NAME = `${pollId}_sync_voters`;
-        const POLL_VOTES_HASH_NAME = `poll_${pollId}_votes`;
-        const POLL_VOTERS_HASH_NAME = `poll_${pollId}_voters`;
+    const BULK_VOTES_TO_UPDATE = [];
+    let BULK_VOTERS_TO_WRITE = [];
 
-        let poll = await PollModel.findById(pollId);
-        let total_votes = 0;
+    const POLL_IDs = await client.sMembers("polls");
+    await client.rename("polls", "polls_to_sync");
 
-        const votes_set = await client.hScan(POLL_VOTES_HASH_NAME, "0");
-        votes_set.entries.forEach((tuple, idx) => {
-          const prev_option = poll.pollOptions[idx].toObject();
-          poll.pollOptions[idx] = {
-            ...prev_option,
-            votesCount: parseInt(tuple.value, 10),
-          };
-          total_votes += parseInt(tuple.value, 10);
+    const promises = POLL_IDs.map(async (POLL_ID) => {
+      const POLL_VOTES_HASH_NAME = `poll_${POLL_ID}_votes`;
+      const POLL_VOTERS_HASH_NAME = `poll_${POLL_ID}_voters`;
+
+      const POLL_VOTES_OBJ = {
+        updateMany: {
+          filter: {
+            _id: new mongoose.Types.ObjectId(POLL_ID),
+          },
+        },
+      };
+
+      const poll_votes = await client.hGetAll(POLL_VOTES_HASH_NAME);
+      const popular_votes = Object.entries(poll_votes)
+        .map((k, v) => [parseInt(k[0]), parseInt(k[1])])
+        .filter((obj) => obj.v != 0);
+
+      const total_options = poll_votes.length;
+
+      let total_change_in_votes = 0;
+      const update = { $inc: {} };
+      const arrayFilters = [];
+
+      for (const [option_no, change_in_votes] of popular_votes) {
+        update["$inc"][`pollOptions.$[i${option_no}].votesCount`] =
+          change_in_votes; // only option_no will hit error
+        arrayFilters.push({ [`i${option_no}.index`]: parseInt(option_no) });
+
+        total_change_in_votes += change_in_votes;
+      }
+
+      update["$inc"]["totalVotes"] = total_change_in_votes;
+
+      POLL_VOTES_OBJ["updateMany"] = {
+        ...POLL_VOTES_OBJ["updateMany"],
+        update,
+        arrayFilters,
+      };
+
+      BULK_VOTES_TO_UPDATE.push(POLL_VOTES_OBJ);
+
+      const poll_voters = await client.hGetAll(POLL_VOTERS_HASH_NAME);
+
+      for (const [userId, optionIndex] of Object.entries(poll_voters)) {
+        BULK_VOTERS_TO_WRITE.push({
+          pollId: new mongoose.Types.ObjectId(POLL_ID),
+          userId: new mongoose.Types.ObjectId(userId),
+          optionIndex: parseInt(optionIndex),
         });
+      }
 
-        poll.totalVotes = total_votes;
+      await client.del(POLL_VOTES_HASH_NAME);
+      await client.del(POLL_VOTERS_HASH_NAME);
+    });
+    await Promise.all(promises);
 
-        // await poll.save();
-
-        const voters_hash = await client.hScan(POLL_VOTERS_SYNC_HASH_NAME, "0");
-        let pollObjArr = [];
-        voters_hash.entries.forEach((tuple) => {
-          let currObj = {
-            pollId,
-            userId: tuple.field,
-            optionIdx: parseInt(tuple.value, 10),
-          };
-
-          pollObjArr.push(currObj);
-        });
-
-        await client.rename(POLL_VOTERS_SYNC_HASH_NAME, `${pollId}_sync_processing`);
-        // await PollVoteModel.insertMany(pollObjArr);
-        await client.del(`${pollId}_sync_processing`);
-
-        await client.sRem(SYNC_HASH_NAME, pollId);
-      });
-    }
-   await client.del(SYNC_HASH_NAME);
+    await client.del("polls_to_sync");
+    await PollModel.bulkWrite(BULK_VOTES_TO_UPDATE);
+    await PollVoteModel.insertMany(BULK_VOTERS_TO_WRITE);
+    await client.set("last_sync_time", Date.now());
   } catch (err) {
     throw err;
   }

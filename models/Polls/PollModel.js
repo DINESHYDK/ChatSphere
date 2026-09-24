@@ -13,6 +13,10 @@ const PollSchema = new mongoose.Schema(
     },
     pollOptions: [
       {
+        index: {
+          type: Number,
+          required: true,
+        },
         content: {
           type: String,
           required: true,

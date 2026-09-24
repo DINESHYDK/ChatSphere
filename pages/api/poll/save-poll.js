@@ -11,6 +11,7 @@ export default async function SavePoll(req, res) {
   if (req.method === "POST") {
     try {
       const obj = await checkAuthAndCookie(req);
+      console.log('obj is ', obj);
       if (!obj)
         return res.status(500).json({ message: "AUTH_ERROR" });
       if (obj.statusCode === 401)
@@ -21,6 +22,7 @@ export default async function SavePoll(req, res) {
       const { title, gender, pollOptions } = req.body.pollData;
       if (!title || !gender || !pollOptions)
         return res.status(400).json({ message: "MISSING_INPUT" });
+
       for (let options of pollOptions) {
         if (options.imageUrl !== "" && !isValidUrl(options.imageUrl))
           return res.status(400).json({ message: "INVALID_IMAGE_URL" });

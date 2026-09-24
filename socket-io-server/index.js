@@ -2,14 +2,20 @@ const express = require("express");
 const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
-const devLog = require("../utils/logger");
 
 const app = express();
 const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
+const PORT = 6969;
+
 const io = new Server(server, {
+  // await client.del()
+  //   await client.sRem(SYNC_HASH_NAME, pollId);
+  // });
+  // }
+  //  await client.del(SYNC_HASH_NAME);
   cors: {
     origin: process.env.CORS_ORIGIN || "*",
     methods: ["GET", "POST"],
@@ -40,14 +46,12 @@ io.on("connection", (socket) => {
   socket.on("update-idx", (data) => {
     io.emit("update-idx", data);
   });
-  
-  
 });
 
 app.get("/", (req, res) => {
   res.send("socket server is live ");
 });
 
-app.listen(port, () => {
-  devLog(`http://localhost:${port}`);
+app.listen(PORT, () => {
+  console.log(`http://localhost:${PORT}`);
 });
