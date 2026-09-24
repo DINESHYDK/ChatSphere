@@ -3,55 +3,73 @@ const http = require("http");
 const cors = require("cors");
 const { Server } = require("socket.io");
 
+require("dotenv").config();
+
 const app = express();
 const server = http.createServer(app);
 app.use(cors());
 app.use(express.json());
 
-const PORT = 6969;
+const port = process.env.PORT;
 
 const io = new Server(server, {
-  // await client.del()
-  //   await client.sRem(SYNC_HASH_NAME, pollId);
-  // });
-  // }
-  //  await client.del(SYNC_HASH_NAME);
   cors: {
     origin: process.env.CORS_ORIGIN || "*",
     methods: ["GET", "POST"],
   },
 });
-io.on("connection", (socket) => {
-  devLog("User connected", socket.id);
 
-  socket.on("join-room", (roomId) => {
-    socket.join(roomId);
-    devLog("Joined room", roomId);
-  });
+const MAX_SYNC_TIME = process.env.MAX_SYNC_TIME || "120000";
 
-  socket.on("send-message", ({ message, roomId }) => {
-    io.to(roomId).emit("receive-message", message);
-  });
+async function FETCH_SYNC_API() {
+  try {
+    await fetch(process.env.NEXT_APP_API_ENDPOINT, {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.API_SECRET_HEADER}`,
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (err) {
+    console.log(err.message);
+  }
+}
+setInterval(async () => {
+  await FETCH_SYNC_API();
+}, parseInt(MAX_SYNC_TIME));
 
-  socket.on("exit-from-room", () => {
-    devLog("User exit", socket.id);
-  });
+// io.on("connection", (socket) => {
+//   devLog("User connected", socket.id);
 
-  socket.on("poll-update", (data) => {
-    devLog("poll-update");
-    io.emit("poll-update", data);
-  });
+//   socket.on("join-room", (roomId) => {
+//     socket.join(roomId);
+//     devLog("Joined room", roomId);
+//   });
 
-  // *** POLL ***
-  socket.on("update-idx", (data) => {
-    io.emit("update-idx", data);
-  });
-});
+//   socket.on("send-message", ({ message, roomId }) => {
+//     io.to(roomId).emit("receive-message", message);
+//   });
+
+//   socket.on("exit-from-room", () => {
+//     devLog("User exit", socket.id);
+//   });
+
+//   socket.on("poll-update", (data) => {
+//     devLog("poll-update");
+//     io.emit("poll-update", data);
+//   });
+
+//   // *** POLL ***
+//   socket.on("update-idx", (data) => {
+//     io.emit("update-idx", data);
+//   });
+
+// });
 
 app.get("/", (req, res) => {
-  res.send("socket server is live ");
+  res.send("SERVER_IS_RUNNING");
 });
 
-app.listen(PORT, () => {
-  console.log(`http://localhost:${PORT}`);
+app.listen(port, () => {
+  console.log(`http://localhost:${port}`);
 });
