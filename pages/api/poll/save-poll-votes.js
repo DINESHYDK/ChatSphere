@@ -3,9 +3,9 @@ import PollVoteModel from "@/models/Polls/PollVoteModel";
 import PollModel from "@/models/Polls/PollModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 import savePollVotesDB from "@/utils/save-poll-votes-db";
-import { ROOT_DIR } from "@/config/paths";
 import client from "@/config/redis";
 import fs from "fs";
+import { ABSOLUTE_PATHS } from "@/constants/absolute-paths";
 
 export default async function SavePollVotes(req, res) {
   await connectToDatabase();
@@ -22,7 +22,7 @@ export default async function SavePollVotes(req, res) {
 
       if (typeof poll_id !== "string" || typeof option_idx !== "number")
         return res.status(400).json({ message: "INVALID_REQUEST" });
-       
+
       // const t1 = Date.now()
       const poll = await PollModel.findById(poll_id);
       if (!poll) return res.status(400).json({ message: "INVALID_REQUEST" });
@@ -37,7 +37,8 @@ export default async function SavePollVotes(req, res) {
       if (option_idx < 0 || option_idx > poll.pollOptions.length - 1)
         return res.status(400).json({ message: "INVALID_REQUEST" });
 
-      const file_path = `${ROOT_DIR}/redis-scripts/add-poll-votes.lua`;
+      const file_path = ABSOLUTE_PATHS.LUA.SAVE_POLL_VOTES;
+      // const file_path = `${ROOT_DIR}/redis-scripts/add-poll-votes.lua`;
       const hash_name = `poll_${poll_id}_voters`;
       const poll_name = `poll_${poll_id}_votes`;
 
@@ -77,7 +78,7 @@ export default async function SavePollVotes(req, res) {
         response_status = parseInt(response_obj.status);
 
         // await savePollVotesDB();
-        const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "100";
+        const MAX_SYNC_SET_SIZE = process.env.MAX_SYNC_SET_SIZE || "50";
         const SYNC_SET_SIZE =
           (await client.scard("polls")) || 1 + MAX_SYNC_SET_SIZE;
 

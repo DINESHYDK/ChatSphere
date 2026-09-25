@@ -4,16 +4,15 @@ import checkAuthAndCookie from "@/utils/checkAuth";
 import isValidUrl from "@/utils/isValidURL";
 import client from "@/config/redis";
 import fs from "fs";
-import { ROOT_DIR } from "@/config/paths";
+import { ABSOLUTE_PATHS } from "@/constants/absolute-paths";
 
 export default async function SavePoll(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
       const obj = await checkAuthAndCookie(req);
-      console.log('obj is ', obj);
-      if (!obj)
-        return res.status(500).json({ message: "AUTH_ERROR" });
+      console.log("obj is ", obj);
+      if (!obj) return res.status(500).json({ message: "AUTH_ERROR" });
       if (obj.statusCode === 401)
         return res.status(401).json({ message: obj.message });
 
@@ -40,7 +39,7 @@ export default async function SavePoll(req, res) {
       let response_status;
 
       // calling lua script
-      const file_path = `${ROOT_DIR}/redis-scripts/add-poll.lua`;
+      const file_path = ABSOLUTE_PATHS.LUA.SAVE_POLL;
       const poll_name = `poll_${newPoll._id.toString()}_votes`;
       const len = pollOptions.length;
 
