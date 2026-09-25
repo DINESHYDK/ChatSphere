@@ -14,6 +14,6 @@ for i = 0, total_option - 1, 1 do
   redis.call("HSET", poll_name, i, 0);
 end
 
-redis.call("HSET", "poll_metadata", poll_id, poll_gender);
+redis.call("SADD", "polls", poll_id);
 
 return '{"status":"200", "message":"SUCCESS"}';

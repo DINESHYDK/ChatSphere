@@ -21,6 +21,7 @@ const Signup = () => {
   }
 
   async function handleSubmit(e) {
+    console.log("userDate is ", userData);
     e.preventDefault();
     const { email, password } = userData;
     try {

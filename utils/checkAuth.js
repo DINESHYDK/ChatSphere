@@ -2,9 +2,8 @@ import { jwtVerify } from "jose";
 import connectToDatabase from "@/config/mongoose";
 import UserModel from "@/models/User/UserModel";
 import { cookies } from "next/headers";
-import devLog from "./logger";
 
-class visError {
+class AUTH_RESPONSE {
   constructor(statusCode, message) {
     this.statusCode = statusCode;
     this.message = message;
@@ -13,11 +12,10 @@ class visError {
 
 export default async function checkAuthAndCookie(req) {
   await connectToDatabase();
-
   try {
     const jwt_cookie_name = process.env.AUTH_JWT_COOKIE;
     const jwt_cookie = req.cookies[jwt_cookie_name];
-    if (!jwt_cookie) return new visError(401, "UNAUTHENTICATED");
+    if (!jwt_cookie) return new AUTH_RESPONSE(401, "AUTH_ERROR");
 
     const secret_key = new TextEncoder().encode(process.env.JWT_SECRET);
 
@@ -25,21 +23,20 @@ export default async function checkAuthAndCookie(req) {
     const TIME_IN_SECOND = Math.floor(Date.now() / 1000);
 
     if (!payload || payload.exp < TIME_IN_SECOND)
-      return new visError(401, "UNAUTHENTICATED");
+      return new AUTH_RESPONSE(401, "AUTH_ERROR");
 
-    const { userId } = payload;
-    if (!userId) return new visError(401, "UNAUTHETICATED");
+    let { _id, userName, gender } = payload;
+    if (!_id || !userName || !gender)
+      return new AUTH_RESPONSE(401, "AUTH_ERROR");
 
-    const userObj = await UserModel.findById(userId);
+    _id = _id.toString();
+    const user = { _id, userName, gender };
+
+    if (!user) return new AUTH_RESPONSE(401, "AUTH_ERROR");
     
-    const {_id, userName, gender}  = userObj;
-    const user = {_id, userName, gender};
-
-    if (!user) return new visError(401, "UNAUTHENTICATED");
-    delete user.password;
-
-    return new visError(200, user);
+    console.log('i am hitting');
+    return new AUTH_RESPONSE(200, user);
   } catch (err) {
-    devLog("AUTH Error", err);
+    console.log("AUTH_ERROR", err);
   }
 }

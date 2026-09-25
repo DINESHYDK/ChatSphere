@@ -11,4 +11,8 @@ redisClient.on("error", (err) => console.log("Redis Client Error", err));
 // if (!global.redis) global.redis = redisClient;
 if (!global.redis) await redisClient.connect();
 global.redis = redisClient;
+
+if (redisClient && !redisClient.scard) {
+  redisClient.scard = (...args) => redisClient.sCard(...args);
+}
 export default redisClient;

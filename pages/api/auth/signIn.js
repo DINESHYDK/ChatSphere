@@ -29,12 +29,13 @@ export default async function signIn(req, res) {
       if (!user.isVerified) {
         return res.status(403).json({ message: "EMAIL_VERIFICATION_PENDING" });
       }
-      setTokenAndCookie(res, user._id);
+      // console.log(user);
+      const { _id, userName, gender } = user;
+      setTokenAndCookie(res, { _id: _id.toString(), userName, gender });
 
       const newUser = user.toObject();
       delete newUser.password;
       res.status(200).json({ message: "SUCCESS", newUser });
-
     } catch (err) {
       console.error("SIGNIN ERROR", err);
       res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
