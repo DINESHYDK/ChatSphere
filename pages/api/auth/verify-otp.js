@@ -1,47 +1,33 @@
 import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
-import generateCookie from "../../../utils/generateCookie";
+import setTokenAndCookie from "../../../utils/generateJwtCookie";
 import devLog from "../../../utils/logger";
 
 export default async function verifyOTP(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { token } = req.body || {};
-
-      if (!token) return res.status(400).json({ message: "TOKEN  REQUIRED" });
+      const { token } = req.body;
       let user = await UserModel.findOne({
         verifyToken: token,
       }).select("-password");
       if (!user) {
-        return res.status(401).json({ message: "INVALID_OTP" });
+        return res.status(401).json({ message: "Invalid OTP" });
       }
       if (user.verifyTokenExpiresAt < Date.now()) {
-        return res.status(401).json({ message: "OTP_EXPIRED" });
+        return res.status(401).json({ message: "Token expired" });
       }
-
-      const { _id, userName, gender } = user;
-
-      generateCookie(res, _id, gender);
-
-      await UserModel.updateOne(
-        { _id: _id },
-        {
-          $set: { isVerified: true },
-          $unset: {
-            verifyToken: "",
-            verifyTokenExpiresAt: "",
-            emailVerificationToken: "",
-            email_verification: "",
-          },
-        },
-      );
-      return res.status(200).json({
-        message: "SUCCESS",
-        user: { _id, userName, gender },
-      });
+      // console.log("user is ", user._id.toString());
+      setTokenAndCookie(res, user._id.toString());
+      ((user.isVerified = true),
+        (user.verifyToken = undefined),
+        (user.verifyTokenExpiresAt = undefined),
+        (user.emailVerificationToken = undefined),
+        await user.save());
+      return res.status(200).json({ message: "Email verified", user });
     } catch (err) {
-      res.status(500).json({ message: `SOMETHING_WENT_WRONG, ${err.message}` });
+      devLog("Something went wrong", err);
+      res.status(500).json({ message: "Internal server error" });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

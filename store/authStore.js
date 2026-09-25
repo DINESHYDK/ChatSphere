@@ -33,7 +33,7 @@ const authStore = create((set, get) => ({
       }
       const { newUser } = data;
       await Router.push(
-        `${ROUTES.VERIFY_EMAIL}${newUser.emailVerificationToken}`,
+        `${ROUTES.VERIFY_EMAIL}${newUser.emailVerificationToken}`
       );
       return data;
     } catch (error) {
@@ -148,7 +148,7 @@ const authStore = create((set, get) => ({
       if (!token) return;
       const url = new URL(
         API_ENDPOINTS.AUTH.VERIFY_EMAIL,
-        window.location.origin,
+        window.location.origin
       );
       url.searchParams.set("token", token);
       if (resend) url.searchParams.set("resend", "true");

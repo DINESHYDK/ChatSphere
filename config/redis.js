@@ -1,9 +1,14 @@
-import { Redis } from "@upstash/redis";
+import { createClient } from "redis";
 
-// Clean, stateless initialization
-const client = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+const redisClient =
+  global.redis ||
+  createClient({
+    url: process.env.REDIS_URL,
+  });
+// const redisClient = createClient();
 
-export default client;
+redisClient.on("error", (err) => console.log("Redis Client Error", err));
+// if (!global.redis) global.redis = redisClient;
+if (!global.redis) await redisClient.connect();
+global.redis = redisClient;
+export default redisClient;

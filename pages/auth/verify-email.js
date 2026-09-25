@@ -84,7 +84,7 @@ export default function VerifyEmail() {
               <button
                 type="button"
                 className="text-sm text-primary hover:underline"
-                onClick={() => verify_email(token, true)}
+                onClick={async () => await verify_email(token, true)}
               >
                 Didn’t get the code? Resend OTP
               </button>
@@ -96,3 +96,13 @@ export default function VerifyEmail() {
   );
 }
 
+// *** Kaam ki baat ***
+// *** Difference between useRef and useState ***
+// *** useState: when a state changes it causes rerendering of page. ***
+// *** If i wanted a state which i don't have to show on page(while updating) then useRef is best ***
+
+// *** Que. Then i can use UseRef instead of useState everywhere? ***
+// *** Ans. No, const countRef = useRef(0);
+/* <button onClick={() => countRef.current++}>Increment</button> */
+/* <p>Count: {countRef.current}</p> *** */
+// *** Above will not change as useRef doesn't render page. ***

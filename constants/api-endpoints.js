@@ -1,4 +1,3 @@
-
 export const API_ENDPOINTS = {
   AUTH: {
     SIGNUP: "/api/auth/signUp",
@@ -14,7 +13,6 @@ export const API_ENDPOINTS = {
   POLLS: {
     SAVE_POLL: "/api/poll/save-poll",
     SAVE_POLL_VOTES: "/api/poll/save-poll-votes",
-    HANDLE_SYNC: "/api/cron/handleSync",
   },
   CHAT: {
     GLOBAL: {
@@ -30,5 +28,3 @@ export const API_ENDPOINTS = {
     GET_SIGNATURE: "/api/cloudinary/get-signature",
   },
 };
-
-

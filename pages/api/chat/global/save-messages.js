@@ -1,4 +1,4 @@
-// import checkAuthAndCookie from "@/utils/checkAuth";
+import checkAuthAndCookie from "@/utils/checkAuth";
 import connectToDatabase from "../../../../config/mongoose";
 import globalMessageModel from "../../../../models/Messages/GlobalMessageModel";
 
@@ -7,21 +7,17 @@ export default async function SaveGlobalMessages(req, res) {
 
   if (req.method === "POST") {
     try {
-      // const obj = await checkAuthAndCookie(req);
-      // if (obj.statusCode === 401)
-      //   return res.status(401).json({ message: obj.message });
-      // if (obj.statusCode === 500) throw obj;
+      const obj = await checkAuthAndCookie(req);
+      if (!obj)
+        return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
+      if (obj.statusCode === 401)
+        return res.status(401).json({ message: obj.message });
 
-      const { _id } = JSON.parse(req.headers.session_info ?? "{}");
-      if (!_id) return res.status(401).json({ message: "UNAUTHENTICATED" });
-
-      //  console.log(JSON.parse(req.headers.session_info)._id.length);
-
-      // const _id = obj.message._id;
+      const senderid = obj.message._id;
       const { content, imageUrl } = req.body;
 
       const newMessage = await globalMessageModel.create({
-        _id,
+        senderId,
         content,
         imageUrl,
         isDelivered: true,

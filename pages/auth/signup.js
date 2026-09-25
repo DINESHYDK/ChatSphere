@@ -5,7 +5,6 @@ import GenderInput from "../../components/Input/GenderInput";
 import Loader1 from "../../components/Loader/Loader1";
 import Link from "next/link";
 import authStore from "../../store/authStore";
-import { ROUTES } from "@/constants/page-routes";
 
 const Signup = () => {
   const { SignUp, is_auth_request_pending } = authStore(); // *** Zustand global state ***
@@ -46,7 +45,10 @@ const Signup = () => {
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <h2 className="mt-10 text-center text-2xl  sm:text-3xl/9  tracking-tight font-inria ">
           Welcome to
-          <span className=" text-4xl font-semibold text-[#6A89A7]  mx-1 ">
+          <span
+            href="/auth/signin"
+            className=" text-4xl font-semibold text-[#6A89A7]  mx-1 "
+          >
             SiteName
           </span>
         </h2>
@@ -151,7 +153,7 @@ const Signup = () => {
         <p className="mt-3 text-center text-sm/6 text-gray-500">
           Already have an account?
           <Link
-            href={ROUTES.SIGNIN}
+            href="/auth/signin"
             className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
           >
             Sign In

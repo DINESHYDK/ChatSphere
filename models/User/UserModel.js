@@ -8,7 +8,7 @@ const UserSchema = new mongoose.Schema(
     },
     gender: {
       type: String,
-      enum: ["B", "G"],
+      enum: ["M", "F"],
     },
     email: {
       type: String,
@@ -39,6 +39,13 @@ const UserSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    blockedUsers: {
+      type: Array,
+      id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
+    },
+    totalOpinionSubmit: {
+      type: Number,
+    },
     verifyToken: String,
     verifyTokenExpiresAt: Date,
     resetToken: String,
@@ -52,8 +59,7 @@ const UserSchema = new mongoose.Schema(
       no_of_requests: { type: Number, default: 0 },
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 const UserModel = mongoose.models.user || mongoose.model("user", UserSchema);
 export default UserModel;
-

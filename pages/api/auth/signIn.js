@@ -2,13 +2,13 @@ import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import bcrypt from "bcrypt";
 import { serialize } from "cookie";
-import generateCookie from "../../../utils/generateCookie";
+import setTokenAndCookie from "../../../utils/generateJwtCookie";
 
 export default async function signIn(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { email, password } = req.body.userData ?? {};
+      const { email, password } = req.body.userData;
 
       if (!email || !password) {
         return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
@@ -29,16 +29,15 @@ export default async function signIn(req, res) {
       if (!user.isVerified) {
         return res.status(403).json({ message: "EMAIL_VERIFICATION_PENDING" });
       }
+      setTokenAndCookie(res, user._id);
 
-      const { _id, gender } = user;
-      await generateCookie(res, _id.toString(), gender);
+      const newUser = user.toObject();
+      delete newUser.password;
+      res.status(200).json({ message: "SUCCESS", newUser });
 
-      res.status(200).json({ message: "SUCCESS" });
     } catch (err) {
       console.error("SIGNIN ERROR", err);
-      res
-        .status(500)
-        .json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

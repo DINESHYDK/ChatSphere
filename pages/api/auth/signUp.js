@@ -11,29 +11,15 @@ export default async function signUp(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { userName, email, password } = req.body.userData || {};
+      const { userName, email, password, gender } = req.body.userData;
 
-      let gender;
-      switch (req.body.userData.gender) {
-        case "M":
-          gender = "B";
-          break;
-        case "F":
-          gender = "G";
-          break;
-        default:
-          gender = null;
-      }
-
-      if (!userName || !email || !password || !gender) {
+      if (!userName || !email || !password) {
         return res.status(400).json({ message: "ALL_FIELDS_ARE_REQUIRED" });
       }
 
       const existingUser = await UserModel.findOne({ email });
       if (existingUser) {
-        if (existingUser.isVerified)
-          return res.status(409).json({ message: "INVALID_REQUEST" });
-        await UserModel.deleteOne({ email });
+        return res.status(409).json({ message: "EMAIL_ALREADY_EXISTS" });
       }
 
       const salt = await bcrypt.genSalt(10);
@@ -49,25 +35,19 @@ export default async function signUp(req, res) {
         password: hashedPassword,
         emailVerificationToken: token,
         verifyToken,
-        verifyTokenExpiresAt: Date.now() + 15 * 60 * 1000 /* 15 minutes */,
+        verifyTokenExpiresAt: Date.now() + 24 * 100 * 60 * 60, // *** Will expire in 24 hr ***
       });
       await newUser.save();
+      delete newUser.password;
       sendVerifyUserEmail(email, verifyToken);
 
-      const new_user_res_obj = {
-        userName,
-        gender,
-        emailVerificationToken: token,
-      };
       res.status(201).json({
-        message: "ACCOUNT_CREATED, PLEASE_VERIFY_YOUR_EMAIL",
-        newUser: new_user_res_obj,
+        message: "User created successfully. Please verify your email.",
+        newUser,
       });
     } catch (err) {
       console.error("SIGNUP ERROR", err);
-      res
-        .status(500)
-        .json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

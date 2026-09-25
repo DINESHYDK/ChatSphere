@@ -3,58 +3,48 @@ import connectToDatabase from "../../../config/mongoose";
 import UserModel from "../../../models/User/UserModel";
 import generateAuthToken from "../../../utils/generateOTP";
 import { VERIFY_API_LIMIT } from "../../../utils/verifyApiLimit";
+import devLog from "../../../utils/logger";
 
 export default async function forgotPassword(req, res) {
   await connectToDatabase();
   if (req.method === "POST") {
     try {
-      const { email } = req.body ?? {};
+      const { email } = req.body;
 
-      if (!email) return res.status(400).json({ messsage: "INVALID REQUEST" });
       let user = await UserModel.findOne({ email }).select("-password");
       if (!user) {
-        return res
-          .status(401)
-          .json({ message: "INVALID_REQUEST: INVALID_EMAIL" });
+        devLog("Invalid email");
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
       if (!user.isVerified) {
-        return res
-          .status(401)
-          .json({ message: "INVALID_REQUEST: EMAIL_NOT_VERIFIED_YET" });
+        devLog("Invalid email");
+        return res.status(401).json({ message: "INVALID_REQUEST" });
       }
       const { no_of_requests } = user.password_reset;
 
-      if (no_of_requests > 1) {
+      if (no_of_requests >= 2) {
         let { last_updation_time } = user.password_reset;
         if (!VERIFY_API_LIMIT(last_updation_time)) {
-          return res.status(429).json({ message: "TOO_MANY_REQUESTS" });
+          return res
+            .status(429)
+            .json({ message: "TOO_MANY_REQUESTS" });
         }
         user.password_reset.no_of_requests = 0;
       }
       const resetToken = generateAuthToken();
+      user.resetToken = resetToken;
+      user.resetTokenExpiresAt = Date.now() + 24 * 60 * 60 * 1000; // *** valid for 24 hour ***
       await sendResetPassEmail(email, resetToken);
 
       user.password_reset = {
         last_updation_time: Date.now(),
         no_of_requests: no_of_requests + 1,
       };
-
-      await UserModel.updateOne(
-        { _id: user._id },
-        {
-          $set: {
-            resetToken,
-            resetTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
-            password_reset: user.password_reset,
-          },
-        },
-      );
+      await user.save();
 
       return res.status(200).json({ message: "PASSWORD RESET EMAIL SENT" });
     } catch (err) {
-      res
-        .status(500)
-        .json({ message: `INTERNAL_SERVER_ERROR, ${err.message}` });
+      res.status(500).json({ message: `INTERNAL_SERVER_ERROR: ${err}` });
     }
   } else {
     res.setHeader("Allow", ["POST"]);

@@ -1,5 +1,5 @@
-import connectToDatabase from "@/config/mongoose";
-import messageModel from "@/models/Messages/MessageModel";
+import connectToDatabase from "../../../config/mongoose";
+import messageModel from "../../../models/Messages/MessageModel";
 import checkAuthAndCookie from "@/utils/checkAuth";
 
 export default async function SavePrivateMessages(req, res) {
@@ -7,17 +7,13 @@ export default async function SavePrivateMessages(req, res) {
 
   if (req.method === "POST") {
     try {
-      // const obj = await checkAuthAndCookie(req);
-      // if (!obj || !obj.statusCode || !obj.message)
-      //   return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
-      // if (obj.statusCode === 401)
-      //   return res.status(401).json({ message: obj.message });
+      const obj = await checkAuthAndCookie(req);
+      if (!obj || !obj.statusCode || !obj.message)
+        return res.status(500).json({ message: "SOMETHING_WENT_WRONG" });
+      if (obj.statusCode === 401)
+        return res.status(401).json({ message: obj.message });
 
-      // const senderId = obj.message._id;
-      const senderId = JSON.parse(req.headers.session_info ?? "{}")._id;
-      if (!senderId)
-        return res.status(401).json({ message: "UNAUTHENTICATED" });
-
+      const senderId = obj.message._id;
       const { receiverId, content, imageUrl } = req.body;
       const newMessage = await messageModel.create({
         senderId,
