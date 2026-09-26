@@ -6,9 +6,10 @@ import Loader1 from "../../components/Loader/Loader1";
 import Link from "next/link";
 import devLog from "../../utils/logger";
 
-const Signup = () => {
+const SignIn = () => {
   const { SignIn, is_auth_request_pending } = authStore();
   const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [userData, setUserData] = useState({
     email: "",
@@ -18,20 +19,23 @@ const Signup = () => {
   function handleDataChange(e) {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
+    if (errorMsg) setErrorMsg("");
   }
 
   async function handleSubmit(e) {
-    console.log("userDate is ", userData);
     e.preventDefault();
     const { email, password } = userData;
+    setErrorMsg("");
     try {
       if (email === "" || password === "") {
+        setErrorMsg("Please enter both email and password.");
         return;
       }
       setLoading(true);
-      await SignIn(userData); // *** calling SignIn (zustand state) ***
+      await SignIn(userData);
     } catch (err) {
       devLog(err.message);
+      setErrorMsg(err.message || "Invalid credentials. Please try again.");
       if (err.status === 403) {
         setUserData((prev) => ({ email: "", password: "" }));
       } else if (err.status == 401) {
@@ -41,66 +45,61 @@ const Signup = () => {
       setLoading(false);
     }
   }
-  // *** Async-await will stop the execution the downwards just wait for the SignIn to done
-  //   if promise if fulfilled then move to the next line else jump directly to catch block
-  // finally will run every time don't depend on whether request will succeed or failed
-  //  ***
+
   return (
-    <>
-      <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-zinc-950 px-6 py-12 lg:px-8">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 sm:p-10">
         <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-          <h2 className="mt-10 text-center text-4xl/9  tracking-tight font-inria">
-            Login your account
+          <h2 className="text-center text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-inria">
+            Sign in to your account
           </h2>
         </div>
 
-        <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
-          <form className="space-y-4" onSubmit={handleSubmit}>
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+          {errorMsg && (
+            <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 p-3 sm:p-4 border border-red-200 dark:border-red-500/20 text-sm text-red-600 dark:text-red-400">
+              {errorMsg}
+            </div>
+          )}
+          
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label
                 htmlFor="email"
-                className="block text-2sm/6 font-medium  font-bold"
+                className="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1.5"
               >
                 Email address
               </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  type="email"
-                  name="email"
-                  value={userData.email || ""}
-                  onChange={handleDataChange}
-                  required
-                  autoComplete="email"
-                  placeholder=""
-                  className="inputStyle"
-                  spellCheck={false}
-                />
-              </div>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                value={userData.email || ""}
+                onChange={handleDataChange}
+                required
+                autoComplete="email"
+                className="inputStyle"
+                spellCheck={false}
+              />
             </div>
 
             <div>
-              <div
-                className="text-right flex justify-between
-"
-              >
+              <div className="flex items-center justify-between mb-1.5">
                 <label
                   htmlFor="password"
-                  className="block text-2sm/6 font-medium  font-bold"
+                  className="block text-sm font-semibold text-gray-900 dark:text-gray-200"
                 >
                   Password
                 </label>
-
-                <div className="text-2sm">
+                <div className="text-sm">
                   <Link
                     href="/auth/forgot-password"
-                    className="font-semibold text-[#6A89A7] hover:text-indigo-500"
+                    className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
                   >
                     Forgot password?
                   </Link>
                 </div>
               </div>
-
               <PasswordInput
                 value={userData.password || ""}
                 onChange={handleDataChange}
@@ -108,31 +107,30 @@ const Signup = () => {
               />
             </div>
 
-            <div>
+            <div className="pt-2">
               <button
                 type="submit"
                 className="authSubmitBtn"
-                disabled={is_auth_request_pending}
+                disabled={is_auth_request_pending || loading}
               >
                 {loading ? <Loader1 /> : "Sign In"}
               </button>
             </div>
           </form>
 
-          <p className="mt-10 text-center text-sm/6 text-gray-500">
-            Don't have an account?
+          <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+            Don't have an account?{" "}
             <Link
               href="/auth/signup"
-              className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
+              className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
             >
-              Sign Up
+              Sign Up here
             </Link>
-            here
           </p>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
-export default Signup;
+export default SignIn;

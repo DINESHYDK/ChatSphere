@@ -3,11 +3,11 @@
 @tailwind utilities;
 
 .inputStyle {
-  @apply block w-full rounded-md bg-transparent px-3 py-1.5  text-lg outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm sm:py-2.5 border;
+  @apply block w-full rounded-lg bg-transparent px-3 py-2 text-base text-foreground placeholder:text-muted-foreground border border-input transition-all duration-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 focus:outline-none sm:text-sm;
 }
 
 .authSubmitBtn {
-  @apply flex w-full justify-center rounded-md bg-[#6A89A7] px-3 py-1.5 text-lg font-semibold text-white shadow-sm hover:bg-[#204D7D] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600;
+  @apply flex w-full justify-center rounded-lg bg-indigo-600 px-4 py-2.5 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-all duration-200 active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed;
 }
 
 

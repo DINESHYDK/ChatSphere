@@ -7,8 +7,9 @@ import Link from "next/link";
 import authStore from "../../store/authStore";
 
 const Signup = () => {
-  const { SignUp, is_auth_request_pending } = authStore(); // *** Zustand global state ***
-  const [loading, setLoading] = useState(false); // *** local state ***
+  const { SignUp, is_auth_request_pending } = authStore();
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState("");
 
   const [userData, setUserData] = useState({
     userName: "",
@@ -16,10 +17,13 @@ const Signup = () => {
     password: "",
     gender: "M",
   });
+
   function handleDataChange(e) {
     const { name, value } = e.target;
     setUserData({ ...userData, [name]: value });
+    if (errorMsg) setErrorMsg("");
   }
+  
   function onGenderChange(g) {
     setUserData({ ...userData, gender: g });
   }
@@ -27,71 +31,75 @@ const Signup = () => {
   async function handleSubmit(e) {
     e.preventDefault();
     const { userName, email, password, gender } = userData;
-    if (userName == "" || email === "" || password === "") {
+    setErrorMsg("");
+    
+    if (userName === "" || email === "" || password === "") {
+      setErrorMsg("Please fill in all required fields.");
       return;
     }
+    
     try {
       setLoading(true);
       await SignUp(userData);
     } catch (err) {
+      setErrorMsg(err.message || "An error occurred during sign up.");
       if (err.status === 409)
         setUserData({ userName: "", email: "", password: "", gender: "M" });
     } finally {
       setLoading(false);
     }
   }
+
   return (
-    <div className="flex min-h-screen flex-col  px-6 py-12 lg:px-8 ">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl  sm:text-3xl/9  tracking-tight font-inria ">
-          Welcome to
-          <span
-            href="/auth/signin"
-            className=" text-4xl font-semibold text-[#6A89A7]  mx-1 "
-          >
-            SiteName
-          </span>
-        </h2>
-      </div>
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 dark:bg-zinc-950 px-6 py-12 lg:px-8">
+      <div className="w-full max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-xl border border-zinc-200 dark:border-zinc-800 p-8 sm:p-10">
+        <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+          <h2 className="text-center text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white font-inria">
+            Welcome to{" "}
+            <span className="text-indigo-600 dark:text-indigo-400">
+              SiteName
+            </span>
+          </h2>
+          <p className="mt-2 text-center text-md text-gray-600 dark:text-gray-400 font-inria">
+            Create your account
+          </p>
+        </div>
 
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-2 text-center text-2xl  tracking-tight font-inria">
-          Register account
-        </h2>
-      </div>
+        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+          {errorMsg && (
+            <div className="mb-4 rounded-lg bg-red-50 dark:bg-red-500/10 p-3 sm:p-4 border border-red-200 dark:border-red-500/20 text-sm text-red-600 dark:text-red-400">
+              {errorMsg}
+            </div>
+          )}
 
-      <div className="mt-2 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form className="space-y-2" onSubmit={handleSubmit}>
-          <div>
-            <label
-              htmlFor="name"
-              className="block text-2sm/6 font-medium  font-bold"
-            >
-              Name
-            </label>
-            <div className="mt-1">
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div>
+              <label
+                htmlFor="userName"
+                className="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1.5"
+              >
+                Name
+              </label>
               <input
                 id="userName"
-                type="userName"
+                type="text"
                 name="userName"
                 value={userData.userName}
                 onChange={handleDataChange}
                 required
-                autoComplete="userName"
+                autoComplete="name"
                 className="inputStyle"
                 spellCheck={false}
               />
             </div>
-          </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-2sm/6 font-medium  font-bold"
-            >
-              Email address
-            </label>
-            <div className="mt-1">
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1.5"
+              >
+                Email address
+              </label>
               <input
                 id="email"
                 type="email"
@@ -104,62 +112,52 @@ const Signup = () => {
                 spellCheck={false}
               />
             </div>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between">
+            <div>
               <label
                 htmlFor="password"
-                className="block text-2sm/6 font-medium "
+                className="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1.5"
               >
                 Password
               </label>
+              <PasswordInput
+                value={userData.password}
+                onChange={handleDataChange}
+                placeholder=""
+              />
+              <p className="mt-1.5 text-xs text-gray-500 dark:text-gray-400">
+                Password must be at least 7 characters long
+              </p>
             </div>
-            <PasswordInput
-              value={userData.password}
-              onChange={handleDataChange}
-              placeholder=""
-            />
-            <p className="mt-1 text-sm/6 text-gray-500">
-              Password must be atleast 7 characters long
-            </p>
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label
-                htmlFor="password"
-                className="block text-2sm/6 font-medium "
-              >
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 dark:text-gray-200 mb-1.5">
                 Select gender
               </label>
-            </div>
-            <div className="flex items-center justify-between">
               <GenderInput value={userData.gender} onChange={onGenderChange} />
             </div>
-          </div>
 
-          <div>
-            <button
-              type="submit"
-              className="authSubmitBtn"
-              disabled={is_auth_request_pending}
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="authSubmitBtn"
+                disabled={is_auth_request_pending || loading}
+              >
+                {loading ? <Loader1 /> : "Sign Up"}
+              </button>
+            </div>
+          </form>
+
+          <p className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+            Already have an account?{" "}
+            <Link
+              href="/auth/signin"
+              className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 transition-colors"
             >
-              {loading ? <Loader1 /> : "Sign Up"}
-            </button>
-          </div>
-        </form>
-
-        <p className="mt-3 text-center text-sm/6 text-gray-500">
-          Already have an account?
-          <Link
-            href="/auth/signin"
-            className=" text-lg font-semibold text-[#6A89A7] hover:text-indigo-500 mx-1 underline"
-          >
-            Sign In
-          </Link>
-          here
-        </p>
+              Sign In here
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );
