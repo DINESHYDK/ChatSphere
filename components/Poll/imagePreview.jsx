@@ -5,7 +5,7 @@ export default function ImagePreviewOverlay({
   imgPreviewLink,
 }) {
   return (
-    <div
+    imgPreviewLink != "" && <div
       className="fixed inset-0 z-[9999] bg-black/80 backdrop-blur-lg flex items-center justify-center p-4 md:p-8"
       onClick={() => set_is_preview_visible(false)}
     >

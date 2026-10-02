@@ -1,3 +1,4 @@
+// for the polls showing data about votes received 
 import React, {useState} from 'react';
 import Image from 'next/image';
 import { Share2, Users as UsersIcon } from 'lucide-react';
@@ -109,7 +110,7 @@ export function PollCard({ poll, type = "PUBLIC", onVote, onDelete }) {
           Remove
         </button>
       </div>
-      {isPreviewVisible && (
+      {previewUrl != "" && (
        <ImagePreviewOverlay 
          set_is_preview_visible={setIsPreviewVisible} 
          imgPreviewLink={previewUrl} 
