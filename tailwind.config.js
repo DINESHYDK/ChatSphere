@@ -52,6 +52,13 @@ const obj = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
+  			},
+  			radium: '#CCFF00',
+  			charcoal: {
+  				DEFAULT: '#121212',
+  				light: '#1C1C1C',
+  				medium: '#242424',
+  				border: '#333333'
   			}
   		},
   		fontFamily: {

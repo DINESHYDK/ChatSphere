@@ -123,168 +123,145 @@ export default function PollCreator({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="w-full max-w-md bg-background rounded-2xl shadow-2xl overflow-hidden">
-        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-          <h2 className="text-lg font-semibold text-foreground">Create Poll</h2>
-          <button className="p-1.5 rounded-full hover:bg-muted transition-colors duration-200">
-            <X
-              className="w-6 h-6 text-muted-foreground"
-              onClick={() => set_is_poll_visible(false)}
-            />
-          </button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+      <form onSubmit={handleSubmit} className="bg-[#1A1A1A] border border-[var(--charcoal-border,#333)] rounded-xl p-6 w-full max-w-full md:max-w-[500px] shadow-lg relative max-h-[90vh] overflow-y-auto">
+        <button type="button" onClick={() => set_is_poll_visible(false)} className="absolute right-6 top-6 text-gray-500 hover:text-white transition-colors">
+          <X className="w-5 h-5" />
+        </button>
+
+        <div className="flex items-center gap-2 mb-5 pr-8">
+          <svg className="text-radium drop-shadow-[0_0_8px_rgba(204,255,0,0.5)]" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+          </svg>
+          <h2 className="font-outfit font-bold text-xl uppercase tracking-wider text-white">Drop a New Poll</h2>
         </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="px-4 py-4 space-y-5">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Poll Title
-              </label>
-              <input
+        <div className="mb-4">
+          <label className="block text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-2">Poll Question</label>
+          <input 
+            type="text"
+            spellCheck={false}
+            placeholder="Enter your question..."
+            className="w-full bg-[#242424] border border-[#333] rounded-lg px-4 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-radium transition-colors"
+            required
+            value={info.title ?? ""}
+            onChange={(e) => setInfo((prev) => ({ ...prev, title: e.target.value }))}
+          />
+        </div>
+
+        <div className="space-y-3 mb-4">
+          {info?.options.map((option, idx) => (
+            <div key={idx} className="flex items-center gap-3 bg-[#242424] border border-[#333] rounded-lg p-3 group hover:border-[#444] transition-colors relative">
+              
+              {/* Image Preview Thumbnail */}
+              {info.options[idx].rawFile && (
+                <div
+                  className="absolute left-[-8px] top-[-8px] z-20 flex items-center justify-center cursor-pointer shadow-[0_0_10px_rgba(0,0,0,0.5)] rounded-lg border border-[#444] bg-[#242424]"
+                  onClick={() => {
+                    set_is_preview_visible(true);
+                    setImgPreviewLink(info.options[idx].blobURL);
+                  }}
+                >
+                  <img
+                    src={info.options[idx].blobURL}
+                    alt="Preview"
+                    className="w-12 h-12 object-cover rounded-lg"
+                  />
+                  <div
+                    className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm border border-background cursor-pointer hover:bg-red-600 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setInfo((prev) => ({
+                        ...prev,
+                        options: prev.options.map((opt, i) =>
+                          idx === i ? { ...opt, rawFile: null } : opt,
+                        ),
+                      }));
+                      set_is_preview_visible(false);
+                      setImgPreviewLink("");
+                    }}
+                  >
+                    <Minus className="w-3 h-3" />
+                  </div>
+                </div>
+              )}
+
+              {/* Upload Icon */}
+              <div className="text-gray-400 shrink-0">
+                <input
+                  type="file"
+                  id={`input-${idx}`}
+                  onChange={(e) => handleFileInputChange(e, idx)}
+                  accept="image/jpg, image/png, image/jpeg, image/webp"
+                  multiple={false}
+                  className="hidden"
+                />
+                <label htmlFor={`input-${idx}`} className="cursor-pointer hover:text-white transition-colors">
+                  <ImagePlus className="w-[18px] h-[18px]" />
+                </label>
+              </div>
+
+              {/* Text Input */}
+              <input 
                 type="text"
                 spellCheck={false}
-                placeholder="Enter your question..."
-                className="w-full px-4 py-3 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200"
-                required
-                value={info.title ?? ""}
+                placeholder={`Option ${idx + 1}`}
+                className="flex-1 bg-transparent text-sm text-white placeholder-gray-500 outline-none pr-2"
+                value={info.options[idx]?.content ?? ""}
                 onChange={(e) =>
-                  setInfo((prev) => ({ ...prev, title: e.target.value }))
+                  setInfo((prev) => ({
+                    ...prev,
+                    options: prev.options.map((item, i) =>
+                      idx === i ? { ...item, content: e.target.value } : item,
+                    ),
+                  }))
                 }
+                required
               />
             </div>
+          ))}
+        </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Who can participate?
-              </label>{" "}
-              <br />
-              <div className="flex gap-2">
-                <button
-                  className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-border ${setColorAndBg("A")}`}
-                  onClick={() => setInfo((prev) => ({ ...prev, gender: "A" }))}
-                  type="button"
-                >
-                  All
-                </button>
-                <button
-                  className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 border border-border ${setColorAndBg("B")}`}
-                  onClick={() => setInfo((prev) => ({ ...prev, gender: "B" }))}
-                  type="button"
-                >
-                  Boys
-                </button>
-                <button
-                  className={`flex-1 px-4 py-2.5 rounded-xl text-sm font-medium  transition-all duration-200 border border-border ${setColorAndBg("G")}`}
-                  onClick={() => setInfo((prev) => ({ ...prev, gender: "G" }))}
-                  type="button"
-                >
-                  Girls
-                </button>
-              </div>
-            </div>
+        {alert_idx > -1 && (
+          <p className="mb-2 text-[11px] text-red-500 font-bold uppercase tracking-wider pl-1">
+            {form_alerts[alert_idx]}
+          </p>
+        )}
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">
-                Options
-              </label>
-              <div className="pt-5 space-y-3 overflow-y-scroll max-h-[230px] no-scroll-arrows">
-                {info?.options.map((option, idx) => (
-                  <div className="relative" key={idx}>
-                    {info.options[idx].rawFile && (
-                      <div
-                        className="absolute left-[-3px] top-[7px] -translate-y-1/2 z-10 flex items-center justify-center cursor-pointer"
-                        onClick={() => {
-                          set_is_preview_visible(true);
-                          setImgPreviewLink(info.options[idx].blobURL);
-                        }}
-                      >
-                        <div className="relative w-10 h-10 rounded-lg border-2 border-background bg-black  shadow-sm overflow-visible">
-                          <img
-                            src={info.options[idx].blobURL}
-                            alt="Preview"
-                            className="w-full h-full object-cover rounded-[6px]"
-                          />
-
-                          <div
-                            className="absolute -top-2.5 -right-2.5 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-[10px] text-white shadow-sm border border-background cursor-pointer"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setInfo((prev) => ({
-                                ...prev,
-                                options: prev.options.map((option, i) =>
-                                  idx === i
-                                    ? { ...option, rawFile: null }
-                                    : option,
-                                ),
-                              }));
-                              set_is_preview_visible(false);
-                              setImgPreviewLink("");
-                            }}
-                          >
-                            <Minus className="w-4 h-4" />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    <input
-                      type="text"
-                      spellCheck={false}
-                      placeholder={`Option ${idx + 1}`}
-                      className={`w-full ${info.options[idx].rawFile ? "pl-10" : "pl-5"} pr-12 py-2.5 bg-muted rounded-xl border border-border text-foreground placeholder:text-muted-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all duration-200 text-sm`}
-                      value={info.options[idx]?.content ?? ""}
-                      onChange={(e) =>
-                        setInfo((prev) => ({
-                          ...prev,
-                          options: prev.options.map((item, i) =>
-                            idx === i
-                              ? { ...item, content: e.target.value }
-                              : item,
-                          ),
-                        }))
-                      }
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
-                    >
-                      <input
-                        type="file"
-                        id={`input-${idx}`}
-                        onChange={(e) => handleFileInputChange(e, idx)}
-                        accept="image/jpg, image/png, image/jpeg, image/webp"
-                        multiple={false}
-                        className="hidden"
-                      />
-                      <label htmlFor={`input-${idx}`}>
-                        <ImagePlus className="w-5 h-5 cursor-pointer"></ImagePlus>
-                      </label>
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              {alert_idx > -1 && (
-                <p className="mt-2 text-sm text-red-600 font-medium">
-                  {form_alerts[alert_idx]}
-                </p>
-              )}
-              <div className="flex justify-between gap-2 text-muted-foreground">
-                <Minus className="w-6 h-6" onClick={() => handlePMLogic(-1)} />
-                <Plus className="w-6 h-6" onClick={() => handlePMLogic(+1)} />
-              </div>
-            </div>
-          </div>
-
-          <div className="px-5 py-4 border-t border-border bg-muted/30">
-            <button type={"submit"} className="authSubmitBtn">
-              Submit Poll
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <button type="button" onClick={() => handlePMLogic(+1)} className="flex-1 sm:flex-none border border-dashed border-radium text-radium px-4 py-2 rounded-full text-[13px] font-semibold hover:bg-[rgba(204,255,0,0.1)] transition-colors flex items-center justify-center gap-1">
+              Add option <Plus size={14} />
+            </button>
+            <button type="button" onClick={() => handlePMLogic(-1)} className="border border-dashed border-[#555] text-gray-400 px-3 py-2 rounded-full hover:bg-[#242424] hover:text-white transition-colors flex items-center justify-center">
+              <Minus size={14} />
             </button>
           </div>
-        </form>
-      </div>
+          
+          <div className="bg-[#242424] p-1 rounded-full flex text-[13px] w-full sm:w-auto">
+            <button type="button" onClick={() => setInfo(prev => ({...prev, gender: "B"}))} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-full transition-colors ${info.gender === 'B' ? 'bg-radium text-[#121212] font-bold shadow-sm' : 'text-gray-400 font-medium hover:text-white'}`}>Boys</button>
+            <button type="button" onClick={() => setInfo(prev => ({...prev, gender: "G"}))} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-full transition-colors ${info.gender === 'G' ? 'bg-radium text-[#121212] font-bold shadow-sm' : 'text-gray-400 font-medium hover:text-white'}`}>Girls</button>
+            <button type="button" onClick={() => setInfo(prev => ({...prev, gender: "A"}))} className={`flex-1 sm:flex-none px-4 py-1.5 rounded-full transition-colors ${info.gender === 'A' ? 'bg-radium text-[#121212] font-bold shadow-sm' : 'text-gray-400 font-medium hover:text-white'}`}>All</button>
+          </div>
+        </div>
+
+        <div className="border-t border-[#333] mt-6 pt-5 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-[13px] font-medium text-gray-400">Anonymous</span>
+            <div className="w-10 h-6 bg-[#121212] rounded-full flex items-center p-1 border border-[#444]">
+              <div className="w-4 h-4 bg-gray-500 rounded-full"></div>
+            </div>
+          </div>
+
+          <button type="submit" className="border-2 border-radium hover:bg-radium hover:text-[#121212] text-radium px-6 py-2 rounded-full font-bold flex items-center gap-2 transition-all duration-300 uppercase tracking-wider text-[13px] drop-shadow-[0_0_12px_rgba(204,255,0,0.15)] hover:drop-shadow-[0_0_18px_rgba(204,255,0,0.4)]">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+            Launch
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
