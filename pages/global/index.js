@@ -8,7 +8,7 @@ import { MobileNav } from '@/components/ui/MobileNav';
 import { FooterInputChatBar } from '@/components/ui/FooterInputChatBar';
 import { ArrowLeft } from 'lucide-react';
 import { PollCard } from '@/components/Poll/PollCard';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 // import { next/navigation } from 'next/router';
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });

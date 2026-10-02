@@ -1,11 +1,13 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LayoutGrid, Earth, MessageCircle, CircleUser } from 'lucide-react';
 import { useScrollStore } from '@/store/scrollStore';
-import React from 'react';
+import { useRouter } from 'next/navigation';
+
 
 export function MobileNav() {
+  const router = useRouter()
   const { scrollDirection, setScrollDirection } = useScrollStore();
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
     const handleScroll = () => setScrollDirection(window.scrollY);
@@ -17,14 +19,14 @@ export function MobileNav() {
     <nav className={`md:hidden fixed bottom-0 left-0 right-0 h-[65px] bg-[#121212]/80 backdrop-blur-sm border-t border-white/10 flex items-start justify-evenly z-50 transition-transform duration-300 ${scrollDirection === 'down' ? 'translate-y-full' : 'translate-y-0'}`}>
       
       <MobileNavItem 
-        active={activeTab === 'home'} 
-        onClick={() => setActiveTab('home')} 
+        active={activeTab === 'dashboard'} 
+        onClick={() => setActiveTab('dashboard')} 
         icon={<LayoutGrid size={22} />} 
       />
       
       <MobileNavItem 
         active={activeTab === 'global'} 
-        onClick={() => setActiveTab('global')} 
+        onClick={() => { setActiveTab('global'); router.push('/global') }} 
         icon={<Earth size={22} />} 
       />
       
