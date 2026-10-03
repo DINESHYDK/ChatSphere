@@ -5,6 +5,7 @@ import { LayoutGrid, Globe, MessageSquare, Share2, Camera, Trash2, User } from '
 import { MobileHeader } from '@/components/ui/MobileHeader';
 import { MobileNav } from '@/components/ui/MobileNav';
 import { PollCard } from '@/components/Poll/PollCard';
+import PollCreator from '@/components/Poll/pollCreator';
 
 const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
 const geist = Inter({ subsets: ['latin'], variable: '--font-geist' });
@@ -45,9 +46,10 @@ export default function PollDashboard() {
     
       {/* Main Content Area */}
       <main className="md:ml-[88px] pb-[80px] md:pb-12 pt-6 md:pt-12 px-[16px] md:px-[48px] max-w-[1400px] mx-auto min-h-screen">
+        <PollCreator canRemove={false}/>
         
         {/* Drop Poll Hero (Composer) */}
-        <div className="bg-[#1A1A1A] border border-charcoal-border rounded-xl p-6 w-full max-w-full md:max-w-[500px] shadow-lg mb-12">
+        {/* <div className="bg-[#1A1A1A] border border-charcoal-border rounded-xl p-6 w-full max-w-full md:max-w-[500px] shadow-lg mb-12">
           <div className="flex items-center gap-2 mb-5">
             <h2 className="font-outfit font-bold text-xl uppercase tracking-wider text-white">Drop a New Poll</h2>
           </div>
@@ -94,11 +96,11 @@ export default function PollDashboard() {
               Launch 
             </button>
           </div>
-        </div>
+        </div> */}
 
         {/* Your Polls Section */}
         <div className="past-polls-section">
-          <div className="flex items-center gap-3 mb-6">
+          <div className="flex items-center gap-3 mt-6 mb-3">
             <h2 className="font-outfit font-bold text-2xl uppercase tracking-wider">Your Polls</h2>
             <div className="bg-[#242424] text-radium text-sm font-bold w-6 h-6 rounded-full flex items-center justify-center">3</div>
           </div>

@@ -35,17 +35,6 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    lastActive: {
-      type: Date,
-      default: Date.now,
-    },
-    blockedUsers: {
-      type: Array,
-      id: { type: mongoose.Schema.Types.ObjectId, ref: "user" },
-    },
-    totalOpinionSubmit: {
-      type: Number,
-    },
     verifyToken: String,
     verifyTokenExpiresAt: Date,
     resetToken: String,

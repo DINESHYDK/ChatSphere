@@ -1,30 +1,37 @@
-import React, { useState } from 'react';
-import Head from 'next/head';
-import Image from 'next/image';
-import { Outfit, Inter } from 'next/font/google';
-import { LayoutGrid, Globe, MessageSquare, User } from 'lucide-react';
+import React, { useState } from "react";
+import Head from "next/head";
+import Image from "next/image";
+import { Outfit, Inter } from "next/font/google";
+import {
+  LayoutGrid,
+  Globe,
+  MessageSquare,
+  User,
+  ArrowLeft,
+} from "lucide-react";
 // import { MobileHeader } from '@/components/ui/MobileHeader';
-import { MobileNav } from '@/components/ui/MobileNav';
-import { FooterInputChatBar } from '@/components/ui/FooterInputChatBar';
-import { ArrowLeft } from 'lucide-react';
-import { PollCard } from '@/components/Poll/PollCard';
-import { useRouter } from 'next/navigation';
+import { MobileNav } from "@/components/ui/MobileNav";
+import { FooterInputChatBar } from "@/components/ui/FooterInputChatBar";
+import { PollCard } from "@/components/Poll/PollCard";
+import { useRouter } from "next/navigation";
+import PollCreator from "@/components/Poll/pollCreator";
+
 // import { next/navigation } from 'next/router';
 
-const outfit = Outfit({ subsets: ['latin'], variable: '--font-outfit' });
-const geist = Inter({ subsets: ['latin'], variable: '--font-geist' });
+const outfit = Outfit({ subsets: ["latin"], variable: "--font-outfit" });
+const geist = Inter({ subsets: ["latin"], variable: "--font-geist" });
 
 // Dummy poll component
 // function FeedPoll({ question, votes, options }) {
 //   return (
 //     <div className="bg-[#1A1A1A] border border-charcoal-border rounded-xl p-5 mt-2 shadow-lg mb-2">
 //       <h3 className="text-white font-bold text-lg mb-4 leading-snug">{question}</h3>
-      
+
 //       <div className="space-y-3">
 //         {options.map((opt, i) => (
 //           <div key={i} className="relative bg-[#242424] border border-[#333] rounded-lg overflow-hidden h-12 flex items-center px-4 z-10 w-full">
-//             <div 
-//               className={`absolute left-0 top-0 bottom-0 z-[-1] transition-all duration-1000 ease-out ${opt.active ? 'bg-radium/10' : 'bg-charcoal/30'}`} 
+//             <div
+//               className={`absolute left-0 top-0 bottom-0 z-[-1] transition-all duration-1000 ease-out ${opt.active ? 'bg-radium/10' : 'bg-charcoal/30'}`}
 //               style={{ width: `${opt.percent}%` }}
 //             ></div>
 //             {opt.active && (
@@ -44,7 +51,7 @@ const geist = Inter({ subsets: ['latin'], variable: '--font-geist' });
 //           </div>
 //         ))}
 //       </div>
-      
+
 //       <div className="flex items-center justify-between mt-5">
 //         <div className="flex items-center gap-1.5 text-xs text-gray-500 font-medium">
 //           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -70,9 +77,13 @@ function ChatMessage({ avatar, name, time, text, children, isLive }) {
       <div className="flex items-center gap-3 mb-2">
         <div className="w-8 h-8 rounded-full bg-[#333] border border-[#444] overflow-hidden flex items-center justify-center relative">
           {avatar ? (
-            <img src={avatar} alt={name} className="w-full h-full object-cover" />
+            <img
+              src={avatar}
+              alt={name}
+              className="w-full h-full object-cover"
+            />
           ) : (
-             <User size={14} className="text-white"/>
+            <User size={14} className="text-white" />
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -102,19 +113,40 @@ function DesktopNav({ activeTab, setActiveTab }) {
   return (
     <aside className="hidden md:flex flex-col items-center py-6 fixed left-0 top-0 bottom-0 w-[88px] bg-charcoal border-r border-charcoal-border z-50">
       <div className="w-12 h-12 bg-radium rounded-full flex items-center justify-center text-charcoal shadow-[0_0_20px_rgba(204,255,0,0.5)] mb-12">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
           <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
         </svg>
       </div>
       <nav className="flex-1 flex flex-col items-center gap-10 mt-4">
-        <NavItem active={activeTab === 'home'} onClick={() => setActiveTab('home')} icon={<LayoutGrid size={24} />} />
-        <NavItem active={activeTab === 'global'} onClick={() => setActiveTab('global')} icon={<Globe size={24} />} />
-        <NavItem active={activeTab === 'chat'} onClick={() => setActiveTab('chat')} icon={<MessageSquare size={24} />} />
+        <NavItem
+          active={activeTab === "home"}
+          onClick={() => setActiveTab("home")}
+          icon={<LayoutGrid size={24} />}
+        />
+        <NavItem
+          active={activeTab === "global"}
+          onClick={() => setActiveTab("global")}
+          icon={<Globe size={24} />}
+        />
+        <NavItem
+          active={activeTab === "chat"}
+          onClick={() => setActiveTab("chat")}
+          icon={<MessageSquare size={24} />}
+        />
       </nav>
       <div className="mt-auto">
         <div className="w-10 h-10 rounded-full border-2 border-charcoal-border overflow-hidden cursor-pointer hover:border-radium transition-colors relative">
           <div className="w-full h-full bg-indigo-500 flex items-center justify-center">
-             <User size={20} className="text-white"/>
+            <User size={20} className="text-white" />
           </div>
         </div>
       </div>
@@ -124,12 +156,14 @@ function DesktopNav({ activeTab, setActiveTab }) {
 
 function NavItem({ icon, active, onClick }) {
   return (
-    <button 
-// onClick={() => (href ? router.push(href) : router.back())}
-className="fixed top-4 left-4 z-50 flex items-center justify-center w-[55px] h-[55px] bg-[#1A1A1A]/95 backdrop-blur-md hover:bg-[#242424] border border-radium text-radium rounded-full transition-all shadow-[0_0_15px_rgba(204,255,0,0.4)]"
+    <button
+      // onClick={() => (href ? router.push(href) : router.back())}
+      className="fixed top-4 left-4 z-50 flex items-center justify-center w-[55px] h-[55px] bg-[#1A1A1A]/95 backdrop-blur-md hover:bg-[#242424] border border-radium text-radium rounded-full transition-all shadow-[0_0_15px_rgba(204,255,0,0.4)]"
       aria-label="Go back"
     >
-      {active && <div className="hidden md:block absolute left-[-16px] w-[2px] h-[24px] bg-radium shadow-[0_0_10px_rgba(204,255,0,0.8)]"></div>}
+      {active && (
+        <div className="hidden md:block absolute left-[-16px] w-[2px] h-[24px] bg-radium shadow-[0_0_10px_rgba(204,255,0,0.8)]"></div>
+      )}
       {icon}
     </button>
   );
@@ -149,82 +183,83 @@ className="fixed top-4 left-4 z-50 flex items-center justify-center w-[55px] h-[
 // }
 
 export default function GlobalFeed() {
-  const router = useRouter()
-  const [activeTab, setActiveTab] = useState('global');
+  const router = useRouter();
+  const [isPollVisible, setIsPollVisible] = useState(false);
+  const [activeTab, setActiveTab] = useState("global");
 
   return (
-    <div className={`min-h-[100dvh] bg-charcoal text-white ${outfit.variable} ${geist.variable} font-sans flex flex-col`}>
+    <div
+      className={`min-h-[100dvh] bg-charcoal text-white ${outfit.variable} ${geist.variable} font-sans flex flex-col`}
+    >
       <Head>
         <title>Global Feed - ChatSphere</title>
       </Head>
 
       <DesktopNav activeTab={activeTab} setActiveTab={setActiveTab} />
-      
+
       {/* Back button */}
       <div className="fixed top-4 left-4 z-50 flex items-center justify-center">
-       <div className="absolute -inset-4 bg-radium/20 rounded-full blur-xl pointer-events-none"></div>
+        <div className="absolute -inset-4 bg-radium/20 rounded-full blur-xl pointer-events-none"></div>
 
-       {/* Main Button */}
-       <button
-         onClick={router.back}
-         className="relative flex items-center justify-center w-[50px] h-[50px] bg-[#1A1A1A]/90 backdrop-blur-md hover:bg-[#242424] border-2 border-radium/30 text-white rounded-full transition-all shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
-         aria-label="Go back"
-       >
-         <ArrowLeft size={18} />
-       </button>
-     </div>
+        {/* Main Button */}
+        <button
+          onClick={router.back}
+          className="relative flex items-center justify-center w-[50px] h-[50px] bg-[#1A1A1A]/90 backdrop-blur-md hover:bg-[#242424] border-2 border-radium/30 text-white rounded-full transition-all shadow-[0_4px_20px_rgba(0,0,0,0.8)]"
+          aria-label="Go back"
+        >
+          <ArrowLeft size={18} />
+        </button>
+      </div>
       {/* MobileHeader */}
-
-
 
       <main className="flex-1 md:ml-[88px] relative pb-[140px] md:pb-[90px]">
         {/* Date separator (optional visual touch from image) */}
         <div className="max-w-[800px] mx-auto px-4 md:px-8 mt-6">
           <div className="flex items-center gap-4 mb-8">
             <div className="h-[1px] flex-1 bg-[#333]"></div>
-            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">SEP 27, 2026</span>
+            <span className="text-[11px] font-bold text-gray-500 uppercase tracking-widest">
+              SEP 27, 2026
+            </span>
             <div className="h-[1px] flex-1 bg-[#333]"></div>
           </div>
-          
+
           <div className="space-y-2">
-            <ChatMessage 
-              name="alex_codez" 
-              time="2m ago" 
-              text="yo who's making polls about food at 2am 😂" 
+            <ChatMessage
+              name="alex_codez"
+              time="2m ago"
+              text="yo who's making polls about food at 2am 😂"
             />
 
-            <ChatMessage 
-              name="gamer_girl_99" 
-              time="5m ago" 
-              isLive
-            >
-            <PollCard 
-              type="PUBLIC"
-              poll={{
-                title: "Morning vibe check: What's in your cup today?",
-                totalVotes: 890,
-                gender: "G",
-                createdOn: new Date(Date.now() - 12 * 60 * 60 * 1000), // ~12 hours ago
-                pollOptions: [
-                  { 
-                    index: 0, 
-                    content: "Iced Caramel Macchiato", 
-                    imageUrl: "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=100&auto=format&fit=crop&q=60", 
-                    votesCount: 520, 
-                    isActive: false 
-                  },
-                  { 
-                    index: 1, 
-                    content: "Ceremonial Matcha Latte", 
-                    imageUrl: "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=100&auto=format&fit=crop&q=60", 
-                    votesCount: 370, 
-                    isActive: true 
-                  }
-                ]
-              }}
-              onVote={(index) => console.log('Voted option:', index)}
-              onDelete={() => console.log('Deleted poll')}
-            />
+            <ChatMessage name="gamer_girl_99" time="5m ago" isLive>
+              <PollCard
+                type="PUBLIC"
+                poll={{
+                  title: "Morning vibe check: What's in your cup today?",
+                  totalVotes: 890,
+                  gender: "G",
+                  createdOn: new Date(Date.now() - 12 * 60 * 60 * 1000), // ~12 hours ago
+                  pollOptions: [
+                    {
+                      index: 0,
+                      content: "Iced Caramel Macchiato",
+                      imageUrl:
+                        "https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=100&auto=format&fit=crop&q=60",
+                      votesCount: 520,
+                      isActive: false,
+                    },
+                    {
+                      index: 1,
+                      content: "Ceremonial Matcha Latte",
+                      imageUrl:
+                        "https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=100&auto=format&fit=crop&q=60",
+                      votesCount: 370,
+                      isActive: true,
+                    },
+                  ],
+                }}
+                onVote={(index) => console.log("Voted option:", index)}
+                onDelete={() => console.log("Deleted poll")}
+              />
               {/* <FeedPoll 
                 question="What's the game you'd play for 24 hours straight?"
                 votes="2,410"
@@ -236,31 +271,32 @@ export default function GlobalFeed() {
               /> */}
             </ChatMessage>
 
-            <ChatMessage 
-              name="sarah_jenkins" 
-              time="4m ago" 
-              text="just dropped a spicy one, go vote!" 
+            <ChatMessage
+              name="sarah_jenkins"
+              time="4m ago"
+              text="just dropped a spicy one, go vote!"
             />
 
-            <ChatMessage 
-              name="marcus_vibe" 
-              time="7m ago" 
-              text="this feed is fire tonight 🔥" 
+            <ChatMessage
+              name="marcus_vibe"
+              time="7m ago"
+              text="this feed is fire tonight 🔥"
             />
-            
+
             {/* Some scrolling space buffer */}
             <div className="h-6"></div>
           </div>
         </div>
       </main>
 
-      <FooterInputChatBar />
+      <FooterInputChatBar setIsPollVisible={setIsPollVisible}/>
 
-      {/* <MobileNav 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        MobileNavItem={MobileNavItem} 
-      /> */}
+      {isPollVisible && (
+        // <div className="absolute inset-0 z-50 min-h-screen w-full flex items-center justify-center bg-black/60 backdrop-blur-md p-4">
+          <div className="fixed inset-0 z-50 h-screen w-screen flex items-center justify-center bg-black/60 backdrop-blur-md p-4 overflow-y-auto">
+          <PollCreator canRemove={true} setIsPollVisible={setIsPollVisible} />
+        </div>
+      )}
     </div>
   );
 }

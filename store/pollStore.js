@@ -1,20 +1,18 @@
-// handling poll creation and uploading on db 
+// handling poll creation and uploading on db
 import { create } from "zustand";
 import { API_ENDPOINTS } from "../constants/api-endpoints";
 import devLog from "../utils/logger";
 import imageCompression from "browser-image-compression";
 import isValidImage from "@/utils/isImageValid";
 
-const  infoDefault = {
-    title: "",
-    gender: "A",
-    options: [
-      { id: 0, content: "", imageUrl: "", rawFile: null, blobURL: "",
-      },
-      { id: 1, content: "", imageUrl: "", rawFile: null, blobURL: "",
-      },
-    ],
-}
+const infoDefault = {
+  title: "",
+  gender: "A",
+  options: [
+    { id: 0, content: "", imageUrl: "", rawFile: null, blobURL: "" },
+    { id: 1, content: "", imageUrl: "", rawFile: null, blobURL: "" },
+  ],
+};
 
 const pollStore = create((set, get) => ({
   // isPollSaving: false, // *** For Loader ***
@@ -26,18 +24,20 @@ const pollStore = create((set, get) => ({
     set({ isSavingPoll: !get().isSavingPoll });
   },
 
-  isPollVisible: false,   // ─── Is the poll actualy visible ───
-  imgPreviewLink: '',  // ─── hold blob url or actual url ───
-  isPreviewVisible: true,  // ─── Do user wants to see the image  ───
+  isPollVisible: false, // ─── Is the poll actualy visible ───
+  // imgPreviewLink: '',  // ─── hold blob url or actual url ───
+  // isPreviewVisible: true,  // ─── Do user wants to see the image  ───
 
-  setIsPollVisible: () => { set({ isPollVisible: !get().isPollVisible }) },
-  setImgPreviewLink: (link) => set({ imgPreviewLink: link }),
-  setIsPreviewVisible: () => set({ isPreviewVisible: !get().isPreviewVisible }),
+  setIsPollVisible: () => {
+    set({ isPollVisible: !get().isPollVisible });
+  },
+  // setImgPreviewLink: (link) => set({ imgPreviewLink: link }),
+  // setIsPreviewVisible: () => set({ isPreviewVisible: !get().isPreviewVisible }),
 
-//  [isPollVisible, setIsPollVisible]: useState(false);
-//  [imgPreviewLink, setImgPreviewLink]: useState("");
-//  [is_preview_visible, set_is_preview_visible]: useState(true); // *** Is previewImage component visible? ***
-  
+  //  [isPollVisible, setIsPollVisible]: useState(false);
+  //  [imgPreviewLink, setImgPreviewLink]: useState("");
+  //  [is_preview_visible, set_is_preview_visible]: useState(true); // *** Is previewImage component visible? ***
+
   // polls: [],
   // myPolls: [],
   // createImagePoll: () => {},
@@ -59,79 +59,28 @@ const pollStore = create((set, get) => ({
   //   }
   // },
 
-  info: infoDefault,
-  setInfo : (info) => {
-     set({ info: info })
-  },
+  // info: infoDefault,
+  // setInfo: (info) => {
+  //   set({ info: info });
+  // },
 
-    // ─── Function to finally  submit the Poll ──────────────────
-  handleSubmit : async (e) => {
-    const { setIsSavingPoll, setIsPollVisible, uploadPollImages, savePoll } = get()
+  // ─── Function to finally  submit the Poll ──────────────────
+  handleSubmit: async (e) => {
+    const { setIsSavingPoll, setIsPollVisible, uploadPollImages, savePoll } =
+      get();
     try {
       e.preventDefault();
       setIsSavingPoll(true);
-  
+
       setIsPollVisible(false); // ─── Removing CREATE_POLL page ──────────────────
       await uploadPollImages(info); // ─── Upload poll Images on cloudiary ──────────────────
       await savePoll(info); // ─── Saving poll in DB ──────────────────
-
     } catch (err) {
       devLog("Error while saving poll", err);
     } finally {
       setIsSavingPoll(false);
     }
   },
-
-  handlePMLogic: (val) =>  {
-    const MAX_LIMIT = 6,
-      MIN_LIMIT = 2;
-    
-    const { info, setInfo } = get()
-    let len = info.options.length;
-    let is_min_limit = len === MIN_LIMIT && val === -1;
-    let is_max_limit = len === MAX_LIMIT && val === +1;
-
-    if (!is_min_limit && !is_max_limit) {
-      const sz = info.options.length;
-      // set_alert_idx(-1);
-      const options =
-        val === +1
-          ? [
-              ...info.options,
-              {
-                id: sz,
-                content: "",
-                imageUrl: "",
-                rawFile: null,
-              },
-            ]
-          : info.options.slice(0, -1);
-      setInfo((prev) => ({ ...prev, options }));
-      return;
-    }
-    // set_alert_idx(len === MAX_LIMIT ? 1 : 0);
-
-    // setTimeout(() => {
-    //   set_alert_idx(-1);
-    // }, 2000);
-  },
-
-  handleFileInputChange: async (e, idx) => {
-    const { setInfo } = get();
-    const file = e.target.files[0];
-    let isImageValid = await isValidImage(file);
-    if (!isImageValid) return; // ─── Checking signature for file ──────────────────
-  
-    const imgBlobURL = URL.createObjectURL(new Blob([file]));
-    setInfo((prev) => ({
-      ...prev,
-      options: prev.options.map((item, i) =>
-        idx === i ? { ...item, rawFile: file, blobURL: imgBlobURL } : item,
-      ),
-    }));
-  },
-
-
 
   compressImages: async (poll_data) => {
     const promiseArr = poll_data.map(async (option, idx) => {
@@ -151,7 +100,6 @@ const pollStore = create((set, get) => ({
             ? imageFile
             : await imageCompression(option.rawFile, myOptions);
 
-
         console.log(`image ${idx} size : ${compressedFile.size / 1024 / 1024}`);
         // console.log(
         //   "compressedFile instanceof Blob",
@@ -161,10 +109,10 @@ const pollStore = create((set, get) => ({
         //   `         console.log(
         //   "compressedFile instanceof Blob",
         //   compressedFile instanceof Blob,
-        // ); 
+        // );
         // console.log(
         //   `compressedFile size ${compressedFile.size / 1024 / 1024} MB`,
-        // ); 
+        // );
         // ); // smaller than maxSizeMB
 
         return { ...option, rawFile: compressedFile };

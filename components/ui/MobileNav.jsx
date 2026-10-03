@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { LayoutGrid, Earth, MessageCircle, CircleUser } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { LayoutGrid, Earth, CircleUser } from 'lucide-react';
 import { useScrollStore } from '@/store/scrollStore';
-import { useRouter } from 'next/navigation';
-
+import { useRouter, usePathname } from 'next/navigation';
+import { ROUTES } from '@/constants/page-routes';
 
 export function MobileNav() {
-  const router = useRouter()
+  const router = useRouter();
+  const pathname = usePathname(); // Get current route
   const { scrollDirection, setScrollDirection } = useScrollStore();
-  const [activeTab, setActiveTab] = useState('dashboard');
 
   useEffect(() => {
     const handleScroll = () => setScrollDirection(window.scrollY);
@@ -19,26 +19,20 @@ export function MobileNav() {
     <nav className={`md:hidden fixed bottom-0 left-0 right-0 h-[65px] bg-[#121212]/80 backdrop-blur-sm border-t border-white/10 flex items-start justify-evenly z-50 transition-transform duration-300 ${scrollDirection === 'down' ? 'translate-y-full' : 'translate-y-0'}`}>
       
       <MobileNavItem 
-        active={activeTab === 'dashboard'} 
-        onClick={() => setActiveTab('dashboard')} 
+        active={pathname === ROUTES.DASHBOARD} 
+        onClick={() => router.push(ROUTES.DASHBOARD)}
         icon={<LayoutGrid size={22} />} 
       />
       
       <MobileNavItem 
-        active={activeTab === 'global'} 
-        onClick={() => { setActiveTab('global'); router.push('/global') }} 
+        active={pathname === ROUTES.GLOBAL_CHAT} 
+        onClick={() => router.push(ROUTES.GLOBAL_CHAT)} 
         icon={<Earth size={22} />} 
       />
       
       <MobileNavItem 
-        active={activeTab === 'chat'} 
-        onClick={() => setActiveTab('chat')} 
-        icon={<MessageCircle size={22} />} 
-      />
-      
-      <MobileNavItem 
-        active={activeTab === 'profile'} 
-        onClick={() => setActiveTab('profile')} 
+        active={pathname === ROUTES.PROFILE} 
+        onClick={() => router.push(ROUTES.PROFILE)} 
         icon={<CircleUser size={22} />} 
       />
     </nav>

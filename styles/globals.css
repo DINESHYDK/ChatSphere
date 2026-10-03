@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .inputStyle {
-  @apply block w-full rounded-md bg-transparent px-3 py-1.5  text-lg outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm sm:py-2.5 border;
+  @apply block w-full rounded-lg bg-transparent px-3 py-1.5  text-lg outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 sm:text-sm sm:py-2.5 border;
 }
 
 .authSubmitBtn {
@@ -204,4 +204,13 @@
     border-left: 0;
     border-right: 0;
   }
+}
+
+/* Override Chrome/Safari Autofill background and text color */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #e5e7eb !important; /* Soft gray text */
+  -webkit-box-shadow: 0 0 0px 1000px #1A1A1A inset !important; /* Dark input background */
+  transition: background-color 5000s ease-in-out 0s;
 }

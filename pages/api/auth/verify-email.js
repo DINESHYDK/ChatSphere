@@ -20,14 +20,14 @@ export default async function verifyEmail(req, res) {
         return res.status(404).json({ message: "INVALID_REQUEST" });
       }
       const { no_of_requests } = user.email_verification;
-      if (no_of_requests >= 2) {
+      if (no_of_requests >= 5) {
         let { last_updation_time } = user.email_verification;
         if (!VERIFY_API_LIMIT(last_updation_time)) {
           return res.status(429).json({ message: "TOO_MANY_REQUESTS" });
         }
         user.email_verification.no_of_requests = 0;
       }
-      if (resend === "true" && no_of_requests < 2) {
+      if (resend === "true" && no_of_requests < 5) {
         await sendVerifyUserEmail(user.email, user.verifyToken);
       }
       user.email_verification = {
